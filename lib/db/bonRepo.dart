@@ -1,0 +1,48 @@
+part of 'DBservice.dart';
+
+abstract class _BonRepo {
+  Database db;
+  _BonRepo(this.db);
+
+  //////----- Bon data -----
+  ///
+  Future<List<BonData>> getAllBon();
+  Future<List<BonData>> getBonFiltered(Filter filter);
+  Future<int> addBon(BonData data);
+  Future<int> deleteBon(BonData data);
+
+  ///----- end karyawan -----
+}
+
+class BonRepository implements _BonRepo {
+  StoreRef<int, Map<String, Object?>> storeBon =
+      intMapStoreFactory.store('karyawanData');
+  BonRepository({required this.db});
+  @override
+  Database db;
+
+  @override
+  Future<int> addBon(BonData data) {
+    return storeBon.add(db, data.toJson());
+  }
+
+  @override
+  Future<int> deleteBon(BonData data) {
+    return storeBon.delete(db, finder: Finder(filter: Filter.byKey(100990)));
+  }
+
+  @override
+  Future<List<BonData>> getAllBon() {
+    return storeBon.query().getSnapshots(db).then((value) => value
+        .map((e) => BonData.fromJson(e.value).copyWith(idKey: e.key))
+        .toList());
+  }
+
+  @override
+  Future<List<BonData>> getBonFiltered(Filter filter) {
+    return storeBon.query(finder: Finder(filter: filter)).getSnapshots(db).then(
+        (value) => value
+            .map((e) => BonData.fromJson(e.value).copyWith(idKey: e.key))
+            .toList());
+  }
+}

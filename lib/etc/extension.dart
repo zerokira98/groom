@@ -1,0 +1,42 @@
+import 'package:intl/intl.dart';
+
+import 'package:intl/date_symbol_data_local.dart';
+
+NumberFormat numfor = NumberFormat("###,###", 'ID_id');
+
+extension Uppercasing on String {
+  String firstUpcase() {
+    String a = this[0].toUpperCase() + substring(1);
+
+    return a;
+  }
+
+  String? numberFormat({bool? currency}) {
+    int? a = int.tryParse(this);
+    if (a != null) {
+      if (currency == true) {
+        return 'Rp${numfor.format(a)}';
+      }
+      return numfor.format(a);
+    } else {
+      return null;
+      // throw Exception('cant parse to int');
+    }
+    // return this.
+  }
+  // ···
+}
+
+extension TanggalFormat on DateTime {
+  String formatLengkap() {
+    initializeDateFormatting();
+    DateFormat tanggalFormat = DateFormat('EEEE, d MMMM yyyy ', 'ID_id');
+    return tanggalFormat.format(this);
+  }
+
+  String clockOnly() {
+    initializeDateFormatting();
+    DateFormat tanggalFormat = DateFormat.Hm('ID_id');
+    return tanggalFormat.format(this);
+  }
+}
