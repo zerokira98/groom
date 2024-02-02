@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 import 'package:groom/pages/adminapp/admin.dart';
+import 'package:groom/pages/bon/bon_page.dart';
+import 'package:groom/pages/equity/equitypage.dart';
 
 import 'package:groom/pages/rangkuman/cubitharian/rangkumanharian_cubit.dart';
 import 'package:groom/pages/rangkuman/cubitmingguan/rangkumanmingg_cubit.dart';
@@ -38,7 +40,14 @@ class SideDrawer extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                const ListTile(
+                ListTile(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EkuitasPage(),
+                        ));
+                  },
                   title: Text('Pemasukan'),
                 ),
                 ListTile(
@@ -61,8 +70,15 @@ class SideDrawer extends StatelessWidget {
                         ));
                   },
                 ),
-                const ListTile(
-                  title: Text('Pengeluaran'),
+                ListTile(
+                  title: Text('Bon / Piutang'),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BonPage(),
+                        ));
+                  },
                 ),
                 ListTile(
                   title: const Text('Rangkuman'),

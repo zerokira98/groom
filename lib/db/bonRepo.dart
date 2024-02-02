@@ -16,7 +16,7 @@ abstract class _BonRepo {
 
 class BonRepository implements _BonRepo {
   StoreRef<int, Map<String, Object?>> storeBon =
-      intMapStoreFactory.store('karyawanData');
+      intMapStoreFactory.store('bonData');
   BonRepository({required this.db});
   @override
   Database db;
@@ -32,9 +32,11 @@ class BonRepository implements _BonRepo {
   }
 
   @override
-  Future<List<BonData>> getAllBon() {
+  Future<List<BonData>> getAllBon() async {
+    var a = await storeBon.query().getSnapshots(db);
+    print(a);
     return storeBon.query().getSnapshots(db).then((value) => value
-        .map((e) => BonData.fromJson(e.value).copyWith(idKey: e.key))
+        .map((e) => BonData.fromJson(e.value).copyWith(idKey: () => e.key))
         .toList());
   }
 
@@ -42,7 +44,7 @@ class BonRepository implements _BonRepo {
   Future<List<BonData>> getBonFiltered(Filter filter) {
     return storeBon.query(finder: Finder(filter: filter)).getSnapshots(db).then(
         (value) => value
-            .map((e) => BonData.fromJson(e.value).copyWith(idKey: e.key))
+            .map((e) => BonData.fromJson(e.value).copyWith(idKey: () => e.key))
             .toList());
   }
 }

@@ -7,14 +7,14 @@ part of 'bondata_mdl.dart';
 // **************************************************************************
 
 BonData _$BonDataFromJson(Map<String, dynamic> json) => BonData(
-      namaKaryawan: json['namaKaryawan'] as String,
-      idKey: json['idKey'] as int,
-      jumlahBon: json['jumlahBon'] as String,
+      namaSubjek: json['namaSubjek'] as String,
+      jumlahBon: json['jumlahBon'] as int,
       tipe: $enumDecode(_$BonTypeEnumMap, json['tipe']),
+      idKey: json['idKey'] as int?,
     );
 
 Map<String, dynamic> _$BonDataToJson(BonData instance) => <String, dynamic>{
-      'namaKaryawan': instance.namaKaryawan,
+      'namaSubjek': instance.namaSubjek,
       'idKey': instance.idKey,
       'jumlahBon': instance.jumlahBon,
       'tipe': _$BonTypeEnumMap[instance.tipe]!,

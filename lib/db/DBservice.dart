@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+import 'package:groom/model/bondata_mdl.dart';
 import 'package:groom/model/karyawan_mdl.dart';
 import 'package:groom/model/struk_mdl.dart';
 import 'package:path/path.dart';

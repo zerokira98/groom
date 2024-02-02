@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> {
                 );
               }
             }
-            return CircularProgressIndicator.adaptive();
+            return const CircularProgressIndicator.adaptive();
           }),
     );
   }

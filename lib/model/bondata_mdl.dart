@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'package:equatable/equatable.dart';
@@ -8,19 +10,22 @@ part 'bondata_mdl.g.dart';
 class BonData extends Equatable {
   BonData(
       {required this.namaSubjek,
-      required this.idKey,
       required this.jumlahBon,
-      required this.tipe});
+      required this.tipe,
+      this.idKey});
 
   final String namaSubjek;
-  final int idKey;
-  final String jumlahBon;
+  final int? idKey;
+  final int jumlahBon;
   final BonType tipe;
   BonData copyWith(
-      {String? namaSubjek, int? idKey, String? jumlahBon, BonType? tipe}) {
+      {String? namaSubjek,
+      ValueGetter<int?>? idKey,
+      int? jumlahBon,
+      BonType? tipe}) {
     return BonData(
         namaSubjek: namaSubjek ?? this.namaSubjek,
-        idKey: idKey ?? this.idKey,
+        idKey: idKey != null ? idKey() : this.idKey,
         jumlahBon: jumlahBon ?? this.jumlahBon,
         tipe: tipe ?? this.tipe);
   }

@@ -18,11 +18,11 @@ class RangkumanMingguan extends StatelessWidget {
           // if (state.groupBy.index == 0) {
           for (var i = 0; i < state.dataPerPerson.length; i++) {
             var countPrice = 0.0;
-            state.dataPerPerson[i].itemCards.forEach((e) {
+            for (var e in state.dataPerPerson[i].itemCards) {
               print('${e.type} ${e.price}');
               // print(e.price);
               countPrice += e.price;
-            });
+            }
             perpersonTotal.add(countPrice);
             // }
           }
@@ -82,11 +82,11 @@ class RangkumanMingguan extends StatelessWidget {
                   for (var ew in state.daily[index + 1].values.first) {
                     totalHarian += ew.totalPendapatan;
                   }
-                  var separatorStyle = TextStyle(color: Colors.white);
+                  var separatorStyle = const TextStyle(color: Colors.white);
                   return Column(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                             gradient: LinearGradient(colors: [
                           Theme.of(context).primaryColorDark,
@@ -143,8 +143,8 @@ class RangkumanMingguan extends StatelessWidget {
                     subtitle: Row(
                       children: [
                         Text(perpersonTotal[index].toString()),
-                        Expanded(child: SizedBox()),
-                        Text('Expected payment: '),
+                        const Expanded(child: SizedBox()),
+                        const Text('Expected payment: '),
                         Text(tot
                                 .toInt()
                                 .toString()
@@ -195,8 +195,7 @@ class RangkumanMingguan extends StatelessWidget {
                                           awo.price.toString(),
                                           textAlign: TextAlign.end,
                                         ),
-                                        Text(' ' +
-                                            cutPercentage(awo.type).toString()),
+                                        Text(' ${cutPercentage(awo.type)}'),
                                         Text(
                                           (awo.price * cutPercentage(awo.type))
                                               .toString(),
@@ -210,8 +209,8 @@ class RangkumanMingguan extends StatelessWidget {
                                       const EdgeInsets.symmetric(vertical: 8.0),
                                   child: Row(
                                     children: [
-                                      Text('Expected payment: '),
-                                      Expanded(child: SizedBox()),
+                                      const Text('Expected payment: '),
+                                      const Expanded(child: SizedBox()),
                                       Text(
                                           ' ${tot.toInt().toString().numberFormat(currency: true)}'),
                                     ],
