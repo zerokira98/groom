@@ -14,21 +14,39 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
   InputserviceBloc({required this.strukrepo, required this.karyawanrepo})
       : super(InputserviceInitial()) {
     on<Initiate>((event, emit) async {
-      var a = await karyawanrepo.getAllKaryawan();
-      emit(InputserviceLoaded(
-          karyawanName: a.first.namaKaryawan, itemCards: const []));
+      if (state is InputserviceLoaded) {
+        var theState = state as InputserviceLoaded;
+        emit(InputserviceLoaded(
+            tipePembayaran: TipePembayaran.cash,
+            karyawanName: theState.karyawanName,
+            itemCards: const [],
+            tanggal: DateTime.now()));
+      } else {
+        var a = await karyawanrepo.getAllKaryawan();
+        emit(InputserviceLoaded(
+            tipePembayaran: TipePembayaran.cash,
+            karyawanName: a.first.namaKaryawan,
+            itemCards: const [],
+            tanggal: DateTime.now()));
+      }
     });
     on<SubmitToDB>((event, emit) async {
       var theState = (state as InputserviceLoaded);
       var a = StrukMdl(
+          tipePembayaran: theState.tipePembayaran,
           namaKaryawan: theState.karyawanName,
-          tanggal: DateTime.now(),
+          tanggal: theState.tanggal.day == DateTime.now().day
+              ? DateTime.now()
+              : theState.tanggal,
           itemCards: theState.itemCards);
-      print('here');
+
       try {
         var x = await strukrepo.insertStruk(a);
-        print(x);
+
+        // print(x);
         emit(InputserviceLoaded(
+            tipePembayaran: TipePembayaran.cash,
+            tanggal: DateTime.now(),
             karyawanName: theState.karyawanName,
             itemCards: const [],
             success: 'input success'));
@@ -89,11 +107,23 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
                   : e)
               .toList()));
     });
+    on<ChangeTipePembayaran>((event, emit) {
+      // var theState = (state as InputserviceLoaded);
+      if (state is InputserviceLoaded) {
+        emit((state as InputserviceLoaded).copyWith(
+          tipePembayaran: event.type,
+        ));
+      }
+    });
     on<ChangeKaryawan>((event, emit) {
       if (state is InputserviceLoaded) {
-        print('was hereas');
         emit((state as InputserviceLoaded)
             .copyWith(karyawanName: event.karyawanName));
+      }
+    });
+    on<ChangeTanggal>((event, emit) {
+      if (state is InputserviceLoaded) {
+        emit((state as InputserviceLoaded).copyWith(tanggal: event.tanggal));
       }
     });
   }

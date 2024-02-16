@@ -17,6 +17,7 @@ abstract class _PemasukanRepo {
 class PemasukanRepository implements _PemasukanRepo {
   PemasukanRepository({required this.db});
   var storePemasukan = intMapStoreFactory.store('strukPemasukan');
+  var storeLainnya = intMapStoreFactory.store('storeLainnya');
   var storePemasukanDeleted = intMapStoreFactory.store('strukPemasukanDeleted');
   @override
   Database db;
@@ -36,6 +37,18 @@ class PemasukanRepository implements _PemasukanRepo {
     }
   }
 
+  Future<List<String>> getAllLainnya(String? query) {
+    return storeLainnya
+        .query(
+            finder: Finder(
+                filter: Filter.matchesRegExp(
+                    'namaBarang', RegExp(query ?? '', caseSensitive: false))))
+        .getSnapshots(db)
+        .then((value) => value
+            .map((e) => ItemCardMdl.fromJson(e.value).namaBarang)
+            .toList());
+  }
+
   @override
   Future<List<StrukMdl>> getAllStruk() {
     // var store = intMapStoreFactory.store('strukPemasukan');
@@ -47,7 +60,6 @@ class PemasukanRepository implements _PemasukanRepo {
         ]))
         .getSnapshots(db)
         .then((value) {
-      print(value);
       if (value.isNotEmpty) {
         return value
             .map((e) => StrukMdl.fromJson(e.value).copyWith(id: () => e.key))
@@ -67,16 +79,17 @@ class PemasukanRepository implements _PemasukanRepo {
     // var startTimestamp = Timestamp.fromDateTime(aye);
     var startTimestamp =
         Timestamp.fromDateTime(DateTime(ts.year, ts.month, ts.day));
-    var endTimestamp = Timestamp.fromDateTime(
-        DateTime(te.year, te.month, te.day).add(const Duration(minutes: 1439)));
+    var endTimestamp =
+        Timestamp.fromDateTime(DateTime(te.year, te.month, te.day));
 
     return storePemasukan
         .query(
           finder: Finder(
               filter: Filter.and([
-            Filter.greaterThanOrEquals('tanggal', startTimestamp),
-            Filter.lessThanOrEquals('tanggal', endTimestamp),
-          ])),
+                Filter.greaterThanOrEquals('tanggal', startTimestamp),
+                Filter.lessThan('tanggal', endTimestamp),
+              ]),
+              sortOrders: [SortOrder('tanggal')]),
         )
         .getSnapshots(db)
         .then((value) => value
@@ -88,6 +101,11 @@ class PemasukanRepository implements _PemasukanRepo {
   Future<int> insertStruk(StrukMdl data) async {
     // var store = intMapStoreFactory.store('strukPemasukan');
     try {
+      for (ItemCardMdl ew in data.itemCards) {
+        if (ew.type == cardType.length - 1) {
+          await storeLainnya.add(db, ew.toJson());
+        }
+      }
       return await storePemasukan.add(db, data.toJson());
       // return await db.transaction((tx) async {
       // });

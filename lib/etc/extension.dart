@@ -6,9 +6,12 @@ NumberFormat numfor = NumberFormat("###,###", 'ID_id');
 
 extension Uppercasing on String {
   String firstUpcase() {
-    String a = this[0].toUpperCase() + substring(1);
+    if (isNotEmpty) {
+      String a = this[0].toUpperCase() + substring(1);
 
-    return a;
+      return a;
+    }
+    return this;
   }
 
   String? numberFormat({bool? currency}) {
@@ -34,9 +37,29 @@ extension TanggalFormat on DateTime {
     return tanggalFormat.format(this);
   }
 
+  String formatDayMonth() {
+    initializeDateFormatting();
+    DateFormat tanggalFormat = DateFormat('d MMM', 'ID_id');
+    return tanggalFormat.format(this);
+  }
+
   String clockOnly() {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat.Hm('ID_id');
     return tanggalFormat.format(this);
+  }
+}
+
+extension Formatnum on num {
+  String numberFormat({bool? currency}) {
+    try {
+      if (currency == true) {
+        return 'Rp${numfor.format(this)}';
+      }
+      return numfor.format(this);
+    } catch (e) {
+      return 'parse err$e';
+    }
+    // return this.
   }
 }

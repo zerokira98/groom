@@ -33,11 +33,29 @@ class BonRepository implements _BonRepo {
 
   @override
   Future<List<BonData>> getAllBon() async {
-    var a = await storeBon.query().getSnapshots(db);
-    print(a);
     return storeBon.query().getSnapshots(db).then((value) => value
         .map((e) => BonData.fromJson(e.value).copyWith(idKey: () => e.key))
         .toList());
+  }
+
+  Future<List<BonData>> getByNama({required String nama, DateTime? tgl}) async {
+    var fil = [Filter.equals('namaSubjek', nama)];
+    if (tgl != null) {
+      var sd = Timestamp.fromDateTime(DateUtils.dateOnly(tgl));
+      var ed = Timestamp.fromDateTime(
+          DateUtils.dateOnly(tgl).add(Duration(days: 1)));
+      fil.add(Filter.greaterThanOrEquals('tanggal', sd));
+      fil.add(Filter.lessThan('tanggal', ed));
+      fil.add(Filter.equals('tipe', 'berhutang'));
+    }
+    return storeBon
+        .query(finder: Finder(filter: Filter.and(fil)))
+        .getSnapshots(db)
+        .then((value) => value
+            .map((e) => BonData.fromJson(e.value).copyWith(
+                  idKey: () => e.key,
+                ))
+            .toList());
   }
 
   @override

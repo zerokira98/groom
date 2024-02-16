@@ -10,11 +10,13 @@ KaryawanData _$KaryawanDataFromJson(Map<String, dynamic> json) => KaryawanData(
       id: json['id'] as int,
       namaKaryawan: json['namaKaryawan'] as String,
       aktif: json['aktif'] as bool,
+      password: json['password'] as String?,
     );
 
 Map<String, dynamic> _$KaryawanDataToJson(KaryawanData instance) =>
     <String, dynamic>{
       'id': instance.id,
       'namaKaryawan': instance.namaKaryawan,
+      'password': instance.password,
       'aktif': instance.aktif,
     };

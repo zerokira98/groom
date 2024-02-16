@@ -1,10 +1,11 @@
+import 'package:formz/formz.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 
 part 'itemcard_mdl.g.dart';
 
 @JsonSerializable()
-class ItemCardMdl extends Equatable {
+class ItemCardMdl extends Equatable with FormzMixin {
   final int index;
   final int type;
   final int pcsBarang;
@@ -41,6 +42,15 @@ class ItemCardMdl extends Equatable {
   String toString() {
     return 'ItemCardMdl{index=$index, type=$type, pcsBarang=$pcsBarang, namaBarang=$namaBarang, price=$price}';
   }
+
+  @override
+  List<FormzInput> get inputs => [];
 }
 
-List cardType = ['Haircut', 'Shave', 'Coloring', 'Goods'];
+List cardType = [
+  'Haircut(rambut)',
+  'Shave(kumis,jenggot)',
+  'Semir',
+  'Barang',
+  'Lainnya'
+];

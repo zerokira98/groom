@@ -40,6 +40,11 @@ class KaryawanRepository implements _KaryawanRepo {
             Finder(filter: Filter.equals('namaKaryawan', data.namaKaryawan)));
   }
 
+  Future<int> update(KaryawanData data) {
+    return storeKaryawan.update(db, data.toJson(),
+        finder: Finder(filter: Filter.byKey(data.id)));
+  }
+
   @override
   Future<List<KaryawanData>> getAllKaryawan() {
     // var store = intMapStoreFactory.store('karyawanData');

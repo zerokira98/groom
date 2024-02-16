@@ -13,7 +13,6 @@ class RemoveCard extends InputserviceEvent {
 }
 
 class SubmitToDB extends InputserviceEvent {
-  // final ItemCardMdl data;
   SubmitToDB();
 }
 
@@ -21,6 +20,11 @@ class ChangeItemType extends InputserviceEvent {
   final int idx;
   final int type;
   ChangeItemType({required this.idx, required this.type});
+}
+
+class ChangeTipePembayaran extends InputserviceEvent {
+  final TipePembayaran type;
+  ChangeTipePembayaran({required this.type});
 }
 
 class ChangeItemDetails extends InputserviceEvent {
@@ -38,4 +42,9 @@ class ChangePrice extends InputserviceEvent {
 class ChangeKaryawan extends InputserviceEvent {
   final String karyawanName;
   ChangeKaryawan(this.karyawanName);
+}
+
+class ChangeTanggal extends InputserviceEvent {
+  final DateTime tanggal;
+  ChangeTanggal(this.tanggal);
 }
