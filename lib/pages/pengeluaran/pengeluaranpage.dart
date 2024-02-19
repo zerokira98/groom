@@ -2,7 +2,8 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
-import 'package:groom/model/pengeluaran_mdl.dart';
+import 'package:groom/model/model.dart';
+import 'package:groom/pages/barang/barangpage.dart';
 import 'package:intl/intl.dart';
 
 import '../adminapp/rangkuman/rangkuman.dart';
@@ -19,6 +20,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
 
   final formKey = GlobalKey<FormState>();
   TextEditingController tanggal = TextEditingController();
+  TextEditingController uangController = TextEditingController();
   TextEditingController deskripsi = TextEditingController();
   TextEditingController pcs = TextEditingController(text: '1');
   var uangFormatter = CurrencyTextInputFormatter(
@@ -64,7 +66,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                             value: TipePengeluaran.barangjual,
                             child: Text('Barang Jual')),
                         DropdownMenuItem(
-                            value: TipePengeluaran.dividen,
+                            value: TipePengeluaran.uang,
                             child: Text('Dividen')),
                       ],
                       onChanged: (value) {
@@ -82,8 +84,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                         'PLN, peralatan & perlengkapan, dll.',
                       TipePengeluaran.barangjual =>
                         'Input barang untuk dijual, masukkan nilai pembelian.',
-                      TipePengeluaran.dividen =>
-                        '"Penghasilan" untuk pemilik jasa.',
+                      TipePengeluaran.uang => 'uang.',
                     }),
                     if (typeValue.index == 0)
                       TextButton(
@@ -159,8 +160,14 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                               children: [
                                 Expanded(
                                     child: Autocomplete(
-                                  onSelected: (option) =>
-                                      deskripsi.text = option,
+                                  onSelected: (option) async {
+                                    deskripsi.text = option;
+                                    var a = await RepositoryProvider.of<
+                                            BarangRepository>(context)
+                                        .find(option);
+                                    uangController.text = uangFormatter
+                                        .format(a.first.hargabeli.toString());
+                                  },
                                   optionsBuilder: (textEditingValue) async {
                                     if (textEditingValue.text == '') {
                                       return const Iterable<String>.empty();
@@ -194,7 +201,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                       0 => 'Nama Karyawan',
                                       1 => 'Deskripsi pengeluaran',
                                       2 => 'Nama Barang',
-                                      3 => 'Alasan',
+                                      3 => 'Deskripsi',
                                       int() => ''
                                     })),
                                   ),
@@ -206,6 +213,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                 Expanded(
                                     flex: 2,
                                     child: TextFormField(
+                                      controller: uangController,
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,
                                       validator: (value) {
@@ -283,8 +291,45 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                 .parseStrict(tanggal.text),
                             namaPengeluaran: deskripsi.text,
                             pcs: int.parse(pcs.text),
-                            biaya: uangFormatter.getUnformattedValue()));
-                    Navigator.pop(context);
+                            biaya: uangFormatter.getUnformattedValue()))
+                        .then((value) async {
+                      if (value != -1) {
+                        if (typeValue == TipePengeluaran.barangjual) {
+                          var find =
+                              await RepositoryProvider.of<BarangRepository>(
+                                      context)
+                                  .find(deskripsi.text);
+                          if (find.isEmpty) {
+                            RepositoryProvider.of<BarangRepository>(context)
+                                .add(BarangMdl(
+                                    namaBarang: deskripsi.text,
+                                    pcs: int.parse(pcs.text),
+                                    hargabeli:
+                                        uangFormatter.getUnformattedValue(),
+                                    hargajual: 0))
+                                .then((value) => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const BarangPage(),
+                                    )));
+                          } else {
+                            RepositoryProvider.of<BarangRepository>(context)
+                                .edit(find.first.copyWith(
+                                    pcs: find.first.pcs + int.parse(pcs.text),
+                                    hargabeli:
+                                        uangFormatter.getUnformattedValue()))
+                                .then((value) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const BarangPage(),
+                                  ));
+                            });
+                          }
+                        }
+                        setState(() {});
+                      } else {}
+                    });
                   } catch (e) {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text(e.toString())));

@@ -8,8 +8,7 @@ import 'package:groom/pages/home/drawer.dart';
 import 'package:groom/etc/extension.dart';
 
 import 'package:groom/pages/home/itemcard.dart';
-import 'package:groom/model/itemcard_mdl.dart';
-import 'package:groom/model/struk_mdl.dart';
+import 'package:groom/model/model.dart';
 import 'package:groom/pages/home/riwayat_pemasukan.dart';
 import 'package:intl/intl.dart';
 
@@ -61,7 +60,9 @@ class Home extends StatelessWidget {
                     total += element.price * (element.pcsBarang);
                   }
                   return Text(
-                      'Total : ${total.toString().numberFormat(currency: true)}');
+                    'Total : ${total.toString().numberFormat(currency: true)}',
+                    textScaler: TextScaler.linear(1.5),
+                  );
                 } else {
                   return const SizedBox();
                 }
@@ -326,12 +327,15 @@ class FloatingButton extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text('Total :'),
-                                    Text(totalpembayaran
-                                            .toInt()
-                                            .toString()
-                                            .numberFormat(currency: true) ??
-                                        'parse err'),
+                                    const Text(
+                                      'Total :',
+                                      textScaler: TextScaler.linear(1.25),
+                                    ),
+                                    Text(
+                                      totalpembayaran.numberFormat(
+                                          currency: true),
+                                      textScaler: TextScaler.linear(1.25),
+                                    ),
                                   ],
                                 ),
                                 BlocBuilder<InputserviceBloc,

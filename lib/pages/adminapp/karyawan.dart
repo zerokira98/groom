@@ -2,7 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
-import 'package:groom/model/karyawan_mdl.dart';
+import 'package:groom/model/model.dart';
 
 class KaryawanConfig extends StatefulWidget {
   const KaryawanConfig({super.key});

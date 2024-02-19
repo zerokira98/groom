@@ -1,5 +1,5 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
@@ -31,7 +31,7 @@ class _SideDrawerState extends State<SideDrawer> {
             children: [
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.only(top: 14, bottom: 4),
+                  padding: const EdgeInsets.only(top: 14, bottom: 4),
                   color: Colors.white,
                   height: 240,
                   child: Image.asset(
@@ -141,7 +141,7 @@ class _SideDrawerState extends State<SideDrawer> {
                 //         ));
                 //   },
                 // ),
-                Padding(padding: EdgeInsets.all(4)),
+                const Padding(padding: EdgeInsets.all(4)),
                 ListTile(
                   title: const Text('Riwayat Pemasukan'),
                   onTap: () {
@@ -166,23 +166,31 @@ class _SideDrawerState extends State<SideDrawer> {
                           (element) => element.namaKaryawan == name,
                         )
                         .password;
-                    showDialog<bool?>(
-                      context: context,
-                      builder: (context) => KeyLock(
-                        tendigits: pass ?? '000',
-                        title: 'Karyawan: $name',
-                      ),
-                    ).then((value) {
-                      if (value != null && value) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PengeluaranHome(),
-                            ));
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    });
+                    if (pass != null) {
+                      showDialog<bool?>(
+                        context: context,
+                        builder: (context) => KeyLock(
+                          tendigits: pass,
+                          title: 'Karyawan: $name',
+                        ),
+                      ).then((value) {
+                        if (value != null && value) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PengeluaranHome(),
+                              ));
+                        } else {
+                          // Navigator.pop(context);
+                        }
+                      });
+                    } else {
+                      Flushbar(
+                        message: 'no password is set',
+                        duration: const Duration(seconds: 3),
+                        animationDuration: Durations.long1,
+                      ).show(context);
+                    }
                   },
                 ),
                 ListTile(
@@ -199,24 +207,32 @@ class _SideDrawerState extends State<SideDrawer> {
                           (element) => element.namaKaryawan == name,
                         )
                         .password;
-                    showDialog<bool?>(
-                      context: context,
-                      builder: (context) => KeyLock(
-                        tendigits: pass ?? '000',
-                        title: 'Karyawan: $name',
-                      ),
-                    ).then((value) {
-                      if (value != null && value) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  HutangHome(namaKaryawan: name),
-                            ));
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    });
+                    if (pass != null) {
+                      showDialog<bool?>(
+                        context: context,
+                        builder: (context) => KeyLock(
+                          tendigits: pass,
+                          title: 'Karyawan: $name',
+                        ),
+                      ).then((value) {
+                        if (value != null && value) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    HutangHome(namaKaryawan: name),
+                              ));
+                        } else {
+                          // Navigator.pop(context);
+                        }
+                      });
+                    } else {
+                      Flushbar(
+                        message: 'no password is set',
+                        duration: const Duration(seconds: 3),
+                        animationDuration: Durations.long1,
+                      ).show(context);
+                    }
                   },
                 ),
                 ListTile(
@@ -228,28 +244,7 @@ class _SideDrawerState extends State<SideDrawer> {
                     bool dia = await showDialog<bool>(
                           context: context,
                           builder: (context) {
-                            Widget child = ScreenLock(
-                              correctString: '12340',
-                              inputController: ic,
-                              onCancelled: () =>
-                                  Navigator.of(context).pop(false),
-                              onUnlocked: () => Navigator.of(context).pop(true),
-                            );
-                            return KeyboardListener(
-                              focusNode: focusNode,
-                              onKeyEvent: (key) {
-                                if (key is! KeyDownEvent) return;
-                                // if (ic.inputStrings
-                                //     .contains(key.character)) {
-                                if (key.logicalKey ==
-                                    LogicalKeyboardKey.backspace) {
-                                  ic.removeCharacter();
-                                  return;
-                                }
-                                ic.addCharacter(key.character!);
-                              },
-                              child: child,
-                            );
+                            return KeyLock(tendigits: '12340', title: 'Admin');
                           },
                         ) ??
                         false;

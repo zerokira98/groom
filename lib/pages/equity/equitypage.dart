@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 import 'package:groom/etc/extension.dart';
-import 'package:groom/model/bondata_mdl.dart';
-import 'package:groom/model/ekuitas_mdl.dart';
-import 'package:groom/model/struk_mdl.dart';
+import 'package:groom/model/model.dart';
 
 class EkuitasPage extends StatefulWidget {
   const EkuitasPage({super.key});
@@ -66,7 +64,7 @@ class _EkuitasPageState extends State<EkuitasPage> {
                   }),
             ),
           ),
-          const ReportCard(),
+          // const ReportCard(),
           InputCard()
         ],
       ),
@@ -163,99 +161,101 @@ class _ReportCardState extends State<ReportCard> {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.refresh_sharp))
+                ///total ekuitas
+                FutureBuilder(
+                  future: RepositoryProvider.of<EkuitasRepository>(context)
+                      .getAll(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      totalekuitas = 0;
+                      for (var e in snapshot.data!) {
+                        totalekuitas += e.uang;
+                      }
+                      return Text(
+                          'Total Uang Masuk: ${totalekuitas.toInt().toString().numberFormat(currency: true)}');
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                ),
+
+                ///Struk income
+                FutureBuilder(
+                  future: RepositoryProvider.of<PemasukanRepository>(context)
+                      .getAllStruk(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      totalpemasukan = 0;
+                      num totalqris = 0;
+                      for (var e in snapshot.data!) {
+                        for (var a in e.itemCards) {
+                          totalpemasukan += a.pcsBarang * a.price;
+                          totalqris += e.tipePembayaran == TipePembayaran.qris
+                              ? a.pcsBarang * a.price
+                              : 0;
+                        }
+                      }
+                      return Text(
+                          'Total All Income : ${totalpemasukan.toInt().toString().numberFormat(currency: true)}');
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                ),
+
+                ///Pengeluaran
+                FutureBuilder(
+                  future: RepositoryProvider.of<PengeluaranRepository>(context)
+                      .getAll(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      totalPengeluaran = 0;
+                      for (var e in snapshot.data!) {
+                        totalPengeluaran += e.pcs * e.biaya;
+                      }
+                      return Text(
+                          'Pengeluaran All tanpaBon : ${totalPengeluaran.toInt().toString().numberFormat(currency: true)}');
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                ),
+
+                ///Bon
+                FutureBuilder(
+                  future:
+                      RepositoryProvider.of<BonRepository>(context).getAllBon(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      totalbon = 0;
+                      for (var e in snapshot.data!) {
+                        totalbon += e.jumlahBon *
+                            (e.tipe == BonType.berhutang ? -1 : 1);
+                      }
+
+                      return Text(
+                          'Pengeluaran Bon : ${totalbon.toInt().toString().numberFormat(currency: true)}');
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                ),
+                Text(
+                    'Total kas sekarang : ${(totalekuitas + totalpemasukan - totalPengeluaran + totalbon).toInt().toString().numberFormat(currency: true)}')
               ],
             ),
-
-            ///total ekuitas
-            FutureBuilder(
-              future:
-                  RepositoryProvider.of<EkuitasRepository>(context).getAll(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  totalekuitas = 0;
-                  for (var e in snapshot.data!) {
-                    totalekuitas += e.uang;
-                  }
-                  return Text(
-                      'Total Uang Masuk: ${totalekuitas.toInt().toString().numberFormat(currency: true)}');
-                } else {
-                  return const SizedBox();
-                }
-              },
-            ),
-
-            ///Struk income
-            FutureBuilder(
-              future: RepositoryProvider.of<PemasukanRepository>(context)
-                  .getAllStruk(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  totalpemasukan = 0;
-                  num totalqris = 0;
-                  for (var e in snapshot.data!) {
-                    for (var a in e.itemCards) {
-                      totalpemasukan += a.pcsBarang * a.price;
-                      totalqris += e.tipePembayaran == TipePembayaran.qris
-                          ? a.pcsBarang * a.price
-                          : 0;
-                    }
-                  }
-                  return Text(
-                      'Total All Income : ${totalpemasukan.toInt().toString().numberFormat(currency: true)}');
-                } else {
-                  return const SizedBox();
-                }
-              },
-            ),
-
-            ///Pengeluaran
-            FutureBuilder(
-              future: RepositoryProvider.of<PengeluaranRepository>(context)
-                  .getAll(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  totalPengeluaran = 0;
-                  for (var e in snapshot.data!) {
-                    totalPengeluaran += e.pcs * e.biaya;
-                  }
-                  return Text(
-                      'Pengeluaran All tanpaBon : ${totalPengeluaran.toInt().toString().numberFormat(currency: true)}');
-                } else {
-                  return const SizedBox();
-                }
-              },
-            ),
-
-            ///Bon
-            FutureBuilder(
-              future: RepositoryProvider.of<BonRepository>(context).getAllBon(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  totalbon = 0;
-                  for (var e in snapshot.data!) {
-                    totalbon +=
-                        e.jumlahBon * (e.tipe == BonType.berhutang ? -1 : 1);
-                  }
-
-                  return Text(
-                      'Pengeluaran Bon : ${totalbon.toInt().toString().numberFormat(currency: true)}');
-                } else {
-                  return const SizedBox();
-                }
-              },
-            ),
-            Text(
-                'Total kas sekarang : ${(totalekuitas + totalpemasukan - totalPengeluaran + totalbon).toInt().toString().numberFormat(currency: true)}')
+            IconButton(
+                onPressed: () {
+                  setState(() {});
+                },
+                icon: const Icon(Icons.refresh_sharp)),
           ],
         ),
       ),

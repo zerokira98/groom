@@ -1,0 +1,9 @@
+export 'barang_mdl.dart';
+export 'bondata_mdl.dart';
+export 'ekuitas_mdl.dart';
+export 'itemcard_mdl.dart';
+export 'karyawan_mdl.dart';
+export 'pelanggan_mdl.dart';
+export 'pengeluaran_mdl.dart';
+export 'struk_mdl.dart';
+export 'perperson.dart';

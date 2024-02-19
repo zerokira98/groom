@@ -7,13 +7,13 @@ part 'ekuitas_mdl.g.dart';
 
 @JsonSerializable()
 class EkuitasMdl extends Equatable {
-  EkuitasMdl(
+  const EkuitasMdl(
       {required this.tanggal,
       required this.uang,
       required this.deskripsi,
       this.id});
 
-  int? id;
+  final int? id;
   @TimestampConverter()
   final DateTime tanggal;
   final num uang;

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 import 'package:groom/etc/extension.dart';
-import 'package:groom/model/pengeluaran_mdl.dart';
+import 'package:groom/model/model.dart';
 
 class PengeluaranHome extends StatefulWidget {
   const PengeluaranHome({super.key});
@@ -48,8 +48,7 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
                           ],
                         ),
                         subtitle: Text(snapshot.data![index].biaya
-                                .numberFormat(currency: true) ??
-                            'err parse'),
+                            .numberFormat(currency: true)),
                       );
                     });
               }
@@ -57,6 +56,7 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
             },
           )),
           Card(
+            elevation: 2,
             margin: const EdgeInsets.all(8),
             child: Padding(
               padding: const EdgeInsets.all(8.0),

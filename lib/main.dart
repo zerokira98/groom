@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/DBservice.dart';
-import 'package:groom/pages/adminapp/rangkuman/cubitbulanan/bulanan_cubit.dart';
-import 'package:groom/pages/adminapp/rangkuman/cubitharian/rangkumanharian_cubit.dart';
-import 'package:groom/pages/adminapp/rangkuman/cubitmingguan/rangkumanmingg_cubit.dart';
+import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
 import 'package:groom/pages/home/home.dart';
 
 import 'package:groom/pages/firstrun_setup.dart';
@@ -23,6 +21,7 @@ void main() async {
       RepositoryProvider(create: (context) => KaryawanRepository(db: db)),
       RepositoryProvider(create: (context) => EkuitasRepository(db2)),
       RepositoryProvider(create: (context) => BonRepository(db: db2)),
+      RepositoryProvider(create: (context) => BarangRepository(db: db2)),
     ], child: const MyApp()),
   );
 }

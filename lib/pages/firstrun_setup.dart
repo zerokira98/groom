@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 import 'package:groom/main.dart';
-import 'package:groom/model/karyawan_mdl.dart';
+import 'package:groom/model/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FirstRun extends StatelessWidget {

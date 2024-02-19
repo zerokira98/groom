@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 import 'package:groom/etc/extension.dart';
-import 'package:groom/model/bondata_mdl.dart';
+import 'package:groom/model/model.dart';
 
 class HutangHome extends StatefulWidget {
   const HutangHome({super.key, required this.namaKaryawan});

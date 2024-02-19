@@ -58,4 +58,4 @@ class PengeluaranMdl extends Equatable {
   }
 }
 
-enum TipePengeluaran { gaji, operasional, barangjual, dividen }
+enum TipePengeluaran { gaji, operasional, barangjual, uang }

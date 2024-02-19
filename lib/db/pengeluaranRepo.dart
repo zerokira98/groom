@@ -135,22 +135,30 @@ class PengeluaranRepository implements _PengeluaranRepo {
     Timestamp? start = starts == null
         ? null
         : Timestamp.fromDateTime(DateUtils.dateOnly(starts));
-    Timestamp? end =
-        ends == null ? null : Timestamp.fromDateTime(DateUtils.dateOnly(ends));
-    List<Filter> filters = [Filter.equals('tipePengeluaran', tipe?.name)];
-    if (starts != null && ends != null) {
+    Timestamp? end = ends == null
+        ? starts == null
+            ? null
+            : Timestamp.fromDateTime(
+                DateUtils.dateOnly(starts.add(Duration(days: 1))))
+        : Timestamp.fromDateTime(DateUtils.dateOnly(ends));
+    List<Filter> filters = [];
+    if (tipe != null) {
+      filters.add(Filter.equals('tipePengeluaran', tipe.name));
+    }
+    if (starts != null) {
       filters.add(Filter.greaterThanOrEquals('tanggal', start));
-      filters.add(Filter.lessThan('tanggal', end));
+      if (ends != null) {
+        filters.add(Filter.lessThan('tanggal', end));
+      } else {
+        filters.add(Filter.lessThan('tanggal', end));
+      }
     }
 
     return storePengeluaran
         .query(
-          finder: (tipe != null)
-              ? Finder(
-                  filter: Filter.and(filters),
-                  sortOrders: [SortOrder('tanggal')])
-              : Finder(sortOrders: [SortOrder('tanggal')]),
-        )
+            finder: Finder(
+                filter: Filter.and(filters),
+                sortOrders: [SortOrder('tanggal')]))
         .getSnapshots(db)
         .then((value) => value
             .map((e) =>

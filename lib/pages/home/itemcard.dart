@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 
-import 'package:groom/model/itemcard_mdl.dart';
+import 'package:groom/model/model.dart';
 
 class ItemCard extends StatelessWidget {
   final ItemCardMdl data;
@@ -184,10 +184,24 @@ class ItemCardColoring extends StatelessWidget {
   }
 }
 
-class ItemCardGoods extends StatelessWidget {
+class ItemCardGoods extends StatefulWidget {
   ItemCardGoods(this.data, {super.key});
   final ItemCardMdl data;
+
+  @override
+  State<ItemCardGoods> createState() => _ItemCardGoodsState();
+}
+
+class _ItemCardGoodsState extends State<ItemCardGoods> {
+  final TextEditingController priceController = TextEditingController();
+
   final TextEditingController tc = TextEditingController();
+  @override
+  void initState() {
+    priceController.text = widget.data.price.toString();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -208,31 +222,43 @@ class ItemCardGoods extends StatelessWidget {
                   onChanged: (value) {
                     BlocProvider.of<InputserviceBloc>(context).add(
                         ChangeItemDetails(
-                            idx: data.index,
-                            data: data.copyWith(namaBarang: value)));
+                            idx: widget.data.index,
+                            data: widget.data.copyWith(namaBarang: value)));
                   },
                   decoration: const InputDecoration(label: Text('Nama Barang')),
                 ),
-                onSelected: (option) {},
+                onSelected: (option) async {
+                  await RepositoryProvider.of<BarangRepository>(context)
+                      .find(option)
+                      .then((value) {
+                    if (value.isNotEmpty) {
+                      print(value.first);
+                      setState(() {
+                        priceController.text = value.first.hargajual.toString();
+                      });
+                      BlocProvider.of<InputserviceBloc>(context).add(
+                          ChangeItemDetails(
+                              idx: widget.data.index,
+                              data: widget.data.copyWith(
+                                  namaBarang: value.first.namaBarang,
+                                  price: value.first.hargajual.toInt())));
+                    }
+                  });
+                },
                 optionsBuilder: (textEditingValue) async {
                   if (textEditingValue.text == '') {
                     return const Iterable<String>.empty();
                   }
-                  var aa = await RepositoryProvider.of<PengeluaranRepository>(
+                  var aa = await RepositoryProvider.of<BarangRepository>(
                           context)
-                      .getNamaBarang(textEditingValue.text);
+                      .getAll()
+                      .then((value) => value.map((e) => e.namaBarang).toList());
+                  // await RepositoryProvider.of<PengeluaranRepository>(
+                  //         context)
+                  //     .getNamaBarang(textEditingValue.text);
                   return aa;
                 },
               ),
-              //     TextField(
-              //   onChanged: (value) {
-              //     BlocProvider.of<InputserviceBloc>(context).add(
-              //         ChangeItemDetails(
-              //             idx: data.index,
-              //             data: data.copyWith(namaBarang: value)));
-              //   },
-              //   decoration: InputDecoration(label: Text('Nama Barang')),
-              // )
             ),
           ],
         ),
@@ -251,12 +277,12 @@ class ItemCardGoods extends StatelessWidget {
                           value: index + 1,
                           child: Text('${index + 1}'),
                         )),
-                value: data.pcsBarang,
+                value: widget.data.pcsBarang,
                 onChanged: (value) {
                   BlocProvider.of<InputserviceBloc>(context).add(
                       ChangeItemDetails(
-                          idx: data.index,
-                          data: data.copyWith(pcsBarang: value ?? 1)));
+                          idx: widget.data.index,
+                          data: widget.data.copyWith(pcsBarang: value ?? 1)));
                 },
               ),
             ),
@@ -268,13 +294,14 @@ class ItemCardGoods extends StatelessWidget {
                   const Text('Harga per pcs : '),
                   Expanded(
                       child: TextField(
+                    controller: priceController,
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       BlocProvider.of<InputserviceBloc>(context).add(
                           ChangeItemDetails(
-                              idx: data.index,
-                              data: data.copyWith(
-                                  price: int.tryParse(value) ?? 0)));
+                              idx: widget.data.index,
+                              data: widget.data
+                                  .copyWith(price: int.tryParse(value) ?? 0)));
                     },
                   )),
                 ],
@@ -285,7 +312,7 @@ class ItemCardGoods extends StatelessWidget {
         Row(
           children: [
             const Text('Total Harga : '),
-            Text('${data.price * (data.pcsBarang)}'),
+            Text('${widget.data.price * (widget.data.pcsBarang)}'),
           ],
         )
       ],

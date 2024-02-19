@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 import 'package:groom/etc/extension.dart';
-import 'package:groom/model/bondata_mdl.dart';
-import 'package:groom/model/itemcard_mdl.dart';
-import 'package:groom/model/pengeluaran_mdl.dart';
-import 'package:groom/model/perperson.dart';
-import 'package:groom/model/struk_mdl.dart';
+import 'package:groom/model/model.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:groom/pages/print/print_to_excel.dart';
 import 'package:sembast/sembast.dart';
@@ -124,11 +120,7 @@ class RangkumanMingguan extends StatelessWidget {
                               ),
                               const Expanded(child: SizedBox()),
                               Text('Total Hari ini:', style: separatorStyle),
-                              Text(
-                                  totalHarian
-                                          .toString()
-                                          .numberFormat(currency: true) ??
-                                      'err parse',
+                              Text(totalHarian.numberFormat(currency: true),
                                   style: separatorStyle)
                             ],
                           ),
@@ -136,13 +128,11 @@ class RangkumanMingguan extends StatelessWidget {
                         for (var z in state.daily[index + 0])
                           ListTile(
                             onTap: () {
-                              print(state.daily[index + 0]);
+                              // print(state.daily[index + 0]);
                             },
                             title: Text(z.namaKaryawan),
-                            subtitle: Text(z.totalPendapatan
-                                    .toString()
-                                    .numberFormat(currency: true) ??
-                                'err format'),
+                            subtitle: Text(
+                                z.totalPendapatan.numberFormat(currency: true)),
                           ),
                       ],
                     );
@@ -268,8 +258,7 @@ class TileMingguan extends StatelessWidget {
                                       Colors.green[800])),
                               onPressed: () async {
                                 var te = dataState.tanggalEnd;
-                                var checkdata = await RepositoryProvider.of<
-                                        PengeluaranRepository>(context)
+                                var checkdata = await RepositoryProvider.of<PengeluaranRepository>(context)
                                     .getByOrder(TipePengeluaran.gaji,
                                         starts: DateUtils.dateOnly(
                                             DateTime.now().subtract(Duration(
@@ -277,7 +266,11 @@ class TileMingguan extends StatelessWidget {
                                         ends: DateUtils.dateOnly(DateTime.now()
                                             .subtract(Duration(
                                                 days: DateTime.now().weekday))
-                                            .addDays(7)));
+                                            .addDays(7)))
+                                    .then((value) => value
+                                        .map((e) => e.karyawan == data.namaKaryawan ? e : null)
+                                        .nonNulls
+                                        .toList());
 
                                 if (boolUtang && (tot + hutang).toInt() < 0) {
                                   await Flushbar(
@@ -470,6 +463,15 @@ class _SlipGajiState extends State<SlipGaji> {
   Future<Widget> bon() async {
     var a = await RepositoryProvider.of<BonRepository>(context)
         .getByNama(nama: widget.nama);
+    var aWeek = await RepositoryProvider.of<BonRepository>(context)
+        .getByNama(
+            nama: widget.nama,
+            tgl: DateUtils.dateOnly(widget.dataState.tanggalStart),
+            tglEnd: DateUtils.dateOnly(widget.dataState.tanggalEnd))
+        .then((value) => value
+            .map((e) => e.tipe == BonType.bayarhutang ? e : null)
+            .nonNulls
+            .toList());
     var b = BonData(
         namaSubjek: widget.nama,
         jumlahBon: 0,
@@ -483,17 +485,26 @@ class _SlipGajiState extends State<SlipGaji> {
           tipe: b.jumlahBon + ey > 0 ? BonType.bayarhutang : BonType.berhutang);
     }
     return Padding(
-      padding: EdgeInsets.all(8),
-      child: Row(
+      padding: const EdgeInsets.all(8),
+      child: Column(
         children: [
-          Text('Hutang : '),
-          Expanded(
-            child: ListTile(
-              title: Text(b.tanggal!.formatDayMonth()),
-              subtitle:
-                  Text(b.jumlahBon.numberFormat(currency: true) ?? 'err parse'),
-            ),
-          )
+          Row(
+            children: [
+              const Text('Sisa Hutang : '),
+              Expanded(
+                child: ListTile(
+                  title: Text(b.jumlahBon.numberFormat(currency: true)),
+                ),
+              )
+            ],
+          ),
+          const Text('Histori pembayaran utang minggu ini'),
+          for (var i in aWeek)
+            ListTile(
+              title: Text(i.jumlahBon.numberFormat()),
+              subtitle: Text(
+                  '${i.tanggal!.formatLengkap()},${i.tanggal!.clockOnly()}'),
+            )
         ],
       ),
     );
@@ -547,7 +558,7 @@ class _SlipGajiState extends State<SlipGaji> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text('Karyawan : ${widget.nama}',
-                textScaler: TextScaler.linear(1.75)),
+                textScaler: const TextScaler.linear(1.75)),
           ),
           Table(
             children: [
@@ -561,19 +572,29 @@ class _SlipGajiState extends State<SlipGaji> {
               for (var i = 0; i < 7; i++,)
                 TableRow(children: [
                   Text(
-                      '${widget.dataState.tanggalStart.addDays(i).formatDayMonth()}'),
+                      widget.dataState.tanggalStart.addDays(i).formatDayMonth()),
                   Text((waw[i].perCategory[0].price * 0.48).numberFormat()),
                   Text((waw[i].perCategory[1].price * 0.5).numberFormat()),
                   Text((waw[i].perCategory[2].price * 0.5).numberFormat()),
                   Text((waw[i].perCategory[3].price * 0.1).numberFormat()),
                 ]),
               TableRow(children: [
-                Text('Total : '),
+                const Text('Total : '),
                 Text((totHC * 0.48).numberFormat()),
                 Text((totSHV * 0.5).numberFormat()),
                 Text((totCLR * 0.5).numberFormat()),
                 Text((totBRG * 0.1).numberFormat()),
               ])
+            ],
+          ),
+          Row(
+            children: [
+              const Text('Total : '),
+              Text(((totHC * 0.48) +
+                      (totSHV * 0.5) +
+                      (totCLR * 0.5) +
+                      (totBRG * 0.1))
+                  .numberFormat())
             ],
           ),
           databon

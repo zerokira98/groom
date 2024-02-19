@@ -18,11 +18,15 @@ class KeyLock extends StatelessWidget {
       autofocus: true,
       onKeyEvent: (key) {
         if (key is! KeyDownEvent) return;
+        if (key.logicalKey == LogicalKeyboardKey.goBack) {
+          return Navigator.of(context).pop(false);
+        }
         if (key.logicalKey == LogicalKeyboardKey.backspace) {
           ic.removeCharacter();
           return;
+        } else {
+          ic.addCharacter(key.character!);
         }
-        ic.addCharacter(key.character!);
       },
       child: ScreenLock(
         title: Text(title),

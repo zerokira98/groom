@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/etc/lockscreen_keylock.dart';
-import 'package:groom/model/itemcard_mdl.dart';
+import 'package:groom/model/model.dart';
 import 'package:intl/intl.dart';
 
 class RiwayatPemasukan extends StatefulWidget {
@@ -22,12 +22,14 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         future: RepositoryProvider.of<PemasukanRepository>(context)
             // .getAllStruk(),
             .getStrukFiltered({
-          'tanggalStart': DateTime.now().subtract(const Duration(days: 1)),
-          'tanggalEnd': DateTime.now().add(const Duration(days: 1))
+          'tanggalStart': DateTime.now(),
+          'tanggalEnd': DateTime.now().add(const Duration(days: 1)),
+          // 'order': 'reverse'
         }),
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             return ListView.builder(
+              // reverse: true,
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 var theData = snapshot.data![index];

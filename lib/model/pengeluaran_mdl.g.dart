@@ -34,5 +34,5 @@ const _$TipePengeluaranEnumMap = {
   TipePengeluaran.gaji: 'gaji',
   TipePengeluaran.operasional: 'operasional',
   TipePengeluaran.barangjual: 'barangjual',
-  TipePengeluaran.dividen: 'dividen',
+  TipePengeluaran.uang: 'uang',
 };

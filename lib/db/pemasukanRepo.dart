@@ -81,15 +81,19 @@ class PemasukanRepository implements _PemasukanRepo {
         Timestamp.fromDateTime(DateTime(ts.year, ts.month, ts.day));
     var endTimestamp =
         Timestamp.fromDateTime(DateTime(te.year, te.month, te.day));
-
+    var fil = [
+      Filter.greaterThanOrEquals('tanggal', startTimestamp),
+      Filter.lessThan('tanggal', endTimestamp),
+    ];
+    List<SortOrder> orders = [];
+    if (filter['order'] != null && filter['order'] == 'reverse') {
+      orders.add(SortOrder('tanggal', false));
+    } else {
+      orders.add(SortOrder('tanggal'));
+    }
     return storePemasukan
         .query(
-          finder: Finder(
-              filter: Filter.and([
-                Filter.greaterThanOrEquals('tanggal', startTimestamp),
-                Filter.lessThan('tanggal', endTimestamp),
-              ]),
-              sortOrders: [SortOrder('tanggal')]),
+          finder: Finder(filter: Filter.and(fil), sortOrders: orders),
         )
         .getSnapshots(db)
         .then((value) => value

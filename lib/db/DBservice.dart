@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:groom/model/barang_mdl.dart';
 import 'package:groom/model/bondata_mdl.dart';
 import 'package:groom/model/ekuitas_mdl.dart';
 import 'package:groom/model/karyawan_mdl.dart';
@@ -11,6 +12,7 @@ import 'package:sembast/sembast_io.dart';
 import 'package:sembast/timestamp.dart';
 import 'package:groom/model/itemcard_mdl.dart';
 
+part 'barang_repo.dart';
 part 'pengeluaranRepo.dart';
 part 'karyawanRepo.dart';
 part 'pemasukanRepo.dart';

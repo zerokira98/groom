@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/DBservice.dart';
 import 'package:groom/etc/extension.dart';
-import 'package:groom/model/pengeluaran_mdl.dart';
+import 'package:groom/model/model.dart';
 
 class HistoriPengeluaran extends StatefulWidget {
   final TipePengeluaran? sortBy;
@@ -13,11 +13,12 @@ class HistoriPengeluaran extends StatefulWidget {
 }
 
 class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
-  TipePengeluaran? sortBy;
+  TipePengeluaran? sortByType;
   List separatorDate = [];
+  DateTime? dateTime;
   @override
   void initState() {
-    sortBy = widget.sortBy;
+    sortByType = widget.sortBy;
     super.initState();
   }
 
@@ -27,38 +28,57 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
       appBar: AppBar(title: const Text("Histori Pengeluaran")),
       body: FutureBuilder(
         future: RepositoryProvider.of<PengeluaranRepository>(context)
-            .getByOrder(sortBy),
+            .getByOrder(sortByType, starts: dateTime),
         builder: (context, snapshot) {
           Widget empty = const SizedBox();
           if (snapshot.hasError) return empty;
           if (snapshot.hasData) {
             return Column(
               children: [
-                DropdownButton(
-                  value: sortBy,
-                  items: const [
-                    DropdownMenuItem(
-                      value: null,
-                      child: Text('Show All'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    DropdownButton(
+                      value: sortByType,
+                      items: const [
+                        DropdownMenuItem(
+                          value: null,
+                          child: Text('Show All'),
+                        ),
+                        DropdownMenuItem(
+                          value: TipePengeluaran.gaji,
+                          child: Text('Gaji'),
+                        ),
+                        DropdownMenuItem(
+                          value: TipePengeluaran.operasional,
+                          child: Text('Operasional'),
+                        ),
+                        DropdownMenuItem(
+                          value: TipePengeluaran.barangjual,
+                          child: Text('Barang'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          sortByType = value;
+                        });
+                      },
                     ),
-                    DropdownMenuItem(
-                      value: TipePengeluaran.gaji,
-                      child: Text('Gaji'),
-                    ),
-                    DropdownMenuItem(
-                      value: TipePengeluaran.operasional,
-                      child: Text('Operasional'),
-                    ),
-                    DropdownMenuItem(
-                      value: TipePengeluaran.barangjual,
-                      child: Text('Barang'),
-                    ),
+                    const Padding(padding: EdgeInsets.all(4)),
+                    ElevatedButton(
+                        onPressed: () {
+                          showDatePicker(
+                            context: context,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                          ).then((value) => value != null
+                              ? setState(() {
+                                  dateTime = value;
+                                })
+                              : null);
+                        },
+                        child: Text(dateTime?.formatLengkap() ?? 'All Dates')),
                   ],
-                  onChanged: (value) {
-                    setState(() {
-                      sortBy = value;
-                    });
-                  },
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -78,7 +98,7 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                       return Column(
                         children: [
                           //separator
-                          if (sortBy == TipePengeluaran.gaji &&
+                          if (sortByType == TipePengeluaran.gaji &&
                               (index == 0 || huh != huhbf))
                             Container(
                               padding: const EdgeInsets.all(8),
@@ -100,7 +120,8 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                                     context: context,
                                     builder: (context) => AlertDialog(
                                       title: const Text('Peringatan'),
-                                      content: const Text('Yakin menghapus enrti?'),
+                                      content:
+                                          const Text('Yakin menghapus enrti?'),
                                       actions: [
                                         ElevatedButton(
                                             onPressed: () {
@@ -108,8 +129,10 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                                                           PengeluaranRepository>(
                                                       context)
                                                   .delete(e)
-                                                  .then((value) =>
-                                                      Navigator.pop(context));
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                setState(() {});
+                                              });
                                             },
                                             child: const Text('Hapus')),
                                         ElevatedButton(
@@ -127,11 +150,8 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                             subtitle: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(e.biaya
-                                        .toInt()
-                                        .toString()
-                                        .numberFormat(currency: true) ??
-                                    'parse err'),
+                                Text((e.biaya * e.pcs)
+                                    .numberFormat(currency: true)),
                                 Text(e.tanggal.formatLengkap().toString()),
                               ],
                             ),

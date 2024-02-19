@@ -1,4 +1,4 @@
-package com.example.groom
+package com.zerokira98.groom
 
 import io.flutter.embedding.android.FlutterActivity
 

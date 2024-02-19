@@ -38,15 +38,23 @@ class BonRepository implements _BonRepo {
         .toList());
   }
 
-  Future<List<BonData>> getByNama({required String nama, DateTime? tgl}) async {
+  Future<List<BonData>> getByNama(
+      {required String nama, DateTime? tgl, DateTime? tglEnd}) async {
     var fil = [Filter.equals('namaSubjek', nama)];
-    if (tgl != null) {
+    if (tgl != null && tglEnd == null) {
       var sd = Timestamp.fromDateTime(DateUtils.dateOnly(tgl));
       var ed = Timestamp.fromDateTime(
           DateUtils.dateOnly(tgl).add(Duration(days: 1)));
       fil.add(Filter.greaterThanOrEquals('tanggal', sd));
       fil.add(Filter.lessThan('tanggal', ed));
       fil.add(Filter.equals('tipe', 'berhutang'));
+    }
+    if (tgl != null && tglEnd != null) {
+      var sd = Timestamp.fromDateTime(DateUtils.dateOnly(tgl));
+      var ed = Timestamp.fromDateTime(
+          DateUtils.dateOnly(tglEnd).add(Duration(days: 1)));
+      fil.add(Filter.greaterThanOrEquals('tanggal', sd));
+      fil.add(Filter.lessThan('tanggal', ed));
     }
     return storeBon
         .query(finder: Finder(filter: Filter.and(fil)))
