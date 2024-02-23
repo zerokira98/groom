@@ -1,9 +1,11 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/db_service.dart';
+import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/barang/barangpage.dart';
+import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:intl/intl.dart';
 
 import '../adminapp/rangkuman/rangkuman.dart';
@@ -66,8 +68,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                             value: TipePengeluaran.barangjual,
                             child: Text('Barang Jual')),
                         DropdownMenuItem(
-                            value: TipePengeluaran.uang,
-                            child: Text('Dividen')),
+                            value: TipePengeluaran.uang, child: Text('Uang')),
                       ],
                       onChanged: (value) {
                         if (value != null) {
@@ -165,8 +166,10 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                     var a = await RepositoryProvider.of<
                                             BarangRepository>(context)
                                         .find(option);
-                                    uangController.text = uangFormatter
-                                        .format(a.first.hargabeli.toString());
+                                    if (typeValue.index != 0) {
+                                      uangController.text = uangFormatter
+                                          .format(a.first.hargabeli.toString());
+                                    }
                                   },
                                   optionsBuilder: (textEditingValue) async {
                                     if (textEditingValue.text == '') {
@@ -327,6 +330,11 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                             });
                           }
                         }
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HistoriPengeluaran(),
+                            ));
                         setState(() {});
                       } else {}
                     });

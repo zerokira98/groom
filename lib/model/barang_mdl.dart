@@ -14,14 +14,14 @@ class BarangMdl extends Equatable {
       this.id,
       this.tglUpdate});
 
-  final num? id;
+  final String? id;
   final DateTime? tglUpdate;
   final String namaBarang;
   final num pcs;
   final num hargabeli;
   final num hargajual;
   BarangMdl copyWith(
-      {ValueGetter<num?>? id,
+      {ValueGetter<String?>? id,
       ValueGetter<DateTime?>? tglUpdate,
       String? namaBarang,
       num? pcs,

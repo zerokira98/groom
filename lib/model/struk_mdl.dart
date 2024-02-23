@@ -1,10 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:groom/etc/timestamp_converter.dart';
+
+import 'package:groom/etc/timestamp_converter_firestore.dart';
 import 'package:groom/model/pelanggan_mdl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:groom/model/itemcard_mdl.dart';
-import 'package:sembast/timestamp.dart';
 
 ///  int? id;
 ///    String namaKaryawan;
@@ -14,9 +15,9 @@ part 'struk_mdl.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class StrukMdl extends Equatable {
-  final int? id;
+  final String? id;
   final String namaKaryawan;
-  @TimestampConverter()
+  @TimestampConverterFirestore()
   final DateTime tanggal;
   final PelangganMdl? pelanggan;
   final TipePembayaran tipePembayaran;
@@ -35,7 +36,7 @@ class StrukMdl extends Equatable {
       [id, namaKaryawan, tanggal, pelanggan, tipePembayaran, itemCards];
 
   StrukMdl copyWith(
-      {ValueGetter<int?>? id,
+      {ValueGetter<String?>? id,
       String? namaKaryawan,
       DateTime? tanggal,
       ValueGetter<PelangganMdl?>? pelanggan,

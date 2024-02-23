@@ -5,15 +5,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/karyawan_repo.dart';
+import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 import 'package:open_app_file/open_app_file.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
+import 'package:weekly_date_picker/datetime_apis.dart';
 
 class PrintMingguan extends StatelessWidget {
   final List<List<PerPerson>> perDay;
-  const PrintMingguan({super.key, required this.perDay});
+  final DateTime startDate;
+  const PrintMingguan(
+      {super.key, required this.perDay, required this.startDate});
   void printIncomeMingguan(
     BuildContext context,
   ) async {
@@ -77,8 +82,7 @@ class PrintMingguan extends StatelessWidget {
       var element = perDay[idx];
       List insertRow =
           List.filled((karyawanList.length * colperPerson.length) + 1, '');
-      var theDate = element;
-      insertRow[0] = theDate;
+      insertRow[0] = startDate.addDays(idx).formatDayMonth();
 
       for (var e in element) {
         var index = karyawanList.indexWhere(
@@ -104,14 +108,16 @@ class PrintMingguan extends StatelessWidget {
 
     final List<int> bytes = workbook.saveAsStream();
     // return;
-    File theFile = File('${docDir.path}/Backup_${DateTime.now()}.xlsx');
+    File theFile = File('${docDir.path}/Backup_${DateTime.now().day}.xlsx');
     theFile.createSync(recursive: true);
     theFile.writeAsBytesSync(bytes, mode: FileMode.write);
     if (Platform.isAndroid) {
-      final params = SaveFileDialogParams(sourceFilePath: theFile.path);
-      final filePath = await FlutterFileDialog.saveFile(params: params);
-      if (filePath != null) await OpenAppFile.open(filePath);
-      // print(filePath);
+      // final params = SaveFileDialogParams(sourceFilePath: theFile.path);
+      // final filePath = await FlutterFileDialog.saveFile(params: params);
+      // if (filePath != null) {
+      var x = await OpenFilex.open(theFile.path);
+      print(x.message);
+      // }
     }
     workbook.dispose();
   }

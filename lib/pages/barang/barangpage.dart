@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/db_service.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/barang/tambahbarang.dart';
@@ -25,18 +25,23 @@ class _BarangPageState extends State<BarangPage> {
         actions: [
           IconButton(
               onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TambahBarang(),
-                  )),
-              icon: Icon(Icons.add))
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TambahBarang(),
+                      )).then((value) {
+                    // if (value != null && value) {
+                    // }
+                    setState(() {});
+                    // return null;
+                  }),
+              icon: const Icon(Icons.add))
         ],
       ),
       body: FutureBuilder(
         future: RepositoryProvider.of<BarangRepository>(context).getAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
-            if (snapshot.data!.isEmpty) return Text('Empty');
+            if (snapshot.data!.isEmpty) return const Text('Empty');
             return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, i) {
@@ -49,7 +54,9 @@ class _BarangPageState extends State<BarangPage> {
                         ).then((value) {
                           if (value != null && value) {
                             setState(() {});
+                            return;
                           }
+                          setState(() {});
                         });
                       },
                       title: Text(snapshot.data![i].namaBarang),
@@ -115,9 +122,27 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(
-            'Edit',
-            textScaler: TextScaler.linear(2),
+          Row(
+            children: [
+              Expanded(
+                child: const Text(
+                  'Edit',
+                  textScaler: TextScaler.linear(2),
+                ),
+              ),
+              ElevatedButton(
+                onLongPress: () {
+                  RepositoryProvider.of<BarangRepository>(context)
+                      .delete(widget.data)
+                      .then((value) => Navigator.pop(context));
+                },
+                onPressed: () {},
+                child: Text('Hapus barang'),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Colors.red),
+                    foregroundColor: MaterialStatePropertyAll(Colors.white)),
+              )
+            ],
           ),
           Row(
             mainAxisSize: MainAxisSize.max,
@@ -125,12 +150,12 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
               Expanded(
                 child: TextFormField(
                   controller: namaBarang,
-                  decoration: InputDecoration(label: Text('Nama Barang')),
+                  decoration: const InputDecoration(label: Text('Nama Barang')),
                 ),
               ),
             ],
           ),
-          Padding(padding: EdgeInsets.all(8)),
+          const Padding(padding: EdgeInsets.all(8)),
           Row(
             mainAxisSize: MainAxisSize.max,
             children: [
@@ -139,24 +164,30 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
                   validator: (value) {
                     if (value == null) return null;
                     if (value.isEmpty) return 'cant empty';
-                    if (int.tryParse(value) == null)
+                    if (int.tryParse(value) == null) {
                       return 'not a valid number';
+                      return null;
+                    }
+                    return null;
                   },
                   controller: hargaJual,
-                  decoration: InputDecoration(label: Text('Harga Jual')),
+                  decoration: const InputDecoration(label: Text('Harga Jual')),
                 ),
               ),
-              Padding(padding: EdgeInsets.all(8)),
+              const Padding(padding: EdgeInsets.all(8)),
               Expanded(
                 child: TextFormField(
                   validator: (value) {
                     if (value == null) return null;
                     if (value.isEmpty) return 'cant empty';
-                    if (int.tryParse(value) == null)
+                    if (int.tryParse(value) == null) {
                       return 'not a valid number';
+                      return null;
+                    }
+                    return null;
                   },
                   controller: jumlahStock,
-                  decoration: InputDecoration(label: Text('Stock')),
+                  decoration: const InputDecoration(label: Text('Stock')),
                 ),
               ),
             ],
@@ -179,13 +210,13 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
                         widget.restate;
                       });
                     },
-                    child: Text('Submit')),
-                Padding(padding: EdgeInsets.all(4)),
+                    child: const Text('Submit')),
+                const Padding(padding: EdgeInsets.all(4)),
                 ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text('Cancel')),
+                    child: const Text('Cancel')),
               ],
             ),
           )

@@ -1,7 +1,7 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/model/model.dart';
 
 class KaryawanConfig extends StatefulWidget {
@@ -16,6 +16,110 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
   int? selectedIdx;
   bool visible = false;
   TextEditingController passcon = TextEditingController();
+  TextEditingController namaController = TextEditingController();
+  GlobalKey<FormState> formkey = GlobalKey<FormState>();
+  Widget options() {
+    return Card(
+      child: Form(
+        key: formkey,
+        child: Column(
+          children: [
+            Row(children: [
+              Text(selectedIdx != null ? 'Karyawan Input' : 'Tambah Karyawan')
+            ]),
+            if (selectedIdx != null) const Text('setPassword'),
+            Row(
+              children: [
+                Expanded(
+                    child: TextFormField(
+                  validator: (value) {
+                    if (value == null) return null;
+                    if (value.isEmpty) return 'cant be empty';
+                    if (value.length < 4) return 'at least 4';
+                    return null;
+                  },
+                  enabled: (selectedIdx == null),
+                  controller: namaController,
+                  decoration: const InputDecoration(
+                    label: Text('Nama Karyawan'),
+                  ),
+                  obscureText: visible,
+                ))
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: TextFormField(
+                  validator: (value) {
+                    if (value == null) return null;
+                    if (value.isEmpty) return 'cant be empty';
+                    if (value.length < 4) return 'at least 4';
+                    return null;
+                  },
+                  controller: passcon,
+                  decoration: InputDecoration(
+                      label: const Text('Password'),
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              visible = !visible;
+                            });
+                          },
+                          icon: Icon(visible
+                              ? Icons.visibility
+                              : Icons.visibility_off))),
+                  obscureText: visible,
+                ))
+              ],
+            ),
+            ElevatedButton(
+                onPressed: () async {
+                  if (selectedIdx != null && nama != null) {
+                    var a = await RepositoryProvider.of<KaryawanRepository>(
+                            context)
+                        .update(nama!.copyWith(password: () => passcon.text))
+                        .then((value) {
+                      setState(() {});
+                      Flushbar(
+                        message: 'Success',
+                        duration: const Duration(seconds: 2),
+                        animationDuration: Durations.long1,
+                      ).show(context);
+                    });
+                  } else {
+                    if (formkey.currentState!.validate()) {
+                      var a = await RepositoryProvider.of<KaryawanRepository>(
+                              context)
+                          .addKaryawan(KaryawanData(
+                              namaKaryawan: namaController.text,
+                              password: passcon.text,
+                              aktif: true))
+                          .then((value) {
+                        if (value == 1) {
+                          Flushbar(
+                            message: 'Success',
+                            duration: const Duration(seconds: 2),
+                            animationDuration: Durations.long1,
+                          ).show(context);
+                          setState(() {
+                            nama = null;
+                            namaController.text = nama?.namaKaryawan ?? '';
+                            selectedIdx = null;
+                            passcon.text = nama?.password ?? '';
+                          });
+                        }
+                      });
+                    }
+                  }
+                },
+                child: const Text('Submit')),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,10 +150,10 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
                                 nama = selectedIdx == index
                                     ? null
                                     : snapshot.data![index];
+                                namaController.text = nama?.namaKaryawan ?? '';
                                 selectedIdx =
                                     selectedIdx == index ? null : index;
-                                passcon.text =
-                                    snapshot.data![index].password ?? '';
+                                passcon.text = nama?.password ?? '';
                               });
                             },
                             trailing: IconButton(
@@ -76,61 +180,7 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
                 return const CircularProgressIndicator();
               },
             ),
-            Flexible(
-              flex: 3,
-              child: Card(
-                child: Column(
-                  children: [
-                    Row(children: [
-                      Text(selectedIdx != null
-                          ? 'Karyawan Input'
-                          : 'Tambah Karyawan')
-                    ]),
-                    if (selectedIdx != null) const Text('setPassword'),
-                    if (selectedIdx != null)
-                      Row(
-                        children: [
-                          Expanded(
-                              child: TextFormField(
-                            controller: passcon,
-                            decoration: InputDecoration(
-                                label: const Text('Password'),
-                                suffixIcon: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        visible = !visible;
-                                      });
-                                    },
-                                    icon: Icon(visible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off))),
-                            obscureText: visible,
-                          ))
-                        ],
-                      ),
-                    if (selectedIdx != null)
-                      ElevatedButton(
-                          onPressed: () async {
-                            if (nama != null) {
-                              var a = await RepositoryProvider.of<
-                                      KaryawanRepository>(context)
-                                  .update(nama!
-                                      .copyWith(password: () => passcon.text))
-                                  .then((value) {
-                                setState(() {});
-                                Flushbar(
-                                  message: 'Success',
-                                  duration: const Duration(seconds: 2),
-                                  animationDuration: Durations.long1,
-                                ).show(context);
-                              });
-                            }
-                          },
-                          child: const Text('Submit')),
-                  ],
-                ),
-              ),
-            )
+            options()
           ],
         ));
   }

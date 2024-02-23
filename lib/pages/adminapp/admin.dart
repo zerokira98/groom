@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/pages/adminapp/karyawan.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
 import 'package:groom/pages/barang/barangpage.dart';
-import 'package:groom/pages/bon/bon_page.dart';
+import 'package:groom/pages/adminapp/bon/bon_page.dart';
 import 'package:groom/pages/equity/equitypage.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:groom/pages/pengeluaran/pengeluaranpage.dart';
@@ -57,7 +57,14 @@ class AdminPage extends StatelessWidget {
                         builder: (context) => const PengeluaranPage(),
                       ));
                 },
-                child: const Text('Catat Pengeluaran'),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.edit),
+                    Padding(padding: EdgeInsets.only(right: 4)),
+                    const Text('Catat Pengeluaran'),
+                  ],
+                ),
               ),
             ),
             Card(
@@ -69,7 +76,14 @@ class AdminPage extends StatelessWidget {
                         builder: (context) => const HistoriPengeluaran(),
                       ));
                 },
-                child: const Text('Histori Pengeluaran'),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.history),
+                    Padding(padding: EdgeInsets.only(right: 4)),
+                    const Text('Histori Pengeluaran'),
+                  ],
+                ),
               ),
             ),
             Card(

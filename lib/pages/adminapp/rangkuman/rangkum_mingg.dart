@@ -1,12 +1,13 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/bon_repo.dart';
+import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:groom/pages/print/print_to_excel.dart';
-import 'package:sembast/sembast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as fc;
 import 'package:weekly_date_picker/datetime_apis.dart';
 import 'cubitmingguan/rangkumanmingg_cubit.dart';
 
@@ -62,8 +63,10 @@ class RangkumanMingguan extends StatelessWidget {
                         // print(state.daily.first.keys);
                         showDialog(
                           context: context,
-                          builder: (context) =>
-                              PrintMingguan(perDay: state.daily),
+                          builder: (context) => PrintMingguan(
+                            perDay: state.daily,
+                            startDate: state.tanggalStart,
+                          ),
                         );
                       },
                       icon: const Icon(Icons.print))
@@ -184,8 +187,8 @@ class TileMingguan extends StatelessWidget {
   Widget build(BuildContext context) {
     StrukMdl data = dataState.dataPerPerson[index];
     return FutureBuilder(
-        future: RepositoryProvider.of<BonRepository>(context)
-            .getBonFiltered(Filter.equals('namaSubjek', data.namaKaryawan)),
+        future: RepositoryProvider.of<BonRepository>(context).getBonFiltered(
+            fc.Filter('namaSubjek', isEqualTo: data.namaKaryawan)),
         builder: (context, snapshot) {
           double cutPercentage(int type) => switch (type) {
                 0 => 0.48,
@@ -461,15 +464,18 @@ class SlipGaji extends StatefulWidget {
 
 class _SlipGajiState extends State<SlipGaji> {
   Future<Widget> bon() async {
+    ///total
     var a = await RepositoryProvider.of<BonRepository>(context)
         .getByNama(nama: widget.nama);
+
+    ///get week
     var aWeek = await RepositoryProvider.of<BonRepository>(context)
         .getByNama(
             nama: widget.nama,
             tgl: DateUtils.dateOnly(widget.dataState.tanggalStart),
             tglEnd: DateUtils.dateOnly(widget.dataState.tanggalEnd))
         .then((value) => value
-            .map((e) => e.tipe == BonType.bayarhutang ? e : null)
+            // .map((e) => e.tipe == BonType.bayarhutang ? e : null)
             .nonNulls
             .toList());
     var b = BonData(
@@ -498,12 +504,19 @@ class _SlipGajiState extends State<SlipGaji> {
               )
             ],
           ),
-          const Text('Histori pembayaran utang minggu ini'),
+          const Text('Histori catatan utang minggu ini'),
           for (var i in aWeek)
             ListTile(
-              title: Text(i.jumlahBon.numberFormat()),
-              subtitle: Text(
-                  '${i.tanggal!.formatLengkap()},${i.tanggal!.clockOnly()}'),
+              title: Text(
+                  (i.jumlahBon * (i.tipe == BonType.bayarhutang ? -1 : 1))
+                      .numberFormat()),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(i.tanggal!.formatLengkap()),
+                  Text(i.tanggal!.clockOnly()),
+                ],
+              ),
             )
         ],
       ),
@@ -528,9 +541,9 @@ class _SlipGajiState extends State<SlipGaji> {
       (index) => PerPerson(
           namaKaryawan: widget.nama, perCategory: const [], totalPendapatan: 0),
     );
-    num totHC = 0, totSHV = 0, totCLR = 0, totBRG = 0;
     List<ItemCardMdl> groundItemCards = List.generate(
         cardType.length, (i) => ItemCardMdl(index: 0, price: 0, type: i));
+    num totHC = 0, totSHV = 0, totCLR = 0, totBRG = 0;
     for (var i = 0; i < 7; i++) {
       waw[i] = widget.dataState.daily[i].firstWhere(
         (element) => element.namaKaryawan == widget.nama,
@@ -553,52 +566,55 @@ class _SlipGajiState extends State<SlipGaji> {
                   .pcsBarang;
     }
     return Dialog.fullscreen(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('Karyawan : ${widget.nama}',
-                textScaler: const TextScaler.linear(1.75)),
-          ),
-          Table(
-            children: [
-              const TableRow(children: [
-                Text('Tgl'),
-                Text('HC'),
-                Text('SHV'),
-                Text('SMR'),
-                Text('BRG'),
-              ]),
-              for (var i = 0; i < 7; i++,)
-                TableRow(children: [
-                  Text(
-                      widget.dataState.tanggalStart.addDays(i).formatDayMonth()),
-                  Text((waw[i].perCategory[0].price * 0.48).numberFormat()),
-                  Text((waw[i].perCategory[1].price * 0.5).numberFormat()),
-                  Text((waw[i].perCategory[2].price * 0.5).numberFormat()),
-                  Text((waw[i].perCategory[3].price * 0.1).numberFormat()),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Karyawan : ${widget.nama}',
+                  textScaler: const TextScaler.linear(1.75)),
+            ),
+            Table(
+              children: [
+                const TableRow(children: [
+                  Text('Tgl'),
+                  Text('HC'),
+                  Text('SHV'),
+                  Text('SMR'),
+                  Text('BRG'),
                 ]),
-              TableRow(children: [
+                for (var i = 0; i < 7; i++,)
+                  TableRow(children: [
+                    Text(widget.dataState.tanggalStart
+                        .addDays(i)
+                        .formatDayMonth()),
+                    Text((waw[i].perCategory[0].price * 0.48).numberFormat()),
+                    Text((waw[i].perCategory[1].price * 0.5).numberFormat()),
+                    Text((waw[i].perCategory[2].price * 0.5).numberFormat()),
+                    Text((waw[i].perCategory[3].price * 0.1).numberFormat()),
+                  ]),
+                TableRow(children: [
+                  const Text('Total : '),
+                  Text((totHC * 0.48).numberFormat()),
+                  Text((totSHV * 0.5).numberFormat()),
+                  Text((totCLR * 0.5).numberFormat()),
+                  Text((totBRG * 0.1).numberFormat()),
+                ])
+              ],
+            ),
+            Row(
+              children: [
                 const Text('Total : '),
-                Text((totHC * 0.48).numberFormat()),
-                Text((totSHV * 0.5).numberFormat()),
-                Text((totCLR * 0.5).numberFormat()),
-                Text((totBRG * 0.1).numberFormat()),
-              ])
-            ],
-          ),
-          Row(
-            children: [
-              const Text('Total : '),
-              Text(((totHC * 0.48) +
-                      (totSHV * 0.5) +
-                      (totCLR * 0.5) +
-                      (totBRG * 0.1))
-                  .numberFormat())
-            ],
-          ),
-          databon
-        ],
+                Text(((totHC * 0.48) +
+                        (totSHV * 0.5) +
+                        (totCLR * 0.5) +
+                        (totBRG * 0.1))
+                    .numberFormat())
+              ],
+            ),
+            databon
+          ],
+        ),
       ),
     );
   }

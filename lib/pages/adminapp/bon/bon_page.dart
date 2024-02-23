@@ -1,10 +1,11 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/bon_repo.dart';
+import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/model/model.dart';
 import 'package:intl/intl.dart';
-import 'package:sembast/sembast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as fc;
 
 class BonPage extends StatefulWidget {
   const BonPage({super.key});
@@ -80,14 +81,13 @@ class _BonPageState extends State<BonPage> {
                         jumlahBon: ele.jumlahBon *
                             (ele.tipe == BonType.berhutang ? -1 : 1)));
                   }
-                  for (var e in groupByPerson) {
-                    groupByPerson = groupByPerson
-                        .map((e) => e.copyWith(
-                            tipe: e.jumlahBon < 0
-                                ? BonType.berhutang
-                                : BonType.bayarhutang))
-                        .toList();
-                  }
+
+                  groupByPerson = groupByPerson
+                      .map((e) => e.copyWith(
+                          tipe: e.jumlahBon < 0
+                              ? BonType.berhutang
+                              : BonType.bayarhutang))
+                      .toList();
                 }
                 return SingleChildScrollView(
                   child: Column(
@@ -294,6 +294,7 @@ class _BonAddPageState extends State<BonAddPage> {
                 try {
                   await RepositoryProvider.of<BonRepository>(context)
                       .addBon(BonData(
+                          author: Author.admin,
                           tanggal: DateTime.now(),
                           namaSubjek: namaKaryawan ?? '',
                           jumlahBon: int.parse(
@@ -449,7 +450,8 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
             onPressed: () async {
               ///make safety var
               var get = await RepositoryProvider.of<BonRepository>(context)
-                  .getBonFiltered(Filter.equals('namaSubjek', namaKaryawan));
+                  .getBonFiltered(
+                      fc.Filter('namaSubjek', isEqualTo: namaKaryawan));
               //negative == punya hutang
               num totalBon = 0;
               if (get.isNotEmpty) {
@@ -466,6 +468,7 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
                   try {
                     await RepositoryProvider.of<BonRepository>(context)
                         .addBon(BonData(
+                            author: Author.admin,
                             namaSubjek: namaKaryawan ?? '',
                             tanggal: DateTime.now(),
                             jumlahBon: int.parse(

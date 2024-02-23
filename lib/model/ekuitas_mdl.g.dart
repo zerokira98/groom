@@ -7,17 +7,17 @@ part of 'ekuitas_mdl.dart';
 // **************************************************************************
 
 EkuitasMdl _$EkuitasMdlFromJson(Map<String, dynamic> json) => EkuitasMdl(
-      tanggal:
-          const TimestampConverter().fromJson(json['tanggal'] as Timestamp),
+      tanggal: const TimestampConverterFirestore()
+          .fromJson(json['tanggal'] as Timestamp),
       uang: json['uang'] as num,
       deskripsi: json['deskripsi'] as String,
-      id: json['id'] as int?,
+      id: json['id'] as String?,
     );
 
 Map<String, dynamic> _$EkuitasMdlToJson(EkuitasMdl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'tanggal': const TimestampConverter().toJson(instance.tanggal),
+      'tanggal': const TimestampConverterFirestore().toJson(instance.tanggal),
       'uang': instance.uang,
       'deskripsi': instance.deskripsi,
     };

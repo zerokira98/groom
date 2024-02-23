@@ -2,7 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/bon_repo.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 
@@ -97,6 +97,7 @@ class _HutangHomeState extends State<HutangHome> {
                               await RepositoryProvider.of<BonRepository>(
                                       context)
                                   .addBon(BonData(
+                                      author: Author.self,
                                       tanggal: DateTime.now(),
                                       namaSubjek: widget.namaKaryawan,
                                       jumlahBon: int.parse(uangFormatter

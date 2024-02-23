@@ -11,7 +11,7 @@ BarangMdl _$BarangMdlFromJson(Map<String, dynamic> json) => BarangMdl(
       pcs: json['pcs'] as num,
       hargabeli: json['hargabeli'] as num,
       hargajual: json['hargajual'] as num,
-      id: json['id'] as num?,
+      id: json['id'] as String?,
       tglUpdate: json['tglUpdate'] == null
           ? null
           : DateTime.parse(json['tglUpdate'] as String),

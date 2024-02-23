@@ -1,6 +1,10 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/bon_repo.dart';
+import 'package:groom/db/pemasukan_repo.dart';
+import 'package:groom/db/pengeluaran_repo.dart';
+import 'package:groom/db/uangmasuk_repo.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 
@@ -40,6 +44,17 @@ class _EkuitasPageState extends State<EkuitasPage> {
                             children: [
                               for (var a in snapshot.data!)
                                 ListTile(
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {
+                                      RepositoryProvider.of<EkuitasRepository>(
+                                              context)
+                                          .delete(a)
+                                          .then((value) => value == 1
+                                              ? setState(() {})
+                                              : null);
+                                    },
+                                  ),
                                   title: Text(a.deskripsi),
                                   subtitle: Row(
                                     mainAxisAlignment:
@@ -76,67 +91,87 @@ class InputCard extends StatelessWidget {
   InputCard({super.key});
   final TextEditingController deskripsi = TextEditingController();
   final TextEditingController uang = TextEditingController();
+  final uangFormatter = CurrencyTextInputFormatter(
+      locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
+  final GlobalKey<FormState> formKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                    child: TextFormField(
-                  controller: deskripsi,
-                  onChanged: (value) {
-                    // BlocProvider.of<InputserviceBloc>(context).add(
-                    //     ChangeItemDetails(
-                    //         idx: data.index,
-                    //         data: data.copyWith(namaBarang: value)));
-                  },
-                  decoration: const InputDecoration(label: Text('Deskripsi')),
-                )),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                    child: TextFormField(
-                  controller: uang,
-                  validator: (value) {
-                    if (value == null) {
-                      return 'null';
-                    } else if (int.tryParse(value) == null)
-                      return 'not a number';
-                    return null;
-                  },
-                  onChanged: (value) {
-                    if (int.tryParse(value) != null) {
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                      child: TextFormField(
+                    validator: (value) {
+                      if (value == null) return null;
+                      if (value.isEmpty) return 'cant empty';
+                      return null;
+                    },
+                    controller: deskripsi,
+                    onChanged: (value) {
                       // BlocProvider.of<InputserviceBloc>(context).add(
                       //     ChangeItemDetails(
                       //         idx: data.index,
-                      //         data: data.copyWith(price: int.tryParse(value))));
-                    }
-                  },
-                  decoration: const InputDecoration(label: Text('Uang')),
-                )),
-              ],
-            ),
-            Row(
-              children: [
-                TextButton(
-                    onPressed: () {
-                      RepositoryProvider.of<EkuitasRepository>(context)
-                          .add(EkuitasMdl(
-                              tanggal: DateTime.now(),
-                              uang: int.parse(uang.text),
-                              deskripsi: deskripsi.text))
-                          .then((value) => Navigator.pop(context));
+                      //         data: data.copyWith(namaBarang: value)));
                     },
-                    child: const Text('Submit'))
-              ],
-            )
-          ],
+                    decoration: const InputDecoration(label: Text('Deskripsi')),
+                  )),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                      child: TextFormField(
+                    controller: uang,
+                    validator: (value) {
+                      if (value == null) {
+                        return null;
+                      } else if (uangFormatter
+                              .getUnformattedValue()
+                              .toString()
+                              .length <=
+                          2) {
+                        return 'too small';
+                      }
+                      return null;
+                    },
+                    inputFormatters: [uangFormatter],
+                    onChanged: (value) {
+                      if (int.tryParse(value) != null) {
+                        // BlocProvider.of<InputserviceBloc>(context).add(
+                        //     ChangeItemDetails(
+                        //         idx: data.index,
+                        //         data: data.copyWith(price: int.tryParse(value))));
+                      }
+                    },
+                    decoration: const InputDecoration(label: Text('Uang')),
+                  )),
+                ],
+              ),
+              Row(
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          RepositoryProvider.of<EkuitasRepository>(context)
+                              .add(EkuitasMdl(
+                                  tanggal: DateTime.now(),
+                                  uang: uangFormatter.getUnformattedValue(),
+                                  deskripsi: deskripsi.text))
+                              .then((value) =>
+                                  value == 1 ? Navigator.pop(context) : null);
+                        }
+                      },
+                      child: const Text('Submit'))
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

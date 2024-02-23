@@ -1,7 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/karyawan_repo.dart';
+import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/model/itemcard_mdl.dart';
 import 'package:groom/model/struk_mdl.dart';
 
@@ -41,7 +42,7 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
           itemCards: theState.itemCards);
 
       try {
-        var x = await strukrepo.insertStruk(a);
+        await strukrepo.insertStruk(a);
 
         // print(x);
         emit(InputserviceLoaded(

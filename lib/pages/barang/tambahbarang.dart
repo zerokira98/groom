@@ -1,6 +1,7 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/db_service.dart';
 import 'package:groom/model/model.dart';
 
 class TambahBarang extends StatefulWidget {
@@ -19,6 +20,10 @@ class _TambahBarangState extends State<TambahBarang> {
   final TextEditingController hargaBeli = TextEditingController();
 
   final TextEditingController jumlahStock = TextEditingController();
+  var uangFormatter = CurrencyTextInputFormatter(
+      locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
+  var uangFormatter2 = CurrencyTextInputFormatter(
+      locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
   @override
@@ -34,7 +39,7 @@ class _TambahBarangState extends State<TambahBarang> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Tambah Barang',
         ),
       ),
@@ -43,19 +48,20 @@ class _TambahBarangState extends State<TambahBarang> {
         child: Form(
           key: formkey,
           child: Column(mainAxisSize: MainAxisSize.max, children: [
-            Text('tidak akan masuk ke catatan pengeluaran'),
+            const Text('tidak akan masuk ke catatan pengeluaran'),
             Row(
               mainAxisSize: MainAxisSize.max,
               children: [
                 Expanded(
                   child: TextFormField(
                     controller: namaBarang,
-                    decoration: InputDecoration(label: Text('Nama Barang')),
+                    decoration:
+                        const InputDecoration(label: Text('Nama Barang')),
                   ),
                 ),
               ],
             ),
-            Padding(padding: EdgeInsets.all(8)),
+            const Padding(padding: EdgeInsets.all(8)),
             Row(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -65,44 +71,62 @@ class _TambahBarangState extends State<TambahBarang> {
                     validator: (value) {
                       if (value == null) return null;
                       if (value.isEmpty) return 'cant empty';
-                      if (int.tryParse(value) == null)
-                        return 'not a valid number';
+                      if (uangFormatter
+                              .getUnformattedValue()
+                              .toString()
+                              .length <
+                          2) {
+                        return 'too small';
+                      }
+                      return null;
                     },
                     controller: hargaBeli,
-                    decoration: InputDecoration(label: Text('Harga Beli')),
+                    inputFormatters: [uangFormatter],
+                    decoration:
+                        const InputDecoration(label: Text('Harga Beli')),
                   ),
                 ),
-                Padding(padding: EdgeInsets.all(4)),
+                const Padding(padding: EdgeInsets.all(4)),
                 Expanded(
                   flex: 3,
                   child: TextFormField(
                     validator: (value) {
                       if (value == null) return null;
                       if (value.isEmpty) return 'cant empty';
-                      if (int.tryParse(value) == null)
-                        return 'not a valid number';
+                      if (uangFormatter2
+                              .getUnformattedValue()
+                              .toString()
+                              .length <
+                          2) {
+                        return 'too small';
+                      }
+                      return null;
                     },
                     controller: hargaJual,
-                    decoration: InputDecoration(label: Text('Harga Jual')),
+                    inputFormatters: [uangFormatter2],
+                    decoration:
+                        const InputDecoration(label: Text('Harga Jual')),
                   ),
                 ),
-                Padding(padding: EdgeInsets.all(4)),
+                const Padding(padding: EdgeInsets.all(4)),
                 Expanded(
                   flex: 2,
                   child: TextFormField(
                     validator: (value) {
                       if (value == null) return null;
                       if (value.isEmpty) return 'cant empty';
-                      if (int.tryParse(value) == null)
+                      if (int.tryParse(value) == null) {
                         return 'not a valid number';
+                      }
+                      return null;
                     },
                     controller: jumlahStock,
-                    decoration: InputDecoration(label: Text('Stock')),
+                    decoration: const InputDecoration(label: Text('Stock')),
                   ),
                 ),
               ],
             ),
-            Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -113,9 +137,11 @@ class _TambahBarangState extends State<TambahBarang> {
                         if (formkey.currentState!.validate()) {
                           RepositoryProvider.of<BarangRepository>(context)
                               .add(BarangMdl(
-                                  hargabeli: 0,
+                                  hargabeli:
+                                      uangFormatter.getUnformattedValue(),
                                   tglUpdate: DateTime.now(),
-                                  hargajual: int.parse(hargaJual.text),
+                                  hargajual:
+                                      uangFormatter2.getUnformattedValue(),
                                   pcs: int.parse(jumlahStock.text),
                                   namaBarang: namaBarang.text))
                               .then((value) {
@@ -123,13 +149,13 @@ class _TambahBarangState extends State<TambahBarang> {
                           });
                         }
                       },
-                      child: Text('Submit')),
-                  Padding(padding: EdgeInsets.all(4)),
+                      child: const Text('Submit')),
+                  const Padding(padding: EdgeInsets.all(4)),
                   ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('Cancel')),
+                      child: const Text('Cancel')),
                 ],
               ),
             )

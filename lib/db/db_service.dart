@@ -1,23 +1,17 @@
-import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groom/model/barang_mdl.dart';
-import 'package:groom/model/bondata_mdl.dart';
-import 'package:groom/model/ekuitas_mdl.dart';
-import 'package:groom/model/karyawan_mdl.dart';
-import 'package:groom/model/pengeluaran_mdl.dart';
-import 'package:groom/model/struk_mdl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
-import 'package:sembast/timestamp.dart';
-import 'package:groom/model/itemcard_mdl.dart';
 
 part 'barang_repo.dart';
-part 'pengeluaranRepo.dart';
-part 'karyawanRepo.dart';
-part 'pemasukanRepo.dart';
-part 'bonRepo.dart';
-part 'ekuitas_repo.dart';
+// part 'pengeluaranRepo.dart';
+// part 'karyawanRepo.dart';
+// part 'pemasukanRepo.dart';
+// part 'bonRepo.dart';
+// part 'uangmasuk_repo.dart';
 
 class SembastDB {
   static Future<Database> init() async {

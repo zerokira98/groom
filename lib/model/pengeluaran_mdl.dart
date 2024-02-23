@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
-import 'package:groom/etc/timestamp_converter.dart';
+// import 'package:groom/etc/timestamp_converter.dart';
+import 'package:groom/etc/timestamp_converter_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sembast/timestamp.dart';
+// import 'package:sembast/timestamp.dart';
 
 part 'pengeluaran_mdl.g.dart';
 
@@ -17,8 +19,8 @@ class PengeluaranMdl extends Equatable {
       this.id,
       this.karyawan});
 
-  final int? id;
-  @TimestampConverter()
+  final String? id;
+  @TimestampConverterFirestore()
   final DateTime tanggal;
   final String namaPengeluaran;
   final TipePengeluaran tipePengeluaran;
@@ -26,7 +28,7 @@ class PengeluaranMdl extends Equatable {
   final num pcs;
   final num biaya;
   PengeluaranMdl copyWith(
-      {ValueGetter<int?>? id,
+      {ValueGetter<String?>? id,
       DateTime? tanggal,
       String? namaPengeluaran,
       TipePengeluaran? tipePengeluaran,

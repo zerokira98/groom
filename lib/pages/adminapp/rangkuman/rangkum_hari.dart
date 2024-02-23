@@ -35,13 +35,24 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text('Total : ${fullTotal.numberFormat(currency: true)}'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                          'Total Pemasukan : ${fullTotal.numberFormat(currency: true)}'),
+                      Text(
+                          'Qris : ${state.qristotal.numberFormat(currency: true)}'),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                          'Pengeluaran+bon by karyawan: ${(state.operasional + state.bontotal).numberFormat(currency: true)}'),
+                    ],
+                  ),
                   Text(
-                      'Qris : ${state.qristotal.numberFormat(currency: true)}'),
-                  Text(
-                      'Pengeluaran : ${state.operasional.numberFormat(currency: true)}'),
-                  Text(
-                      'Total cash : ${(fullTotal - state.qristotal - state.operasional).toInt().numberFormat(currency: true)}'),
+                      'Total cash : ${(fullTotal - state.qristotal - state.operasional - state.bontotal).toInt().numberFormat(currency: true)}'),
                 ],
               ),
             )),
@@ -101,10 +112,8 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                     for (var e in state.incomePerPerson)
                       ListTile(
                         title: Text(e.namaKaryawan),
-                        subtitle: Text(e.totalPendapatan
-                                .toString()
-                                .numberFormat(currency: true) ??
-                            'err format'),
+                        subtitle: Text(
+                            e.totalPendapatan.numberFormat(currency: true)),
                       )
                   ],
                 ))

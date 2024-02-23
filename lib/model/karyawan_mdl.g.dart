@@ -7,9 +7,9 @@ part of 'karyawan_mdl.dart';
 // **************************************************************************
 
 KaryawanData _$KaryawanDataFromJson(Map<String, dynamic> json) => KaryawanData(
-      id: json['id'] as int,
       namaKaryawan: json['namaKaryawan'] as String,
       aktif: json['aktif'] as bool,
+      id: json['id'] as String?,
       password: json['password'] as String?,
     );
 

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/db_service.dart';
+import 'package:groom/db/pemasukan_repo.dart';
 
 import 'package:groom/model/model.dart';
 
@@ -185,7 +186,7 @@ class ItemCardColoring extends StatelessWidget {
 }
 
 class ItemCardGoods extends StatefulWidget {
-  ItemCardGoods(this.data, {super.key});
+  const ItemCardGoods(this.data, {super.key});
   final ItemCardMdl data;
 
   @override
@@ -362,7 +363,9 @@ class ItemCardOthers extends StatelessWidget {
               validator: (value) {
                 if (value == null) {
                   return 'null';
-                } else if (int.tryParse(value) == null) return 'not a number';
+                } else if (int.tryParse(value) == null) {
+                  return 'not a number';
+                }
                 return null;
               },
               onChanged: (value) {

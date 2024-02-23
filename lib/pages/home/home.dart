@@ -2,7 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/etc/lockscreen_keylock.dart';
 import 'package:groom/pages/home/drawer.dart';
 import 'package:groom/etc/extension.dart';
@@ -61,7 +61,7 @@ class Home extends StatelessWidget {
                   }
                   return Text(
                     'Total : ${total.toString().numberFormat(currency: true)}',
-                    textScaler: TextScaler.linear(1.5),
+                    textScaler: const TextScaler.linear(1.5),
                   );
                 } else {
                   return const SizedBox();
@@ -95,14 +95,15 @@ class Home extends StatelessWidget {
                             builder: (context, snapshot) {
                               if (snapshot.hasData &&
                                   snapshot.data!.isNotEmpty) {
-                                List<DropdownMenuEntry<int>> a = snapshot.data!
+                                List<DropdownMenuEntry<String?>> a = snapshot
+                                    .data!
                                     .map((e) => e.aktif
                                         ? DropdownMenuEntry(
                                             value: e.id, label: e.namaKaryawan)
                                         : null)
                                     .nonNulls
                                     .toList();
-                                return DropdownMenu<int>(
+                                return DropdownMenu<String?>(
                                   dropdownMenuEntries: a,
                                   controller: dropdownC,
                                   initialSelection: a
@@ -110,7 +111,7 @@ class Home extends StatelessWidget {
                                         (element) =>
                                             element.label == state.karyawanName,
                                         orElse: () => const DropdownMenuEntry(
-                                            value: -1, label: 'error'),
+                                            value: '-1', label: 'error'),
                                       )
                                       .value,
                                   onSelected: (value) {
@@ -334,7 +335,7 @@ class FloatingButton extends StatelessWidget {
                                     Text(
                                       totalpembayaran.numberFormat(
                                           currency: true),
-                                      textScaler: TextScaler.linear(1.25),
+                                      textScaler: const TextScaler.linear(1.25),
                                     ),
                                   ],
                                 ),

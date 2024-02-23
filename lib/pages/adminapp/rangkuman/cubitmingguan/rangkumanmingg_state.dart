@@ -19,7 +19,7 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
   final int totalKotor;
   final int totalBagiHasil;
 
-  RangkumanWeekLoaded(
+  const RangkumanWeekLoaded(
       {required this.tanggalStart,
       required this.tanggalEnd,
       required this.groupBy,

@@ -1,8 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
-import 'package:groom/etc/timestamp_converter.dart';
+import 'package:groom/etc/timestamp_converter_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sembast/timestamp.dart';
 part 'ekuitas_mdl.g.dart';
 
 @JsonSerializable()
@@ -13,8 +13,8 @@ class EkuitasMdl extends Equatable {
       required this.deskripsi,
       this.id});
 
-  final int? id;
-  @TimestampConverter()
+  final String? id;
+  @TimestampConverterFirestore()
   final DateTime tanggal;
   final num uang;
   final String deskripsi;
@@ -27,7 +27,7 @@ class EkuitasMdl extends Equatable {
   factory EkuitasMdl.fromJson(Map<String, dynamic> json) =>
       _$EkuitasMdlFromJson(json);
   EkuitasMdl copyWith(
-      {ValueGetter<int?>? id,
+      {ValueGetter<String?>? id,
       DateTime? tanggal,
       num? uang,
       String? deskripsi}) {

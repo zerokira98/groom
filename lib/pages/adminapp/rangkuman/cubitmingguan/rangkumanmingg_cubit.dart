@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/bon_repo.dart';
+import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/model/bondata_mdl.dart';
 import 'package:groom/model/itemcard_mdl.dart';
 import 'package:groom/model/perperson.dart';
@@ -156,6 +157,7 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
         'tanggalStart': DateTime(ts.year, ts.month, ts.day),
         'tanggalEnd': DateTime(te.year, te.month, te.day),
       });
+      print(a);
 
       ///too many loop @_@
       for (var e1 in a) {

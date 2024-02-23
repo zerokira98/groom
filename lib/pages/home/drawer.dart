@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/etc/lockscreen_keylock.dart';
 
 import 'package:groom/pages/adminapp/admin.dart';
@@ -71,16 +71,16 @@ class _SideDrawerState extends State<SideDrawer> {
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData &&
                                       snapshot.data!.isNotEmpty) {
-                                    List<DropdownMenuEntry<int>> a = snapshot
-                                        .data!
-                                        .map((e) => e.aktif
-                                            ? DropdownMenuEntry(
-                                                value: e.id,
-                                                label: e.namaKaryawan)
-                                            : null)
-                                        .nonNulls
-                                        .toList();
-                                    return DropdownMenu<int>(
+                                    List<DropdownMenuEntry<String?>> a =
+                                        snapshot.data!
+                                            .map((e) => e.aktif
+                                                ? DropdownMenuEntry(
+                                                    value: e.id,
+                                                    label: e.namaKaryawan)
+                                                : null)
+                                            .nonNulls
+                                            .toList();
+                                    return DropdownMenu<String?>(
                                       dropdownMenuEntries: a,
                                       controller: dropdownC,
                                       initialSelection: a
@@ -90,7 +90,8 @@ class _SideDrawerState extends State<SideDrawer> {
                                                 state.karyawanName,
                                             orElse: () =>
                                                 const DropdownMenuEntry(
-                                                    value: -1, label: 'error'),
+                                                    value: '-1',
+                                                    label: 'error'),
                                           )
                                           .value,
                                       onSelected: (value) {

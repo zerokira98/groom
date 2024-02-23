@@ -6,8 +6,6 @@ part 'pengeluaran_state.dart';
 
 class PengeluaranBloc extends Bloc<PengeluaranEvent, PengeluaranState> {
   PengeluaranBloc() : super(PengeluaranInitial()) {
-    on<PengeluaranEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+    on<PengeluaranEvent>((event, emit) {});
   }
 }

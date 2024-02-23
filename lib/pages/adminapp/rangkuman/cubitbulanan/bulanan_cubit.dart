@@ -1,7 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:groom/db/DBservice.dart';
+import 'package:groom/db/pemasukan_repo.dart';
+import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/model/struk_mdl.dart';
 
 part 'bulanan_state.dart';
