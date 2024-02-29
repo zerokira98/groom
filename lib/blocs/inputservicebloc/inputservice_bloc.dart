@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:groom/db/barang_repo.dart';
 import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/model/itemcard_mdl.dart';
@@ -12,7 +13,11 @@ part 'inputservice_state.dart';
 class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
   PemasukanRepository strukrepo;
   KaryawanRepository karyawanrepo;
-  InputserviceBloc({required this.strukrepo, required this.karyawanrepo})
+  BarangRepository barangrepo;
+  InputserviceBloc(
+      {required this.strukrepo,
+      required this.karyawanrepo,
+      required this.barangrepo})
       : super(InputserviceInitial()) {
     on<Initiate>((event, emit) async {
       if (state is InputserviceLoaded) {
@@ -23,7 +28,7 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
             itemCards: const [],
             tanggal: DateTime.now()));
       } else {
-        var a = await karyawanrepo.getAllKaryawan();
+        var a = await karyawanrepo.getAllKaryawan(true);
         emit(InputserviceLoaded(
             tipePembayaran: TipePembayaran.cash,
             karyawanName: a.first.namaKaryawan,
@@ -42,9 +47,17 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
           itemCards: theState.itemCards);
 
       try {
-        await strukrepo.insertStruk(a);
-
-        // print(x);
+        strukrepo.insertStruk(a);
+        for (var e in a.itemCards) {
+          if (e.type == 3) {
+            barangrepo.find(e.namaBarang).then((v) {
+              if (v.isNotEmpty) {
+                var single = v.first;
+                barangrepo.edit(single.copyWith(pcs: single.pcs - e.pcsBarang));
+              }
+            });
+          }
+        }
         emit(InputserviceLoaded(
             tipePembayaran: TipePembayaran.cash,
             tanggal: DateTime.now(),
@@ -52,6 +65,7 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
             itemCards: const [],
             success: 'input success'));
       } catch (e) {
+        debugPrint('catched err');
         emit(theState.copyWith(err: () => e.toString()));
       }
     });

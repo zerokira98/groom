@@ -89,7 +89,7 @@ class BonRepository implements _BonRepo {
         .collection('bon')
         .add(data.toJson())
         .then((DocumentReference doc) {
-      print('DocumentSnapshot added with ID: ${doc.id}');
+      debugPrint('DocumentSnapshot added with ID: ${doc.id}');
       return doc.id;
     });
   }
@@ -117,8 +117,8 @@ class BonRepository implements _BonRepo {
     // var fil = [Filter('namaSubjek', isEqualTo: nama)];
     if (tgl != null && tglEnd == null) {
       var sd = Timestamp.fromDate(DateUtils.dateOnly(tgl));
-      var ed =
-          Timestamp.fromDate(DateUtils.dateOnly(tgl).add(const Duration(days: 1)));
+      var ed = Timestamp.fromDate(
+          DateUtils.dateOnly(tgl).add(const Duration(days: 1)));
       return db
           .collection('bon')
           .where(Filter.and(
@@ -134,14 +134,23 @@ class BonRepository implements _BonRepo {
     }
     if (tgl != null && tglEnd != null) {
       var sd = Timestamp.fromDate(DateUtils.dateOnly(tgl));
-      var ed =
-          Timestamp.fromDate(DateUtils.dateOnly(tglEnd).add(const Duration(days: 1)));
+      var ed = Timestamp.fromDate(
+          DateUtils.dateOnly(tglEnd).add(const Duration(days: 1)));
       return db
           .collection('bon')
           .where(Filter.and(
               Filter('tanggal', isGreaterThanOrEqualTo: sd),
               Filter('tanggal', isLessThan: ed),
               Filter('namaSubjek', isEqualTo: nama)))
+          .get()
+          .then((value) => value.docs
+              .map(
+                  (e) => BonData.fromJson(e.data()).copyWith(idKey: () => e.id))
+              .toList());
+    } else {
+      return db
+          .collection('bon')
+          .where(Filter('namaSubjek', isEqualTo: nama))
           .get()
           .then((value) => value.docs
               .map(

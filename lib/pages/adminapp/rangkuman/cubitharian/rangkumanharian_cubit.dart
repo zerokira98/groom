@@ -6,6 +6,7 @@ import 'package:groom/db/bon_repo.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/model/bondata_mdl.dart';
+import 'package:groom/model/pengeluaran_mdl.dart';
 import 'package:groom/model/perperson.dart';
 import 'package:groom/model/struk_mdl.dart';
 
@@ -33,8 +34,6 @@ class RangkumanDayCubit extends Cubit<RangkumanDayState> {
     for (var e in c) {
       bontot += e.tipe == BonType.berhutang ? e.jumlahBon : 0;
     }
-    print(c);
-    print(bontot);
     List<PerPerson> perPerson = [];
     num qrisTotal = 0;
     num operasionalTotal = 0;
@@ -79,6 +78,7 @@ class RangkumanDayCubit extends Cubit<RangkumanDayState> {
     emit(RangkumanDayLoaded(
         qristotal: qrisTotal,
         operasional: operasionalTotal,
+        pengeluaranList: b,
         bontotal: bontot,
         tanggalStart: DateUtils.dateOnly(filter['tanggalStart']),
         tanggalEnd: DateUtils.dateOnly(filter['tanggalEnd']),

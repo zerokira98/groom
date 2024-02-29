@@ -1,4 +1,9 @@
-part of 'db_service.dart';
+// part of 'db_service.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:groom/model/barang_mdl.dart';
+import 'package:groom/model/itemcard_mdl.dart';
+import 'package:sembast/sembast.dart';
 
 class BarangRepository {
   final StoreRef<int, Map<String, Object?>> _storeRef =
@@ -47,9 +52,10 @@ class BarangRepository {
     //     .toList());
   }
 
+  ///return single
   Future<List<BarangMdl>> find(String namaBarang) async {
     return ref
-        .where('namaBarrang', isEqualTo: namaBarang)
+        .where('namaBarang', isEqualTo: namaBarang)
         .get()
         .then((value) => value.docs.map((e) => e.data()).toList());
     // return _storeRef
@@ -58,5 +64,9 @@ class BarangRepository {
     //     .then((value) => value
     //         .map((e) => BarangMdl.fromJson(e.value).copyWith(id: () => e.key))
     //         .toList());
+  }
+
+  Future decrease(ItemCardMdl e) async {
+    // ref.where(''namaBarrang', isEqualTo: namaBarang')
   }
 }

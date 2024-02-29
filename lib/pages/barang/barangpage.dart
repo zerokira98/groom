@@ -1,6 +1,7 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/db_service.dart';
+import 'package:groom/db/barang_repo.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/barang/tambahbarang.dart';
@@ -102,6 +103,8 @@ class BarangEditDialog extends StatefulWidget {
 }
 
 class _BarangEditDialogState extends State<BarangEditDialog> {
+  var uangFormatter = CurrencyTextInputFormatter(
+      locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   final TextEditingController namaBarang = TextEditingController();
 
   final TextEditingController hargaJual = TextEditingController();
@@ -124,8 +127,8 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Row(
             children: [
-              Expanded(
-                child: const Text(
+              const Expanded(
+                child: Text(
                   'Edit',
                   textScaler: TextScaler.linear(2),
                 ),
@@ -137,10 +140,10 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
                       .then((value) => Navigator.pop(context));
                 },
                 onPressed: () {},
-                child: Text('Hapus barang'),
-                style: ButtonStyle(
+                style: const ButtonStyle(
                     backgroundColor: MaterialStatePropertyAll(Colors.red),
                     foregroundColor: MaterialStatePropertyAll(Colors.white)),
+                child: const Text('Hapus barang'),
               )
             ],
           ),
@@ -166,11 +169,11 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
                     if (value.isEmpty) return 'cant empty';
                     if (int.tryParse(value) == null) {
                       return 'not a valid number';
-                      return null;
                     }
                     return null;
                   },
                   controller: hargaJual,
+                  inputFormatters: [uangFormatter],
                   decoration: const InputDecoration(label: Text('Harga Jual')),
                 ),
               ),
@@ -182,7 +185,6 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
                     if (value.isEmpty) return 'cant empty';
                     if (int.tryParse(value) == null) {
                       return 'not a valid number';
-                      return null;
                     }
                     return null;
                   },

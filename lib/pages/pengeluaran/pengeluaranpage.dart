@@ -1,7 +1,7 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/db_service.dart';
+import 'package:groom/db/barang_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/barang/barangpage.dart';
@@ -123,8 +123,9 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                         },
                                         onChanged: (value) {
                                           setState(() {});
-                                          print(DateFormat.yMd('id_ID')
-                                              .tryParseStrict(value));
+                                          debugPrint(DateFormat.yMd('id_ID')
+                                              .tryParseStrict(value)
+                                              .toString());
                                         },
                                         decoration: InputDecoration(
                                             label: const Text('Tanggal'),
@@ -230,7 +231,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                       inputFormatters: [uangFormatter],
                                       onChanged: (value) {
                                         setState(() {});
-                                        // print(uangFormatter
+                                        // debugPrint(uangFormatter
                                         //     .getUnformattedValue());
                                       },
                                       decoration: InputDecoration(
@@ -289,6 +290,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                   try {
                     await RepositoryProvider.of<PengeluaranRepository>(context)
                         .insert(PengeluaranMdl(
+                            tanggalPost: DateTime.now(),
                             tipePengeluaran: typeValue,
                             tanggal: DateFormat.yMd('id_ID')
                                 .parseStrict(tanggal.text),
@@ -341,7 +343,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                   } catch (e) {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text(e.toString())));
-                    print(e);
+                    debugPrint(e.toString());
                   }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -354,7 +356,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
               )),
           // ElevatedButton(
           //     onPressed: () async {
-          //       print(uangFormatter.getUnformattedValue().toString());
+          //       debugPrint(uangFormatter.getUnformattedValue().toString());
           //     },
           //     child: const Text('try it!'))
         ],

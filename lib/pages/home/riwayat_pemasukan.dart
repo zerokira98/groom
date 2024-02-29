@@ -9,7 +9,6 @@ import 'package:groom/etc/extension.dart';
 import 'package:groom/etc/lockscreen_keylock.dart';
 import 'package:groom/model/model.dart';
 import 'package:intl/intl.dart';
-import 'package:open_app_file/open_app_file.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -115,10 +114,8 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
                                               RepositoryProvider.of<
                                                           PemasukanRepository>(
                                                       context)
-                                                  .deleteStruk(theData)
-                                                  .then((value) =>
-                                                      Navigator.pop(
-                                                          context, true));
+                                                  .deleteStruk(theData);
+                                              Navigator.pop(context, true);
                                             } else {}
                                           });
                                         },
@@ -178,28 +175,39 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
                               child: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(theData.namaKaryawan),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(theData.namaKaryawan,
+                                          textScaler: const TextScaler.linear(1.2)),
+                                    ),
                                     for (var e in theData.itemCards)
                                       Row(
                                         children: [
                                           Text('${cardType[e.type]} : '),
-                                          Text(e.price.toString())
+                                          Text((e.price * e.pcsBarang)
+                                              .toString())
                                         ],
                                       ),
-                                    Row(
-                                      children: [
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              generatePDF(true, theData);
-                                            },
-                                            child: Text('Share PDF')),
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              generatePDF(false, theData);
-                                            },
-                                            child: Text('Open PDF')),
-                                      ],
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                generatePDF(true, theData);
+                                              },
+                                              child: const Text('Share PDF')),
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                generatePDF(false, theData);
+                                              },
+                                              child: const Text('Open PDF')),
+                                        ],
+                                      ),
                                     )
                                   ],
                                 ),
@@ -229,7 +237,7 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
   }
 
   void generatePDF(bool share, StrukMdl theData) async {
-    const MethodChannel _platformCall = MethodChannel('launchFile');
+    const MethodChannel platformCall = MethodChannel('launchFile');
     //Create a PDF document.
     final PdfDocument document = PdfDocument();
     document.pageSettings.size = PdfPageSize.a6;
@@ -238,8 +246,6 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
     final PdfPage page = document.pages.add();
     //Get page client size
     final Size pageSize = page.getClientSize();
-    print(pageSize);
-
     final PdfGrid grid = PdfGrid();
     grid.columns.add(count: 4);
     final PdfGridRow headerRow = grid.headers.add(1)[0];
@@ -255,7 +261,9 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
     headerRow.cells[3]
       ..value = 'Total'
       ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 2);
+    var sumtotal = 0.0;
     for (var i = 0; i < theData.itemCards.length; i++) {
+      sumtotal += theData.itemCards[i].price * theData.itemCards[i].pcsBarang;
       var telo = grid.rows.add();
       telo.cells[0]
         ..value = (i + 1).toString()
@@ -264,7 +272,8 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         ..value = theData.itemCards[i].pcsBarang.toString()
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 2);
       telo.cells[3]
-        ..value = theData.itemCards[i].price.numberFormat(currency: true)
+        ..value = (theData.itemCards[i].price * theData.itemCards[i].pcsBarang)
+            .numberFormat(currency: true)
         ..stringFormat = PdfStringFormat(alignment: PdfTextAlignment.right)
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 2);
 
@@ -272,7 +281,7 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         ..value = cardType[theData.itemCards[i].type]
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 2);
     }
-    // grid.rows.add();
+    grid.rows.add().cells[3].value = sumtotal.numberFormat(currency: true);
     grid.columns[0].width = 24;
     grid.columns[2].width = 24;
 // Set header font.
@@ -283,7 +292,7 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         brush: PdfSolidBrush(PdfColor(0, 0, 0)),
         bounds: const Rect.fromLTWH(0, 0, 150, 20));
     page.graphics.drawString(
-      'Karyawan: ' + theData.namaKaryawan,
+      'Karyawan: ${theData.namaKaryawan}',
       PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.regular),
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 12, pageSize.width, 12),
@@ -292,7 +301,7 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
           lineAlignment: PdfVerticalAlignment.middle),
     );
     page.graphics.drawString(
-      theData.tanggal.formatLengkap() + ' ' + theData.tanggal.clockOnly(),
+      '${theData.tanggal.formatLengkap()} ${theData.tanggal.clockOnly()}',
       PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.regular),
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 24, pageSize.width, 12),
@@ -304,6 +313,7 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         page: page,
         bounds: Rect.fromLTWH(
             0, 44, page.getClientSize().width, page.getClientSize().height));
+
     var appdoc = await getApplicationDocumentsDirectory();
 // Save the document.
     var thefile = await File(join(appdoc.path, 'HelloWorld.pdf'))
@@ -313,14 +323,14 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         Share.shareXFiles([XFile(thefile.path)]);
       } else {
         await OpenFilex.open(thefile.path).then((value) {
-          print(value.message);
+          debugPrint(value.message);
           return null;
         });
       }
-      // print(thefile.absolute);
+      // debugPrint(thefile.absolute);
       // await OpenAppFile.open(thefile.path);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     // if (Platform.isAndroid || Platform.isIOS) {
     //   final Map<String, String> argument = <String, String>{

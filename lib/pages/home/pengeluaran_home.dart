@@ -17,6 +17,7 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final TextEditingController deskripsi = TextEditingController();
+  final TextEditingController uangController = TextEditingController();
 
   final uangFormatter = CurrencyTextInputFormatter(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
@@ -31,9 +32,11 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
           Expanded(
               child: FutureBuilder(
             future: RepositoryProvider.of<PengeluaranRepository>(context)
-                .getByKaryawan((BlocProvider.of<InputserviceBloc>(context).state
-                        as InputserviceLoaded)
-                    .karyawanName),
+                .getByKaryawan(
+                    (BlocProvider.of<InputserviceBloc>(context).state
+                            as InputserviceLoaded)
+                        .karyawanName,
+                    DateUtils.dateOnly(DateTime.now())),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
                 return ListView.builder(
@@ -82,6 +85,7 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
                         const Padding(padding: EdgeInsets.all(4)),
                         Expanded(
                           child: TextFormField(
+                            controller: uangController,
                             validator: (value) {
                               if (value == null) return null;
                               if (value.isEmpty) return 'cant be empty';
@@ -97,11 +101,12 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
                     ElevatedButton(
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
-                            // print(uangFormatter.getUnformattedValue());
+                            // debugPrint(uangFormatter.getUnformattedValue());
                             RepositoryProvider.of<PengeluaranRepository>(
                                     context)
                                 .insert(PengeluaranMdl(
                                     tanggal: DateTime.now(),
+                                    tanggalPost: DateTime.now(),
                                     namaPengeluaran: deskripsi.text,
                                     tipePengeluaran:
                                         TipePengeluaran.operasional,
@@ -112,8 +117,10 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
                                                     context)
                                                 .state as InputserviceLoaded)
                                             .karyawanName))
-                                .then((value) {
-                              setState(() {});
+                                .then((value) {});
+                            setState(() {
+                              deskripsi.text = '';
+                              uangController.text = '';
                             });
                           }
                         },

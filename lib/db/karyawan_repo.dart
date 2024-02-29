@@ -67,11 +67,13 @@ class KaryawanRepository implements _KaryawanRepo {
   }
 
   @override
-  Future<List<KaryawanData>> getAllKaryawan() {
+  Future<List<KaryawanData>> getAllKaryawan([bool? first]) {
     // var store = intMapStoreFactory.store('karyawanData');
+    GetOptions? getOptions =
+        first == null ? const GetOptions(source: Source.cache) : null;
     return ref
         .orderBy('namaKaryawan')
-        .get()
+        .get(getOptions)
         .then((value) => value.docs.map((e) => e.data()).toList());
     // return storeKaryawan
     //     .query(finder: Finder(sortOrders: [SortOrder('namaKaryawan')]))

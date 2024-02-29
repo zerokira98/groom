@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
+import 'package:groom/db/barang_repo.dart';
 import 'package:groom/db/db_service.dart';
 import 'package:groom/db/bon_repo.dart';
 import 'package:groom/db/karyawan_repo.dart';
@@ -77,12 +78,14 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => InputserviceBloc(
               strukrepo: RepositoryProvider.of<PemasukanRepository>(context),
-              karyawanrepo: RepositoryProvider.of<KaryawanRepository>(context)),
+              karyawanrepo: RepositoryProvider.of<KaryawanRepository>(context),
+              barangrepo: RepositoryProvider.of<BarangRepository>(context)),
         ),
         BlocProvider(
           create: (context) => RangkumanWeekCubit(
               RepositoryProvider.of<PemasukanRepository>(context),
-              RepositoryProvider.of<BonRepository>(context)),
+              RepositoryProvider.of<BonRepository>(context),
+              RepositoryProvider.of<PengeluaranRepository>(context)),
         ),
         BlocProvider(
           create: (context) => RangkumanDayCubit(

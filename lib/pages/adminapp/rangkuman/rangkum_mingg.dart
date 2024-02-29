@@ -60,7 +60,7 @@ class RangkumanMingguan extends StatelessWidget {
                   ),
                   IconButton(
                       onPressed: () {
-                        // print(state.daily.first.keys);
+                        // debugPrint(state.daily.first.keys);
                         showDialog(
                           context: context,
                           builder: (context) => PrintMingguan(
@@ -131,7 +131,7 @@ class RangkumanMingguan extends StatelessWidget {
                         for (var z in state.daily[index + 0])
                           ListTile(
                             onTap: () {
-                              // print(state.daily[index + 0]);
+                              // debugPrint(state.daily[index + 0]);
                             },
                             title: Text(z.namaKaryawan),
                             subtitle: Text(
@@ -160,7 +160,7 @@ class RangkumanMingguan extends StatelessWidget {
                       'Total income: ${state.totalKotor.toString().numberFormat(currency: true)}'),
                   Text(
                       'Income-bagihasil: ${(state.totalKotor - state.totalBagiHasil).toString().numberFormat()}'),
-                  Text('Pengeluaran: ${state.totalBagiHasil}+bon:nodata'),
+                  Text('Pengeluaran: ${state.pengeluaran}+bon:${state.bon}'),
                 ],
               )
             ]);
@@ -261,20 +261,21 @@ class TileMingguan extends StatelessWidget {
                                       Colors.green[800])),
                               onPressed: () async {
                                 var te = dataState.tanggalEnd;
-                                var checkdata = await RepositoryProvider.of<PengeluaranRepository>(context)
-                                    .getByOrder(TipePengeluaran.gaji,
-                                        starts: DateUtils.dateOnly(
-                                            DateTime.now().subtract(Duration(
-                                                days: DateTime.now().weekday))),
-                                        ends: DateUtils.dateOnly(DateTime.now()
-                                            .subtract(Duration(
-                                                days: DateTime.now().weekday))
-                                            .addDays(7)))
+                                var checkdata = await RepositoryProvider.of<
+                                        PengeluaranRepository>(context)
+                                    .getByOrder(
+                                      TipePengeluaran.gaji,
+                                      starts: DateUtils.dateOnly(te),
+                                      ends: DateUtils.dateOnly(
+                                          te.add(const Duration(days: 1))),
+                                    )
                                     .then((value) => value
-                                        .map((e) => e.karyawan == data.namaKaryawan ? e : null)
+                                        .map((e) =>
+                                            e.karyawan == data.namaKaryawan
+                                                ? e
+                                                : e)
                                         .nonNulls
                                         .toList());
-
                                 if (boolUtang && (tot + hutang).toInt() < 0) {
                                   await Flushbar(
                                     message: 'Mines Pak!',
@@ -288,7 +289,8 @@ class TileMingguan extends StatelessWidget {
                                   RepositoryProvider.of<PengeluaranRepository>(
                                           context)
                                       .insert(PengeluaranMdl(
-                                          tanggal: DateTime.now(),
+                                          tanggalPost: DateTime.now(),
+                                          tanggal: DateUtils.dateOnly(te),
                                           namaPengeluaran: data.namaKaryawan,
                                           tipePengeluaran: TipePengeluaran.gaji,
                                           pcs: 1,
@@ -337,12 +339,6 @@ class TileMingguan extends StatelessWidget {
                                 }
                               },
                               child: const Text('Bayar & Catat Pengeluaran')),
-                          // TextButton(
-                          //     onPressed: () {},
-                          //     child: const Text(
-                          //       'Bayar & Catat Tanpa Bayar Hutang',
-                          //       textAlign: TextAlign.center,
-                          //     )),
                           TextButton(
                               onPressed: () {
                                 Navigator.pop(context);

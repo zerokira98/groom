@@ -27,6 +27,23 @@ class _HutangHomeState extends State<HutangHome> {
       appBar: AppBar(title: const Text('Tambah Hutang')),
       body: Column(
         children: [
+          FutureBuilder(
+            future: RepositoryProvider.of<BonRepository>(context).getByNama(
+              nama: widget.namaKaryawan,
+            ),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                var total = 0.0;
+                for (var e in snapshot.data!) {
+                  total += e.jumlahBon * (e.tipe == BonType.berhutang ? -1 : 1);
+                }
+                return ListTile(
+                    subtitle: Text(total.numberFormat(currency: true)),
+                    title: const Text('Jumlah Hutang'));
+              }
+              return const CircularProgressIndicator();
+            },
+          ),
           Text(DateTime.now().formatLengkap()),
           const Padding(padding: EdgeInsets.all(8)),
           Expanded(
@@ -110,9 +127,6 @@ class _HutangHomeState extends State<HutangHome> {
                                   duration: const Duration(seconds: 2),
                                   animationDuration: Durations.long1,
                                 ).show(context);
-                                setState(() {
-                                  jumlahBon.text = '';
-                                });
                               }).onError((error, stackTrace) {
                                 Flushbar(
                                   message: 'Error $error',
@@ -120,8 +134,12 @@ class _HutangHomeState extends State<HutangHome> {
                                   animationDuration: Durations.long1,
                                 ).show(context);
                               });
+
+                              setState(() {
+                                jumlahBon.text = '';
+                              });
                             } catch (e) {
-                              print(e);
+                              debugPrint(e.toString());
                             }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(

@@ -218,14 +218,16 @@ class PemasukanRepository implements _PemasukanRepo {
 
   @override
   Future<int> insertStruk(StrukMdl data) {
-    return db.collection('strukMasuk').add(data.toJson()).then((value) async {
-      for (ItemCardMdl ew in data.itemCards) {
-        if (ew.type == cardType.length - 1) {
-          // await storeLainnya.add(db, ew.toJson());
-          await db.collection('strukLainnya').add(ew.toJson());
-        }
+    for (ItemCardMdl ew in data.itemCards) {
+      if (ew.type == cardType.length - 1) {
+        // await storeLainnya.add(db, ew.toJson());
+        db.collection('strukLainnya').add(ew.toJson());
       }
+    }
+    return db.collection('strukMasuk').add(data.toJson()).then((v) {
       return 1;
-    }).onError((error, stackTrace) => -1);
+    }).onError((error, stackTrace) {
+      return -1;
+    });
   }
 }

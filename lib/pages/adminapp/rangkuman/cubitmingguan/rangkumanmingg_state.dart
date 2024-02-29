@@ -18,15 +18,19 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
   final List<List<PerPerson>> daily;
   final int totalKotor;
   final int totalBagiHasil;
+  final num pengeluaran;
+  final num bon;
 
-  const RangkumanWeekLoaded(
+  RangkumanWeekLoaded(
       {required this.tanggalStart,
       required this.tanggalEnd,
       required this.groupBy,
       required this.dataPerPerson,
       required this.daily,
       required this.totalKotor,
-      required this.totalBagiHasil});
+      required this.totalBagiHasil,
+      required this.pengeluaran,
+      required this.bon});
 
   @override
   List<Object?> get props => [
@@ -36,7 +40,9 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
         dataPerPerson,
         daily,
         totalKotor,
-        totalBagiHasil
+        totalBagiHasil,
+        pengeluaran,
+        bon
       ];
 
   RangkumanWeekLoaded copyWith(
@@ -46,7 +52,9 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
       List<StrukMdl>? dataPerPerson,
       List<List<PerPerson>>? daily,
       int? totalKotor,
-      int? totalBagiHasil}) {
+      int? totalBagiHasil,
+      num? pengeluaran,
+      num? bon}) {
     return RangkumanWeekLoaded(
         tanggalStart: tanggalStart ?? this.tanggalStart,
         tanggalEnd: tanggalEnd ?? this.tanggalEnd,
@@ -54,7 +62,9 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
         dataPerPerson: dataPerPerson ?? this.dataPerPerson,
         daily: daily ?? this.daily,
         totalKotor: totalKotor ?? this.totalKotor,
-        totalBagiHasil: totalBagiHasil ?? this.totalBagiHasil);
+        totalBagiHasil: totalBagiHasil ?? this.totalBagiHasil,
+        pengeluaran: pengeluaran ?? this.pengeluaran,
+        bon: bon ?? this.bon);
   }
 }
 

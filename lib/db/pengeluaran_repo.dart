@@ -279,10 +279,9 @@ class PengeluaranRepository implements _PengeluaranRepo {
         Timestamp.fromDate(DateTime(ts.year, ts.month, ts.day));
     var endTimestamp = Timestamp.fromDate(DateTime(te.year, te.month, te.day));
     return storeRef
-        .where(
-          Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
-        )
-        .where(Filter('tanggal', isLessThan: endTimestamp))
+        .where(Filter.and(
+            Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
+            Filter('tanggal', isLessThan: endTimestamp)))
         .get()
         .then((value) => value.docs.map((e) => e.data()).toList());
   }
@@ -331,9 +330,11 @@ class PengeluaranRepository implements _PengeluaranRepo {
             .toList());
   }
 
-  Future<List<PengeluaranMdl>> getByKaryawan(String karyawan) {
+  Future<List<PengeluaranMdl>> getByKaryawan(String karyawan,
+      [DateTime? tanggal]) {
     return storeRef
         .where('karyawan', isEqualTo: karyawan)
+        .where('tanggal', isGreaterThanOrEqualTo: tanggal)
         .orderBy('tanggal')
         .get()
         .then((value) => value.docs.map((e) => e.data()).toList());
@@ -368,37 +369,32 @@ class PengeluaranRepository implements _PengeluaranRepo {
             : Timestamp.fromDate(
                 DateUtils.dateOnly(starts.add(const Duration(days: 1))))
         : Timestamp.fromDate(DateUtils.dateOnly(ends));
-    // List<Filter> filters = [];
-    // if (tipe != null) {
-    //   filters.add(Filter.equals('tipePengeluaran', tipe.name));
-    // }
-    // if (starts != null) {
-    //   filters.add(Filter.greaterThanOrEquals('tanggal', start));
-    //   if (ends != null) {
-    //     filters.add(Filter.lessThan('tanggal', end));
-    //   } else {
-    //     filters.add(Filter.lessThan('tanggal', end));
-    //   }
-    // }
-    var ref = storeRef;
+
     if (tipe != null) {
-      ref.where(Filter('tipePengeluaran', isEqualTo: tipe.name));
-    }
-    if (starts != null) {
-      ref.where(
-        Filter('tanggal', isGreaterThanOrEqualTo: start),
-      );
-    }
-    return ref
-        // .where(
-        //   Filter('tanggal', isGreaterThanOrEqualTo: start),
-        // )
-        // .where(
-        //   Filter('tanggal', isLessThan: end),
-        // )
-        // .where(Filter.and(
-        //   // Filter('tipePengeluaran', isEqualTo: tipe?.name),
-        // ))
+      if (starts != null) {
+        return storeRef
+            // .where()
+            .where(Filter.and(
+              Filter('tipePengeluaran', isEqualTo: tipe.name),
+              Filter('tanggal', isGreaterThanOrEqualTo: start),
+              Filter('tanggal', isLessThan: end),
+            ))
+            .get()
+            .then((value) => value.docs.map((e) => e.data()).toList());
+      }
+      return storeRef
+          .where(Filter('tipePengeluaran', isEqualTo: tipe.name))
+          .get()
+          .then((value) => value.docs.map((e) => e.data()).toList());
+    } else if (starts != null) {
+      return storeRef
+          .where(Filter('tanggal', isGreaterThanOrEqualTo: start))
+          .get()
+          .then((value) => value.docs.map((e) => e.data()).toList());
+    } else {}
+    return storeRef
+        // .where(Filter('tipePengeluaran',
+        //     isEqualTo: tipe?.name ?? TipePengeluaran.operasional))
         .get()
         .then((value) => value.docs.map((e) => e.data()).toList());
     // return storePengeluaran
@@ -445,7 +441,10 @@ class PengeluaranRepository implements _PengeluaranRepo {
 
   @override
   Future<int> insert(PengeluaranMdl data) {
-    return firestore.collection('pengeluaran').add(data.toJson()).then((value) {
+    return firestore
+        .collection('pengeluaran')
+        .add(data.copyWith(tanggalPost: DateTime.now()).toJson())
+        .then((value) {
       return 1;
     }).onError((error, stackTrace) => -1);
   }

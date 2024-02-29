@@ -4,11 +4,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
-import 'package:open_app_file/open_app_file.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
@@ -28,7 +26,7 @@ class PrintMingguan extends StatelessWidget {
     karyawanListfr =
         karyawanListfr.map((e) => e.aktif ? e : null).nonNulls.toList();
     var karyawanList = karyawanListfr.map((e) => e.namaKaryawan).toList();
-    // print(karyawanList);
+    // debugPrint(karyawanList);
     // var karyawanList = ['Rudy', 'Alfin', 'Febri', 'Indra', 'Yudha'];
     var karyawanColorList = [
       'DDEBF7',
@@ -116,7 +114,7 @@ class PrintMingguan extends StatelessWidget {
       // final filePath = await FlutterFileDialog.saveFile(params: params);
       // if (filePath != null) {
       var x = await OpenFilex.open(theFile.path);
-      print(x.message);
+      debugPrint(x.message);
       // }
     }
     workbook.dispose();

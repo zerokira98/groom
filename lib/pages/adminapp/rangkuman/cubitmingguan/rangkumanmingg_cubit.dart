@@ -1,7 +1,10 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:groom/db/bon_repo.dart';
 import 'package:groom/db/pemasukan_repo.dart';
+import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/model/bondata_mdl.dart';
 import 'package:groom/model/itemcard_mdl.dart';
 import 'package:groom/model/perperson.dart';
@@ -12,7 +15,8 @@ part 'rangkumanmingg_state.dart';
 class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
   PemasukanRepository repoPemasukan;
   BonRepository repoBon;
-  RangkumanWeekCubit(this.repoPemasukan, this.repoBon)
+  PengeluaranRepository repoKeluar;
+  RangkumanWeekCubit(this.repoPemasukan, this.repoBon, this.repoKeluar)
       : super(RangkumanWeekInitial());
 
   ///Map filter =>require start senin->end minggu 00:00 => 23.59
@@ -29,7 +33,16 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
         };
     var jumlahPiutang = 0;
     var jumlahPiutangTerbayar = 0;
-    var bon = await repoBon.getAllBon();
+    var bon = await repoBon.getBonFiltered(Filter.and(
+      Filter('tanggal',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(DateUtils.dateOnly(ts))),
+      Filter('tanggal', isLessThan: Timestamp.fromDate(DateUtils.dateOnly(te))),
+    ));
+    var pengeluaran = await repoKeluar.getFiltered(tglStart: ts, tglEnd: te);
+    var totalKeluar = 0.0;
+    for (var e in pengeluaran) {
+      totalKeluar += e.biaya * e.pcs;
+    }
     for (var e in bon) {
       switch (e.tipe) {
         case BonType.berhutang:
@@ -157,7 +170,7 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
         'tanggalStart': DateTime(ts.year, ts.month, ts.day),
         'tanggalEnd': DateTime(te.year, te.month, te.day),
       });
-      print(a);
+      // debugPrint(a);
 
       ///too many loop @_@
       for (var e1 in a) {
@@ -189,7 +202,9 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
         },
       );
       emit(RangkumanWeekLoaded(
+        bon: jumlahPiutangTerbayar - jumlahPiutang,
         groupBy: groupBy,
+        pengeluaran: totalKeluar,
         tanggalStart: filter['tanggalStart'],
         tanggalEnd: filter['tanggalEnd'],
         dataPerPerson: dataPerPerson,

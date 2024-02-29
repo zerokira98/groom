@@ -13,10 +13,10 @@ class PlayBox extends StatelessWidget {
                 ///==-=-=-
                 var availability = await FlutterNfcKit.nfcAvailability;
                 if (availability != NFCAvailability.available) {
-                  print('oh no');
+                  debugPrint('oh no');
                   // oh-no
                 } else {
-                  print('oh yes');
+                  debugPrint('oh yes');
                 }
 
                 ///
@@ -25,7 +25,7 @@ class PlayBox extends StatelessWidget {
                     timeout: const Duration(seconds: 15),
                     iosMultipleTagMessage: "Multiple tags found!",
                     iosAlertMessage: "Scan your tag");
-                print(tag.toJson());
+                debugPrint(tag.toJson());
               },
               child: const Text('Lets play!'))),
     );

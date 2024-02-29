@@ -44,5 +44,5 @@ final class InputserviceLoaded extends InputserviceState {
 
   @override
   List<Object?> get props =>
-      [karyawanName, itemCards, tanggal, err, success, tipePembayaran];
+      [karyawanName, itemCards, tanggal, tipePembayaran, err, success];
 }

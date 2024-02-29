@@ -1,7 +1,7 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/db_service.dart';
+import 'package:groom/db/barang_repo.dart';
 import 'package:groom/model/model.dart';
 
 class TambahBarang extends StatefulWidget {

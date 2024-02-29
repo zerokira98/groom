@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/karyawan_repo.dart';
@@ -157,12 +158,20 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
                               });
                             },
                             trailing: IconButton(
-                                onPressed: () {
-                                  RepositoryProvider.of<KaryawanRepository>(
-                                          context)
-                                      .update(snapshot.data![index].copyWith(
-                                          aktif: !snapshot.data![index].aktif))
-                                      .then((value) => Navigator.pop(context));
+                                onPressed: () async {
+                                  final connectivityResult =
+                                      await (Connectivity()
+                                          .checkConnectivity());
+                                  if (connectivityResult !=
+                                      ConnectivityResult.none) {
+                                    RepositoryProvider.of<KaryawanRepository>(
+                                            context)
+                                        .update(snapshot.data![index].copyWith(
+                                            aktif:
+                                                !snapshot.data![index].aktif))
+                                        .then(
+                                            (value) => Navigator.pop(context));
+                                  }
                                 },
                                 icon: const Icon(Icons.power_settings_new)),
                             selectedTileColor: Colors.black38,

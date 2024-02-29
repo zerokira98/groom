@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/bon_repo.dart';
 import 'package:groom/db/karyawan_repo.dart';
+import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fc;
@@ -116,7 +117,19 @@ class _BonPageState extends State<BonPage> {
                                     child: ListView.builder(
                                       itemCount: ttt.length,
                                       itemBuilder: (context, index) => ListTile(
-                                        title: Text(ttt[index].tipe.name),
+                                        title: Row(
+                                          children: [
+                                            Text(ttt[index]
+                                                .tipe
+                                                .name
+                                                .firstUpcase()),
+                                            Text(ttt[index]
+                                                    .author
+                                                    ?.name
+                                                    .firstUpcase() ??
+                                                ''),
+                                          ],
+                                        ),
                                         subtitle: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -124,10 +137,11 @@ class _BonPageState extends State<BonPage> {
                                             Text(ttt[index]
                                                 .jumlahBon
                                                 .toString()),
-                                            Text(ttt[index]
-                                                    .tanggal
-                                                    ?.toString() ??
-                                                'tanggal'),
+                                            Text('${ttt[index]
+                                                    .tanggal!
+                                                    .formatDayMonth()} ${ttt[index]
+                                                    .tanggal!
+                                                    .clockOnly()}'),
                                           ],
                                         ),
                                       ),
@@ -217,7 +231,7 @@ class _BonAddPageState extends State<BonAddPage> {
                                 typeValue = value;
                               });
                             }
-                            print(value);
+                            debugPrint(value.toString());
                           },
                         ),
                         const Expanded(child: SizedBox()),
@@ -305,7 +319,7 @@ class _BonAddPageState extends State<BonAddPage> {
                         duration: Durations.long1, curve: Curves.easeInOut);
                   });
                 } catch (e) {
-                  print(e);
+                  debugPrint(e.toString());
                 }
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -320,7 +334,7 @@ class _BonAddPageState extends State<BonAddPage> {
         //     onPressed: () async {
         //       // var t = await RepositoryProvider.of<BonRepository>(context)
         //       //     .getAllBon();
-        //       print(uangFormatter.getUnformattedValue().toString());
+        //       debugPrint(uangFormatter.getUnformattedValue().toString());
         //     },
         //     child: const Text('try it!'))
       ],
@@ -376,7 +390,7 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
                                 typeValue = value;
                               });
                             }
-                            print(value);
+                            debugPrint(value.toString());
                           },
                         ),
                         const Expanded(child: SizedBox()),
@@ -479,7 +493,7 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
                           duration: Durations.long1, curve: Curves.easeInOut);
                     });
                   } catch (e) {
-                    print(e);
+                    debugPrint(e.toString());
                   }
                 } else {
                   var message = totalBon == 0
@@ -511,7 +525,7 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
         //     onPressed: () async {
         //       // var t = await RepositoryProvider.of<BonRepository>(context)
         //       //     .getAllBon();
-        //       print(uangFormatter.getUnformattedValue().toString());
+        //       debugPrint(uangFormatter.getUnformattedValue().toString());
         //     },
         //     child: const Text('try it!'))
       ],

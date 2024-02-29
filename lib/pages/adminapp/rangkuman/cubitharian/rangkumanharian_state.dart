@@ -13,6 +13,7 @@ final class RangkumanDayLoaded extends RangkumanDayState {
   final DateTime tanggalStart;
   final DateTime tanggalEnd;
   final List<PerPerson> incomePerPerson;
+  final List<PengeluaranMdl> pengeluaranList;
   final num qristotal;
   final num operasional;
   final num bontotal;
@@ -20,6 +21,7 @@ final class RangkumanDayLoaded extends RangkumanDayState {
       {required this.tanggalStart,
       required this.tanggalEnd,
       required this.incomePerPerson,
+      required this.pengeluaranList,
       required this.qristotal,
       required this.operasional,
       required this.bontotal});
@@ -29,6 +31,7 @@ final class RangkumanDayLoaded extends RangkumanDayState {
         tanggalStart,
         tanggalEnd,
         incomePerPerson,
+        pengeluaranList,
         qristotal,
         operasional,
         bontotal
@@ -38,6 +41,7 @@ final class RangkumanDayLoaded extends RangkumanDayState {
       {DateTime? tanggalStart,
       DateTime? tanggalEnd,
       List<PerPerson>? incomePerPerson,
+      List<PengeluaranMdl>? pengeluaranList,
       num? qristotal,
       num? operasional,
       num? bontotal}) {
@@ -45,6 +49,7 @@ final class RangkumanDayLoaded extends RangkumanDayState {
         tanggalStart: tanggalStart ?? this.tanggalStart,
         tanggalEnd: tanggalEnd ?? this.tanggalEnd,
         incomePerPerson: incomePerPerson ?? this.incomePerPerson,
+        pengeluaranList: pengeluaranList ?? this.pengeluaranList,
         qristotal: qristotal ?? this.qristotal,
         operasional: operasional ?? this.operasional,
         bontotal: bontotal ?? this.bontotal);

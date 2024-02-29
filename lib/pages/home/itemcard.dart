@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
-import 'package:groom/db/db_service.dart';
+import 'package:groom/db/barang_repo.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 
 import 'package:groom/model/model.dart';
@@ -233,7 +233,7 @@ class _ItemCardGoodsState extends State<ItemCardGoods> {
                       .find(option)
                       .then((value) {
                     if (value.isNotEmpty) {
-                      print(value.first);
+                      debugPrint(value.first.toString());
                       setState(() {
                         priceController.text = value.first.hargajual.toString();
                       });
@@ -250,10 +250,18 @@ class _ItemCardGoodsState extends State<ItemCardGoods> {
                   if (textEditingValue.text == '') {
                     return const Iterable<String>.empty();
                   }
-                  var aa = await RepositoryProvider.of<BarangRepository>(
-                          context)
-                      .getAll()
-                      .then((value) => value.map((e) => e.namaBarang).toList());
+                  var aa =
+                      await RepositoryProvider.of<BarangRepository>(context)
+                          .getAll()
+                          .then((value) => value
+                              .map((e) => RegExp(textEditingValue.text,
+                                          caseSensitive: false)
+                                      .hasMatch(e.namaBarang)
+                                  ? e.namaBarang
+                                  : null)
+                              .nonNulls
+                              .toList());
+
                   // await RepositoryProvider.of<PengeluaranRepository>(
                   //         context)
                   //     .getNamaBarang(textEditingValue.text);

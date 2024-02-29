@@ -1,6 +1,7 @@
 // part of 'DBservice.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:groom/model/ekuitas_mdl.dart';
 import 'package:sembast/sembast.dart' hide Filter;
 
@@ -32,7 +33,7 @@ class EkuitasRepository extends _EkuitasRepo {
   @override
   Future<int> add(EkuitasMdl data) async {
     return ref.add(data).then((value) => 1).onError((error, stackTrace) {
-      print(error);
+      debugPrint(error.toString());
       return -1;
     });
     // return await store.add(db, data.toJson());

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:groom/pages/adminapp/equity/uangkeluar.dart';
 import 'package:groom/pages/adminapp/karyawan.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
 import 'package:groom/pages/barang/barangpage.dart';
 import 'package:groom/pages/adminapp/bon/bon_page.dart';
-import 'package:groom/pages/equity/equitypage.dart';
+import 'package:groom/pages/adminapp/equity/equitypage.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:groom/pages/pengeluaran/pengeluaranpage.dart';
 // import 'package:groom/pages/rangkuman/cubitharian/rangkumanharian_cubit.dart';
@@ -23,13 +24,14 @@ class AdminPage extends StatelessWidget {
         //       onPressed: () async {
         //         var a = await RepositoryProvider.of<KaryawanRepository>(context)
         //             .getAllKaryawan();
-        //         print(a);
+        //         debugPrint(a);
         //       },
         //       icon: const Icon(Icons.bug_report))
         // ],
       ),
       body: SingleChildScrollView(
         child: Wrap(
+          spacing: 8.0,
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
@@ -48,55 +50,49 @@ class AdminPage extends StatelessWidget {
                 ],
               ),
             ),
-            Card(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PengeluaranPage(),
-                      ));
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.edit),
-                    Padding(padding: EdgeInsets.only(right: 4)),
-                    const Text('Catat Pengeluaran'),
-                  ],
-                ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PengeluaranPage(),
+                    ));
+              },
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.edit),
+                  Padding(padding: EdgeInsets.only(right: 4)),
+                  Text('Catat Pengeluaran'),
+                ],
               ),
             ),
-            Card(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HistoriPengeluaran(),
-                      ));
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.history),
-                    Padding(padding: EdgeInsets.only(right: 4)),
-                    const Text('Histori Pengeluaran'),
-                  ],
-                ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HistoriPengeluaran(),
+                    ));
+              },
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.history),
+                  Padding(padding: EdgeInsets.only(right: 4)),
+                  Text('Histori Pengeluaran'),
+                ],
               ),
             ),
-            Card(
-              child: ElevatedButton(
-                child: const Text('Bon / Piutang'),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const BonPage(),
-                      ));
-                },
-              ),
+            ElevatedButton(
+              child: const Text('Bon / Piutang'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BonPage(),
+                    ));
+              },
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -111,21 +107,29 @@ class AdminPage extends StatelessWidget {
                             Theme.of(context).primaryColorDark,
                             Theme.of(context).primaryColorDark.withOpacity(0.45)
                           ])),
-                          child: const Text('Masuk')))
+                          child: const Text('Uang / Rekonsiliasi Bank')))
                 ],
               ),
             ),
-            Card(
-              child: ElevatedButton(
-                child: const Text('Uang Masuk'),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const EkuitasPage(),
-                      ));
-                },
-              ),
+            ElevatedButton(
+              child: const Text('Uang Masuk'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EkuitasPage(),
+                    ));
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Uang Keluar'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UangKeluarPage(),
+                    ));
+              },
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -144,70 +148,64 @@ class AdminPage extends StatelessWidget {
                 ],
               ),
             ),
-            Card(
-              child: ElevatedButton(
-                child: const Text('Rangkuman Harian'),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BlocProvider.value(
-                          value: BlocProvider.of<RangkumanDayCubit>(context)
-                            ..loadData({
-                              'tanggalStart': DateTime.now(),
-                              'tanggalEnd': DateTime.now().addDays(1),
-                            }),
-                          child: const RangkumanHarian(),
-                        ),
-                      ));
-                },
-              ),
-            ),
-            Card(
-              child: ElevatedButton(
-                child: const Text('Rangkuman Mingguan'),
-                onPressed: () {
-                  Navigator.push(
+            ElevatedButton(
+              child: const Text('Rangkuman Harian'),
+              onPressed: () {
+                Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => BlocProvider.value(
-                        value: BlocProvider.of<RangkumanWeekCubit>(context)
+                        value: BlocProvider.of<RangkumanDayCubit>(context)
                           ..loadData({
-                            'tanggalStart': DateTime(DateTime.now().year,
-                                    DateTime.now().month, DateTime.now().day)
-                                .subtract(Duration(
-                              days: DateTime.now().weekday,
-                            )),
-                            'tanggalEnd': DateTime(DateTime.now().year,
-                                    DateTime.now().month, DateTime.now().day)
-                                .subtract(Duration(
-                                  days: DateTime.now().weekday,
-                                ))
-                                .add(const Duration(days: 7)),
+                            'tanggalStart': DateTime.now(),
+                            'tanggalEnd': DateTime.now().addDays(1),
                           }),
-                        child: const RangkumanMingguan(),
-                        // ),
+                        child: const RangkumanHarian(),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    ));
+              },
             ),
-            Card(
-              child: ElevatedButton(
-                child: const Text('Rangkuman Bulanan'),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BlocProvider.value(
-                          value: BlocProvider.of<BulananCubit>(context)
-                            ..loadData(DateTime.now()),
-                          child: const RangkumMonth(),
-                        ),
-                      ));
-                },
-              ),
+            ElevatedButton(
+              child: const Text('Rangkuman Mingguan'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider.value(
+                      value: BlocProvider.of<RangkumanWeekCubit>(context)
+                        ..loadData({
+                          'tanggalStart': DateTime(DateTime.now().year,
+                                  DateTime.now().month, DateTime.now().day)
+                              .subtract(Duration(
+                            days: DateTime.now().weekday,
+                          )),
+                          'tanggalEnd': DateTime(DateTime.now().year,
+                                  DateTime.now().month, DateTime.now().day)
+                              .subtract(Duration(
+                                days: DateTime.now().weekday,
+                              ))
+                              .add(const Duration(days: 7)),
+                        }),
+                      child: const RangkumanMingguan(),
+                      // ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Rangkuman Bulanan'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider.value(
+                        value: BlocProvider.of<BulananCubit>(context)
+                          ..loadData(DateTime.now()),
+                        child: const RangkumMonth(),
+                      ),
+                    ));
+              },
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -226,29 +224,25 @@ class AdminPage extends StatelessWidget {
                 ],
               ),
             ),
-            Card(
-              child: ElevatedButton(
-                child: const Text('Atur Karyawan'),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const KaryawanConfig(),
-                      ));
-                },
-              ),
+            ElevatedButton(
+              child: const Text('Atur Karyawan'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const KaryawanConfig(),
+                    ));
+              },
             ),
-            Card(
-              child: ElevatedButton(
-                child: const Text('Atur Barang'),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const BarangPage(),
-                      ));
-                },
-              ),
+            ElevatedButton(
+              child: const Text('Atur Barang'),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BarangPage(),
+                    ));
+              },
             ),
             const ReportCard(),
           ],

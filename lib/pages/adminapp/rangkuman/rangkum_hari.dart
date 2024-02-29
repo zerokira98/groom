@@ -52,14 +52,13 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                     ],
                   ),
                   Text(
-                      'Total cash : ${(fullTotal - state.qristotal - state.operasional - state.bontotal).toInt().numberFormat(currency: true)}'),
+                      'Total cash laci: ${(fullTotal - state.qristotal - state.operasional - state.bontotal).toInt().numberFormat(currency: true)}'),
                 ],
               ),
             )),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text('Harian'),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
@@ -106,16 +105,65 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                   ],
                 ),
                 Expanded(
-                    child: Column(
-                  children: [
-                    // perPerson.entries
-                    for (var e in state.incomePerPerson)
-                      ListTile(
-                        title: Text(e.namaKaryawan),
-                        subtitle: Text(
-                            e.totalPendapatan.numberFormat(currency: true)),
-                      )
-                  ],
+                    flex: 1,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                        gradient: LinearGradient(colors: [
+                                      Theme.of(context).primaryColorDark,
+                                      Theme.of(context).primaryColorDark,
+                                      Theme.of(context)
+                                          .primaryColorDark
+                                          .withOpacity(0.45)
+                                    ])),
+                                    child: const Text('Pemasukan')),
+                              ),
+                            ],
+                          ),
+                          // perPerson.entries
+                          for (var e in state.incomePerPerson)
+                            ListTile(
+                              title: Text(e.namaKaryawan),
+                              subtitle: Text(e.totalPendapatan
+                                  .numberFormat(currency: true)),
+                            )
+                        ],
+                      ),
+                    )),
+                Expanded(
+                    child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    gradient: LinearGradient(colors: [
+                                  Theme.of(context).primaryColorDark,
+                                  Theme.of(context).primaryColorDark,
+                                  Theme.of(context)
+                                      .primaryColorDark
+                                      .withOpacity(0.45)
+                                ])),
+                                child: const Text('Pengeluaran')),
+                          ),
+                        ],
+                      ),
+                      for (var e in state.pengeluaranList)
+                        ListTile(
+                          title: Text(e.namaPengeluaran),
+                          subtitle: Text(e.biaya.numberFormat(currency: true)),
+                        )
+                    ],
+                  ),
                 ))
               ],
             ),
