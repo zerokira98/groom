@@ -16,21 +16,27 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
   final List<StrukMdl> dataPerPerson;
   // final RangkumFilter filter;
   final List<List<PerPerson>> daily;
+  final Map pengeluaranlist;
   final int totalKotor;
   final int totalBagiHasil;
   final num pengeluaran;
   final num bon;
+  final List<StrukMdl> dataPerPersoncut;
+  final List<List<PerPerson>> dailycut;
 
-  RangkumanWeekLoaded(
+  const RangkumanWeekLoaded(
       {required this.tanggalStart,
       required this.tanggalEnd,
       required this.groupBy,
       required this.dataPerPerson,
       required this.daily,
+      required this.pengeluaranlist,
       required this.totalKotor,
       required this.totalBagiHasil,
       required this.pengeluaran,
-      required this.bon});
+      required this.bon,
+      required this.dataPerPersoncut,
+      required this.dailycut});
 
   @override
   List<Object?> get props => [
@@ -39,10 +45,13 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
         groupBy,
         dataPerPerson,
         daily,
+        pengeluaranlist,
         totalKotor,
         totalBagiHasil,
         pengeluaran,
-        bon
+        bon,
+        dataPerPersoncut,
+        dailycut
       ];
 
   RangkumanWeekLoaded copyWith(
@@ -51,20 +60,26 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
       GroupBy? groupBy,
       List<StrukMdl>? dataPerPerson,
       List<List<PerPerson>>? daily,
+      Map? pengeluaranlist,
       int? totalKotor,
       int? totalBagiHasil,
       num? pengeluaran,
-      num? bon}) {
+      num? bon,
+      List<StrukMdl>? dataPerPersoncut,
+      List<List<PerPerson>>? dailycut}) {
     return RangkumanWeekLoaded(
         tanggalStart: tanggalStart ?? this.tanggalStart,
         tanggalEnd: tanggalEnd ?? this.tanggalEnd,
         groupBy: groupBy ?? this.groupBy,
         dataPerPerson: dataPerPerson ?? this.dataPerPerson,
         daily: daily ?? this.daily,
+        pengeluaranlist: pengeluaranlist ?? this.pengeluaranlist,
         totalKotor: totalKotor ?? this.totalKotor,
         totalBagiHasil: totalBagiHasil ?? this.totalBagiHasil,
         pengeluaran: pengeluaran ?? this.pengeluaran,
-        bon: bon ?? this.bon);
+        bon: bon ?? this.bon,
+        dataPerPersoncut: dataPerPersoncut ?? this.dataPerPersoncut,
+        dailycut: dailycut ?? this.dailycut);
   }
 }
 

@@ -4,14 +4,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
+import 'package:intl/intl.dart';
 
-class UangKeluarPage extends StatelessWidget {
+class UangKeluarPage extends StatefulWidget {
   const UangKeluarPage({super.key});
 
+  @override
+  State<UangKeluarPage> createState() => _UangKeluarPageState();
+}
+
+class _UangKeluarPageState extends State<UangKeluarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        bottom: const PreferredSize(
+            preferredSize: Size.zero,
+            child: Text('Masuk ke tabel pengeluaran')),
         title: const Text('Uang Keluar'),
       ),
       body: Column(
@@ -21,20 +30,34 @@ class UangKeluarPage extends StatelessWidget {
             sortBy: TipePengeluaran.uang,
             hidebar: true,
           )),
-          InputCardKeluar()
+          InputCardKeluar(setstate: setState)
         ],
       ),
     );
   }
 }
 
-class InputCardKeluar extends StatelessWidget {
-  InputCardKeluar({super.key});
+class InputCardKeluar extends StatefulWidget {
+  final void Function(VoidCallback fn) setstate;
+  const InputCardKeluar({super.key, required this.setstate});
+
+  @override
+  State<InputCardKeluar> createState() => _InputCardKeluarState();
+}
+
+class _InputCardKeluarState extends State<InputCardKeluar> {
   final TextEditingController deskripsi = TextEditingController();
+
   final TextEditingController uang = TextEditingController();
+
+  final TextEditingController tanggal = TextEditingController(
+      text: DateFormat.yMd('id_ID').format(DateTime.now()));
+
   final uangFormatter = CurrencyTextInputFormatter(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
+
   final GlobalKey<FormState> formKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -68,6 +91,7 @@ class InputCardKeluar extends StatelessWidget {
                 children: [
                   Expanded(
                       child: TextFormField(
+                    keyboardType: TextInputType.number,
                     controller: uang,
                     validator: (value) {
                       if (value == null) {
@@ -92,6 +116,46 @@ class InputCardKeluar extends StatelessWidget {
                     },
                     decoration: const InputDecoration(label: Text('Uang')),
                   )),
+                  const Padding(padding: EdgeInsets.all(4)),
+                  Expanded(
+                      child: TextFormField(
+                          controller: tanggal,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null) return null;
+                            try {
+                              DateFormat.yMd('id_ID').parseStrict(value);
+                              return null;
+                            } on FormatException catch (e) {
+                              return e.message.toString();
+                            }
+                          },
+                          onChanged: (value) {
+                            widget.setstate(() {});
+                            debugPrint(DateFormat.yMd('id_ID')
+                                .tryParseStrict(value)
+                                .toString());
+                          },
+                          decoration: InputDecoration(
+                              label: const Text('Tanggal'),
+                              errorMaxLines: 2,
+                              suffixIcon: InkWell(
+                                onTap: () {
+                                  showDatePicker(
+                                          context: context,
+                                          firstDate: DateTime(2020),
+                                          lastDate: DateTime.now())
+                                      .then((value) {
+                                    if (value != null) {
+                                      widget.setstate(() {
+                                        tanggal.text = DateFormat.yMd('id_ID')
+                                            .format(value);
+                                      });
+                                    }
+                                  });
+                                },
+                                child: const Icon(Icons.calendar_today),
+                              ))))
                 ],
               ),
               Row(
@@ -101,12 +165,17 @@ class InputCardKeluar extends StatelessWidget {
                         if (formKey.currentState!.validate()) {
                           RepositoryProvider.of<PengeluaranRepository>(context)
                               .insert(PengeluaranMdl(
-                                  tanggal: DateTime.now(),
+                                  tanggal: DateFormat.yMd('id_ID')
+                                      .parseStrict(tanggal.text),
                                   tanggalPost: DateTime.now(),
                                   namaPengeluaran: deskripsi.text,
                                   tipePengeluaran: TipePengeluaran.uang,
                                   pcs: 1,
                                   biaya: uangFormatter.getUnformattedValue()));
+                          widget.setstate(() {
+                            deskripsi.clear();
+                            uang.clear();
+                          });
                           // .add(
                           //   EkuitasMdl(
                           //     tanggal: DateTime.now(),

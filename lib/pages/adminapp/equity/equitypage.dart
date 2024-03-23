@@ -7,6 +7,7 @@ import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/db/uangmasuk_repo.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
+import 'package:intl/intl.dart';
 
 class EkuitasPage extends StatefulWidget {
   const EkuitasPage({super.key});
@@ -80,23 +81,39 @@ class _EkuitasPageState extends State<EkuitasPage> {
             ),
           ),
           // const ReportCard(),
-          InputCard()
+          InputCard(setstate: setState)
         ],
       ),
     );
   }
 }
 
-class InputCard extends StatelessWidget {
-  InputCard({super.key});
+class InputCard extends StatefulWidget {
+  final void Function(VoidCallback fn) setstate;
+  const InputCard({super.key, required this.setstate});
+
+  @override
+  State<InputCard> createState() => _InputCardState();
+}
+
+class _InputCardState extends State<InputCard> {
   final TextEditingController deskripsi = TextEditingController();
+
   final TextEditingController uang = TextEditingController();
+
+  final TextEditingController tanggal = TextEditingController(
+      text: DateFormat.yMd('id_ID').format(DateTime.now()));
+
   final uangFormatter = CurrencyTextInputFormatter(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
+
   final GlobalKey<FormState> formKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 2,
+      margin: const EdgeInsets.all(8),
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Form(
@@ -140,6 +157,7 @@ class InputCard extends StatelessWidget {
                       }
                       return null;
                     },
+                    keyboardType: TextInputType.number,
                     inputFormatters: [uangFormatter],
                     onChanged: (value) {
                       if (int.tryParse(value) != null) {
@@ -151,20 +169,65 @@ class InputCard extends StatelessWidget {
                     },
                     decoration: const InputDecoration(label: Text('Uang')),
                   )),
+                  const Padding(padding: EdgeInsets.all(4)),
+                  Expanded(
+                      child: TextFormField(
+                          controller: tanggal,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null) return null;
+                            try {
+                              DateFormat.yMd('id_ID').parseStrict(value);
+                              return null;
+                            } on FormatException catch (e) {
+                              return e.message.toString();
+                            }
+                          },
+                          onChanged: (value) {
+                            widget.setstate(() {});
+                            debugPrint(DateFormat.yMd('id_ID')
+                                .tryParseStrict(value)
+                                .toString());
+                          },
+                          decoration: InputDecoration(
+                              label: const Text('Tanggal'),
+                              errorMaxLines: 2,
+                              suffixIcon: InkWell(
+                                onTap: () {
+                                  showDatePicker(
+                                          context: context,
+                                          firstDate: DateTime(2020),
+                                          lastDate: DateTime.now())
+                                      .then((value) {
+                                    if (value != null) {
+                                      widget.setstate(() {
+                                        tanggal.text = DateFormat.yMd('id_ID')
+                                            .format(value);
+                                      });
+                                    }
+                                  });
+                                },
+                                child: const Icon(Icons.calendar_today),
+                              ))))
                 ],
               ),
               Row(
                 children: [
-                  TextButton(
+                  ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          RepositoryProvider.of<EkuitasRepository>(context)
-                              .add(EkuitasMdl(
-                                  tanggal: DateTime.now(),
+                          RepositoryProvider.of<EkuitasRepository>(context).add(
+                              EkuitasMdl(
+                                  tanggal: DateFormat.yMd('id_ID')
+                                      .parseStrict(tanggal.text),
                                   uang: uangFormatter.getUnformattedValue(),
-                                  deskripsi: deskripsi.text))
-                              .then((value) =>
-                                  value == 1 ? Navigator.pop(context) : null);
+                                  deskripsi: deskripsi.text));
+                          widget.setstate(() {
+                            deskripsi.clear();
+                            uang.clear();
+                          });
+                          // .then((value) =>
+                          //     value == 1 ? Navigator.pop(context) : null);
                         }
                       },
                       child: const Text('Submit'))
@@ -197,12 +260,14 @@ class _ReportCardState extends State<ReportCard> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text('Masuk :'),
+
                 ///total ekuitas
                 FutureBuilder(
                   future: RepositoryProvider.of<EkuitasRepository>(context)
@@ -244,6 +309,24 @@ class _ReportCardState extends State<ReportCard> {
                     }
                   },
                 ),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //         child: Container(
+                //             padding: const EdgeInsets.all(8),
+                //             decoration: BoxDecoration(
+                //                 gradient: LinearGradient(colors: [
+                //               Theme.of(context).primaryColorDark,
+                //               Theme.of(context).primaryColorDark,
+                //               Theme.of(context)
+                //                   .primaryColorDark
+                //                   .withOpacity(0.45)
+                //             ])),
+                //             child: const
+                const Text('Keluar :'),
+                // ))
+                //   ],
+                // ),
 
                 ///Pengeluaran
                 FutureBuilder(
@@ -282,6 +365,7 @@ class _ReportCardState extends State<ReportCard> {
                     }
                   },
                 ),
+                const Padding(padding: EdgeInsets.all(4)),
                 Text(
                     'Total kas sekarang : ${(totalekuitas + totalpemasukan - totalPengeluaran + totalbon).toInt().toString().numberFormat(currency: true)}')
               ],

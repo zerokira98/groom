@@ -86,6 +86,7 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
                         Expanded(
                           child: TextFormField(
                             controller: uangController,
+                            keyboardType: TextInputType.number,
                             validator: (value) {
                               if (value == null) return null;
                               if (value.isEmpty) return 'cant be empty';

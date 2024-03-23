@@ -17,15 +17,24 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,16 +52,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBGyc7Qdofoyz2lgD-Z9gTf4e79YxAADoI',
-    appId: '1:644442202771:web:ed4530b41a6b808d3b6366',
-    messagingSenderId: '644442202771',
-    projectId: 'groom-c6593',
-    authDomain: 'groom-c6593.firebaseapp.com',
-    databaseURL: 'https://groom-c6593-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'groom-c6593.appspot.com',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAA-vBAZLuzQg5LYhO6DfESkiahMbTmiLg',
     appId: '1:644442202771:android:17c8637904cc6a6b3b6366',
@@ -60,25 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'groom-c6593',
     databaseURL: 'https://groom-c6593-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'groom-c6593.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAn0qmQEeqDK5NQ-h9_JLxHJVjpRqeDHK8',
-    appId: '1:644442202771:ios:cdc7c86034bbe1573b6366',
-    messagingSenderId: '644442202771',
-    projectId: 'groom-c6593',
-    databaseURL: 'https://groom-c6593-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'groom-c6593.appspot.com',
-    iosBundleId: 'com.example.groom',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAn0qmQEeqDK5NQ-h9_JLxHJVjpRqeDHK8',
-    appId: '1:644442202771:ios:6954060a9659da3a3b6366',
-    messagingSenderId: '644442202771',
-    projectId: 'groom-c6593',
-    databaseURL: 'https://groom-c6593-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'groom-c6593.appspot.com',
-    iosBundleId: 'com.example.groom.RunnerTests',
   );
 }

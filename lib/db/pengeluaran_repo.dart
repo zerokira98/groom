@@ -279,9 +279,11 @@ class PengeluaranRepository implements _PengeluaranRepo {
         Timestamp.fromDate(DateTime(ts.year, ts.month, ts.day));
     var endTimestamp = Timestamp.fromDate(DateTime(te.year, te.month, te.day));
     return storeRef
-        .where(Filter.and(
-            Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
-            Filter('tanggal', isLessThan: endTimestamp)))
+        .where('tanggal', isGreaterThanOrEqualTo: startTimestamp)
+        .where('tanggal', isLessThan: endTimestamp)
+        // .where(Filter.and(
+        //     Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
+        //     Filter('tanggal', isLessThan: endTimestamp)))
         .get()
         .then((value) => value.docs.map((e) => e.data()).toList());
   }
@@ -306,7 +308,7 @@ class PengeluaranRepository implements _PengeluaranRepo {
 
   Future<List<String>> getNamaBarang(String queryText) async {
     return storeRef
-        .where((Filter('tipePengeluaran', isEqualTo: 'barangjual')))
+        .where(('tipePengeluaran', isEqualTo: 'barangjual'))
         .get()
         .then((value) => value.docs
             .map((e) => RegExp(queryText, caseSensitive: false)
@@ -319,7 +321,7 @@ class PengeluaranRepository implements _PengeluaranRepo {
 
   Future<List<String>> getOperational(String queryText) async {
     return storeRef
-        .where((Filter('tipePengeluaran', isEqualTo: 'operasional')))
+        .where(('tipePengeluaran', isEqualTo: 'operasional'))
         .get()
         .then((value) => value.docs
             .map((e) => RegExp(queryText, caseSensitive: false)
@@ -360,7 +362,12 @@ class PengeluaranRepository implements _PengeluaranRepo {
   }
 
   Future<List<PengeluaranMdl>> getByOrder(TipePengeluaran? tipe,
-      {DateTime? starts, DateTime? ends}) {
+      {DateTime? starts,
+      DateTime? ends,
+      int limit = 20,
+      bool descending = false,
+      PengeluaranMdl? lastId,
+      PengeluaranMdl? firstId}) {
     Timestamp? start =
         starts == null ? null : Timestamp.fromDate(DateUtils.dateOnly(starts));
     Timestamp? end = ends == null
@@ -369,30 +376,53 @@ class PengeluaranRepository implements _PengeluaranRepo {
             : Timestamp.fromDate(
                 DateUtils.dateOnly(starts.add(const Duration(days: 1))))
         : Timestamp.fromDate(DateUtils.dateOnly(ends));
-
-    if (tipe != null) {
-      if (starts != null) {
-        return storeRef
-            // .where()
-            .where(Filter.and(
-              Filter('tipePengeluaran', isEqualTo: tipe.name),
-              Filter('tanggal', isGreaterThanOrEqualTo: start),
-              Filter('tanggal', isLessThan: end),
-            ))
-            .get()
-            .then((value) => value.docs.map((e) => e.data()).toList());
+    Query<PengeluaranMdl> newStoreRef =
+        storeRef.limit(limit).orderBy('tanggal', descending: descending);
+    if (lastId != null) {
+      newStoreRef = newStoreRef.startAfter([lastId.tanggal]);
+    }
+    if (firstId != null) {
+      newStoreRef = newStoreRef.endBefore([firstId.tanggal]);
+    }
+    if (starts != null) {
+      if (end != null) {
+        newStoreRef = newStoreRef.where(Filter.and(
+            Filter('tanggal', isGreaterThanOrEqualTo: start),
+            Filter('tanggal', isLessThan: end)));
+      } else {
+        newStoreRef =
+            newStoreRef.where('tanggal', isGreaterThanOrEqualTo: start);
       }
-      return storeRef
-          .where(Filter('tipePengeluaran', isEqualTo: tipe.name))
-          .get()
-          .then((value) => value.docs.map((e) => e.data()).toList());
-    } else if (starts != null) {
-      return storeRef
-          .where(Filter('tanggal', isGreaterThanOrEqualTo: start))
-          .get()
-          .then((value) => value.docs.map((e) => e.data()).toList());
-    } else {}
-    return storeRef
+    }
+    if (tipe != null) {
+      newStoreRef = newStoreRef.where('tipePengeluaran', isEqualTo: tipe.name);
+    }
+    print(newStoreRef.parameters);
+    // if (tipe != null) {
+    //   if (starts != null) {
+    //     return storeRef
+    //         // .where()
+    //         .where(Filter.and(
+    //           Filter('tipePengeluaran', isEqualTo: tipe.name),
+    //           Filter('tanggal', isGreaterThanOrEqualTo: start),
+    //           Filter('tanggal', isLessThan: end),
+    //         ))
+    //         .orderBy('tanggal')
+    //         .get()
+    //         .then((value) => value.docs.map((e) => e.data()).toList());
+    //   }
+    //   return storeRef
+    //       .where(Filter('tipePengeluaran', isEqualTo: tipe.name))
+    //       .orderBy('tanggal')
+    //       .get()
+    //       .then((value) => value.docs.map((e) => e.data()).toList());
+    // } else if (starts != null) {
+    //   return storeRef
+    //       .where(Filter('tanggal', isGreaterThanOrEqualTo: start))
+    //       .get()
+    //       .then((value) => value.docs.map((e) => e.data()).toList());
+    // } else {}
+    return newStoreRef
         // .where(Filter('tipePengeluaran',
         //     isEqualTo: tipe?.name ?? TipePengeluaran.operasional))
         .get()

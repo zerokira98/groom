@@ -1,5 +1,6 @@
 // part of 'DBservice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:groom/etc/extension.dart';
 import 'package:groom/model/itemcard_mdl.dart';
 import 'package:groom/model/struk_mdl.dart';
 
@@ -133,7 +134,9 @@ class PemasukanRepository implements _PemasukanRepo {
         .doc(data.id)
         .delete()
         .then((value) async {
-      await db.collection('strukMasukDeleted').add(data.toJson());
+      await db
+          .collection('strukMasukDeleted')
+          .add(data.toJson()..addAll({'time': DateTime.now().timestampFire}));
       return 1;
     }).onError((error, stackTrace) => -1);
   }
@@ -171,41 +174,65 @@ class PemasukanRepository implements _PemasukanRepo {
     var startTimestamp =
         Timestamp.fromDate(DateTime(ts.year, ts.month, ts.day));
     var endTimestamp = Timestamp.fromDate(DateTime(te.year, te.month, te.day));
+    Query<Map<String, dynamic>> reff = db.collection('strukMasuk');
+    for (var e in filter.entries) {
+      switch (e.key) {
+        case 'order' when e.value != null:
+          reff = reff.orderBy('tanggal', descending: true);
+          break;
+        case 'tanggalStart' when !filter.keys.contains('tanggalEnd'):
+          reff = reff.where('tanggal', isGreaterThanOrEqualTo: startTimestamp);
+          break;
+        case 'tanggalStart' when filter.keys.contains('tanggalEnd'):
+          reff = reff.where(Filter.and(
+              Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
+              Filter('tanggal', isLessThan: endTimestamp)));
+          break;
+        default:
+      }
+    }
+    return reff.get().then((value) => value.docs
+        .map((e) => StrukMdl.fromJson(e.data()).copyWith(
+              id: () => e.id,
+            ))
+        .toList());
     // var fil = [
     //   Filter.greaterThanOrEquals('tanggal', startTimestamp),
     //   Filter.lessThan('tanggal', endTimestamp),
     // ];
     // List<SortOrder> orders = [];
-    if (filter['order'] != null && filter['order'] == 'reverse') {
-      // orders.add(SortOrder('tanggal', false));
-      return db
-          .collection('strukMasuk')
-          .where(Filter.and(
-              Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
-              Filter('tanggal', isLessThan: endTimestamp)))
-          .orderBy('tanggal', descending: true)
-          .get()
-          .then((value) => value.docs
-              .map((e) => StrukMdl.fromJson(e.data()).copyWith(
-                    id: () => e.id,
-                  ))
-              .toList());
-    } else {
-      // orders.add(SortOrder('tanggal'));
-      return db
-          .collection('strukMasuk')
-          .where(Filter.and(
-              Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
-              Filter('tanggal', isLessThan: endTimestamp)))
-          .orderBy('tanggal')
-          .get()
-          .then((value) => value.docs
-              .map((e) => StrukMdl.fromJson(e.data()).copyWith(
-                    id: () => e.id,
-                  ))
-              .toList());
-    }
+    ///---worked code below
+    // if (filter['order'] != null && filter['order'] == 'reverse') {
+    //   // orders.add(SortOrder('tanggal', false));
+    //   return db
+    //       .collection('strukMasuk')
+    //       .where(Filter.and(
+    //           Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
+    //           Filter('tanggal', isLessThan: endTimestamp)))
+    //       .orderBy('tanggal', descending: true)
+    //       .get()
+    //       .then((value) => value.docs
+    //           .map((e) => StrukMdl.fromJson(e.data()).copyWith(
+    //                 id: () => e.id,
+    //               ))
+    //           .toList());
+    // } else {
+    //   // orders.add(SortOrder('tanggal'));
+    //   return db
+    //       .collection('strukMasuk')
+    //       .where(Filter.and(
+    //           Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
+    //           Filter('tanggal', isLessThan: endTimestamp)))
+    //       .orderBy('tanggal')
+    //       .get()
+    //       .then((value) => value.docs
+    //           .map((e) => StrukMdl.fromJson(e.data()).copyWith(
+    //                 id: () => e.id,
+    //               ))
+    //           .toList());
+    // }
     // return [];
+    ///===end
     // return storePemasukan
     //     .query(
     //       finder: Finder(filter: Filter.and(fil), sortOrders: orders),

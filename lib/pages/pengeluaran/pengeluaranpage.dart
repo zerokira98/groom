@@ -218,6 +218,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                     flex: 2,
                                     child: TextFormField(
                                       controller: uangController,
+                                      keyboardType: TextInputType.number,
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,
                                       validator: (value) {
@@ -236,7 +237,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                       },
                                       decoration: InputDecoration(
                                           label: Text((typeValue.index == 2)
-                                              ? 'Harga perPcs'
+                                              ? 'Harga beli perPcs'
                                               : 'Jumlah Uang')),
                                     )),
                                 if (typeValue.index == 2)

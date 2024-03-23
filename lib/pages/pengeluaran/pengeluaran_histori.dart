@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
@@ -17,21 +18,83 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
   TipePengeluaran? sortByType;
   List separatorDate = [];
   DateTime? dateTime;
+  late Future<List<PengeluaranMdl>> myfuture;
+  PengeluaranMdl? lastSeen;
+  PengeluaranMdl? firstSeen;
+  Future<List<PengeluaranMdl>> theFuture(
+      {int limit = 20, bool back = false, bool next = false}) async {
+    if (back) {
+      return RepositoryProvider.of<PengeluaranRepository>(context)
+          .getByOrder(sortByType,
+              starts: dateTime, limit: limit, firstId: firstSeen)
+          .then((value) {
+        if (value.isNotEmpty) {
+          firstSeen = value[0];
+          lastSeen = value[value.length - 1];
+        }
+        return value;
+      });
+    }
+    if (next) {
+      return RepositoryProvider.of<PengeluaranRepository>(context)
+          .getByOrder(sortByType,
+              starts: dateTime, limit: limit, lastId: lastSeen)
+          .then((value) {
+        if (value.isNotEmpty) {
+          firstSeen = value[0];
+          lastSeen = value[value.length - 1];
+        }
+        return value;
+      });
+    }
+    return RepositoryProvider.of<PengeluaranRepository>(context)
+        .getByOrder(sortByType, starts: dateTime, limit: limit)
+        .then((value) {
+      if (value.isNotEmpty) {
+        firstSeen = value[0];
+        lastSeen = value[value.length - 1];
+      }
+      return value;
+    });
+  }
+
   @override
   void initState() {
-    sortByType = widget.sortBy;
+    setState(() {
+      sortByType = widget.sortBy;
+      myfuture = theFuture();
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          children: [
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    myfuture = theFuture(back: true);
+                  });
+                },
+                icon: const Icon(Icons.keyboard_arrow_left_sharp)),
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    myfuture = theFuture(next: true);
+                  });
+                },
+                icon: const Icon(Icons.keyboard_arrow_right_sharp)),
+          ],
+        ),
+      ),
       appBar: (widget.hidebar == null || widget.hidebar == false)
           ? AppBar(title: const Text("Histori Pengeluaran"))
           : null,
-      body: FutureBuilder(
-        future: RepositoryProvider.of<PengeluaranRepository>(context)
-            .getByOrder(sortByType, starts: dateTime),
+      body: FutureBuilder<List<PengeluaranMdl>>(
+        future: myfuture,
         builder: (context, snapshot) {
           debugPrint('setstated');
           Widget empty([String? err]) => SizedBox(
@@ -39,9 +102,6 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
               );
           if (snapshot.hasError) return empty('error real${snapshot.error}');
           if (snapshot.hasData) {
-            // if (snapshot.data!.isEmpty) {
-            //   return empty();
-            // }
             return Column(
               children: [
                 if (widget.hidebar == null || widget.hidebar == false)
@@ -75,6 +135,7 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                         onChanged: (value) {
                           setState(() {
                             sortByType = value;
+                            myfuture = theFuture();
                           });
                         },
                       ),
@@ -88,6 +149,7 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                             ).then((value) => value != null
                                 ? setState(() {
                                     dateTime = value;
+                                    myfuture = theFuture();
                                   })
                                 : null);
                           },
@@ -98,6 +160,7 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                             setState(() {
                               sortByType = null;
                               dateTime = null;
+                              myfuture = theFuture();
                             });
                           },
                           icon: const Icon(Icons.highlight_remove))
@@ -136,50 +199,40 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                                     .withOpacity(0.45)
                               ])),
                               child: Text(
-                                  '${e.tanggal.subtract(Duration(days: e.tanggal.weekday + 6)).formatLengkap()} - ${e.tanggal.subtract(Duration(days: e.tanggal.weekday)).formatLengkap()}'),
+                                  '${e.tanggal.subtract(Duration(days: e.tanggal.weekday)).formatLengkap()} - ${e.tanggal.subtract(Durations.extralong1).formatLengkap()}'),
                             ),
-                          ListTile(
-                            trailing: IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Peringatan'),
-                                      content:
-                                          const Text('Yakin menghapus enrti?'),
-                                      actions: [
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              RepositoryProvider.of<
-                                                          PengeluaranRepository>(
-                                                      context)
-                                                  .delete(e)
-                                                  .then((value) {
-                                                Navigator.pop(context);
-                                                setState(() {});
-                                              });
-                                            },
-                                            child: const Text('Hapus')),
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('Batal')),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(Icons.delete)),
-                            title: Text(
-                                e.namaPengeluaran.toString().firstUpcase()),
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text((e.biaya * e.pcs)
-                                    .numberFormat(currency: true)),
-                                Text('${e.tanggal.formatDayMonth()} ${e.tanggal.clockOnly()}'),
-                              ],
-                            ),
+                          TilePengeluaran(
+                            e: e,
+                            trailing: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Peringatan'),
+                                  content: const Text('Yakin menghapus enrti?'),
+                                  actions: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          RepositoryProvider.of<
+                                                      PengeluaranRepository>(
+                                                  context)
+                                              .delete(e)
+                                              .then((value) {
+                                            Navigator.pop(context);
+                                            setState(() {
+                                              myfuture = theFuture();
+                                            });
+                                          });
+                                        },
+                                        child: const Text('Hapus')),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Batal')),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ],
                       );
@@ -191,6 +244,75 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
           }
           return empty('default');
         },
+      ),
+    );
+  }
+}
+
+class TilePengeluaran extends StatelessWidget {
+  final void Function()? trailing;
+  final PengeluaranMdl e;
+  const TilePengeluaran({super.key, this.trailing, required this.e});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: () {
+        Flushbar(
+          message:
+              'Tanggal post: ${e.tanggalPost?.formatDayMonth()} ${e.tanggalPost?.clockOnly()}',
+          duration: const Duration(seconds: 2),
+          animationDuration: Durations.long1,
+        ).show(context);
+        //   showDialog(
+        //   context: context,
+        //   builder: (context) => Dialog(
+        //     child: Text(
+        //         'Tanggal post: ${e.tanggalPost?.formatDayMonth()} ${e.tanggalPost?.clockOnly()}'),
+        //   ),
+        // );
+      },
+      trailing: (trailing != null)
+          ? IconButton(
+              onPressed: trailing,
+              // onPressed: () {
+              //   showDialog(
+              //     context: context,
+              //     builder: (context) => AlertDialog(
+              //       title: const Text('Peringatan'),
+              //       content: const Text('Yakin menghapus enrti?'),
+              //       actions: [
+              //         ElevatedButton(
+              //             onPressed: () {
+
+              //             }, child: const Text('Hapus')),
+              //         ElevatedButton(
+              //             onPressed: () {
+              //               Navigator.pop(context);
+              //             },
+              //             child: const Text('Batal')),
+              //       ],
+              //     ),
+              //   );
+              // },
+              icon: const Icon(Icons.delete))
+          : null,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(e.namaPengeluaran.toString().firstUpcase()),
+          Text(
+            e.tipePengeluaran.name.toString().firstUpcase(),
+            textScaler: const TextScaler.linear(0.925),
+          ),
+        ],
+      ),
+      subtitle: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text((e.biaya * e.pcs).numberFormat(currency: true)),
+          Text('${e.tanggal.formatDayMonth()} ${e.tanggal.clockOnly()}'),
+        ],
       ),
     );
   }

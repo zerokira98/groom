@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/bon_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/etc/extension.dart';
+import 'package:groom/etc/globalvar.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:groom/pages/print/print_to_excel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fc;
+import 'package:intl/intl.dart';
 import 'package:weekly_date_picker/datetime_apis.dart';
 import 'cubitmingguan/rangkumanmingg_cubit.dart';
 
@@ -20,6 +22,28 @@ class RangkumanMingguan extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          BlocBuilder<RangkumanWeekCubit, RangkumanWeekState>(
+            builder: (context, state) {
+              if (state is RangkumanWeekLoaded) {
+                return IconButton(
+                    onPressed: () {
+                      // debugPrint(state.daily.first.keys);
+                      showDialog(
+                        context: context,
+                        builder: (context) => PrintMingguan(
+                          perDay: state.daily,
+                          startDate: state.tanggalStart,
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.print));
+              } else {
+                return Container();
+              }
+            },
+          )
+        ],
         title: const Text('Rangkuman Mingguan'),
       ),
       body: BlocBuilder<RangkumanWeekCubit, RangkumanWeekState>(
@@ -36,62 +60,92 @@ class RangkumanMingguan extends StatelessWidget {
             }
 
             return Column(children: [
+              // Row(
+              //   children: [
+              //     // const Text('Order by person?'),
+              //     // Checkbox(
+              //     //   value: state.groupBy == GroupBy.namaKayrawan,
+              //     //   onChanged: (value) {
+              //     //     var sd = state.tanggalStart;
+              //     //     var ed = state.tanggalEnd;
+              //     //     if (value!) {
+              //     //       BlocProvider.of<RangkumanWeekCubit>(context).loadData({
+              //     //         'tanggalStart': sd,
+              //     //         'tanggalEnd': ed,
+              //     //         'groupBy': GroupBy.namaKayrawan
+              //     //       });
+              //     //     } else {
+              //     //       BlocProvider.of<RangkumanWeekCubit>(context).loadData({
+              //     //         'tanggalStart': sd,
+              //     //         'tanggalEnd': ed,
+              //     //       });
+              //     //     }
+              //     //   },
+              //     // ),
+              //     // IconButton(
+              //     //     onPressed: () {
+              //     //       // debugPrint(state.daily.first.keys);
+              //     //       showDialog(
+              //     //         context: context,
+              //     //         builder: (context) => PrintMingguan(
+              //     //           perDay: state.daily,
+              //     //           startDate: state.tanggalStart,
+              //     //         ),
+              //     //       );
+              //     //     },
+              //     //     icon: const Icon(Icons.print))
+              //   ],
+              // ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Order by person?'),
-                  Checkbox(
-                    value: state.groupBy == GroupBy.namaKayrawan,
-                    onChanged: (value) {
-                      var sd = state.tanggalStart;
-                      var ed = state.tanggalEnd;
-                      if (value!) {
+                  IconButton(
+                      onPressed: () {
                         BlocProvider.of<RangkumanWeekCubit>(context).loadData({
-                          'tanggalStart': sd,
-                          'tanggalEnd': ed,
-                          'groupBy': GroupBy.namaKayrawan
+                          'tanggalStart': state.tanggalStart
+                              .subtract(const Duration(days: 7)),
+                          'tanggalEnd': state.tanggalEnd
+                              .subtract(const Duration(days: 7)),
                         });
-                      } else {
-                        BlocProvider.of<RangkumanWeekCubit>(context).loadData({
-                          'tanggalStart': sd,
-                          'tanggalEnd': ed,
+                      },
+                      icon: const Icon(Icons.chevron_left)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        showDatePicker(
+                          context: context,
+                          firstDate: DateTime(now.year - 5),
+                          lastDate: now.add(const Duration(days: 7)),
+                        ).then((value) {
+                          if (value != null) {
+                            var ts =
+                                DateTime(value.year, value.month, value.day)
+                                    .subtract(Duration(days: value.weekday));
+                            var te = ts.add(const Duration(days: 7));
+                            BlocProvider.of<RangkumanWeekCubit>(context)
+                                .loadData({
+                              'tanggalStart': ts,
+                              'tanggalEnd': te,
+                            });
+                          }
                         });
-                      }
-                    },
+                      },
+                      child: Text(
+                          '${DateFormat.yMEd('id_ID').format(state.tanggalStart)} - ${DateFormat.yMEd('id_ID').format(state.tanggalEnd.subtract(Durations.extralong1))}'),
+                    ),
                   ),
                   IconButton(
                       onPressed: () {
-                        // debugPrint(state.daily.first.keys);
-                        showDialog(
-                          context: context,
-                          builder: (context) => PrintMingguan(
-                            perDay: state.daily,
-                            startDate: state.tanggalStart,
-                          ),
-                        );
+                        BlocProvider.of<RangkumanWeekCubit>(context).loadData({
+                          'tanggalStart':
+                              state.tanggalStart.add(const Duration(days: 7)),
+                          'tanggalEnd':
+                              state.tanggalEnd.add(const Duration(days: 7)),
+                        });
                       },
-                      icon: const Icon(Icons.print))
+                      icon: const Icon(Icons.chevron_right)),
                 ],
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  showDatePicker(
-                    context: context,
-                    firstDate: DateTime(now.year - 5),
-                    lastDate: now.add(const Duration(days: 7)),
-                  ).then((value) {
-                    if (value != null) {
-                      var ts = DateTime(value.year, value.month, value.day)
-                          .subtract(Duration(days: value.weekday));
-                      var te = ts.add(const Duration(days: 7));
-                      BlocProvider.of<RangkumanWeekCubit>(context).loadData({
-                        'tanggalStart': ts,
-                        'tanggalEnd': te,
-                      });
-                    }
-                  });
-                },
-                child: Text(
-                    'Week ${state.tanggalStart.formatLengkap()}-${state.tanggalEnd.subtract(Durations.extralong1).formatLengkap()}'),
               ),
               if (state.groupBy == GroupBy.date)
                 Expanded(
@@ -143,15 +197,70 @@ class RangkumanMingguan extends StatelessWidget {
                 )),
               if (state.groupBy == GroupBy.namaKayrawan)
                 Expanded(
+                    flex: 6,
                     child: ListView.builder(
-                  itemCount: state.dataPerPerson.length,
-                  itemBuilder: (context, index) {
-                    return TileMingguan(
-                        dataState: state,
-                        total: perpersonTotal[index],
-                        index: index);
-                  },
-                )),
+                      itemCount: state.dataPerPerson.length,
+                      itemBuilder: (context, index) {
+                        return TileMingguan(
+                            dataState: state,
+                            total: perpersonTotal[index],
+                            index: index);
+                      },
+                    )),
+              Expanded(
+                  flex: 4,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                    gradient: LinearGradient(colors: [
+                                  Theme.of(context).primaryColorDark,
+                                  Theme.of(context).primaryColorDark,
+                                  Theme.of(context)
+                                      .primaryColorDark
+                                      .withOpacity(0.45)
+                                ])),
+                                child: const Text('Pengeluaran')),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                          child: ListView.builder(
+                        itemCount: state.pengeluaranlist.length,
+                        itemBuilder: (context, index) {
+                          TipePengeluaran tipe =
+                              state.pengeluaranlist.keys.toList()[index];
+                          return ListTile(
+                            title: Text(tipe.name),
+                            subtitle: Text((state.pengeluaranlist.values
+                                    .toList()[index]['sum'] as num)
+                                .numberFormat(currency: true)),
+                            onTap: () => showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                  child: ListView.builder(
+                                      itemCount: (state.pengeluaranlist[tipe]
+                                              ['list'] as List)
+                                          .length,
+                                      itemBuilder: (context, index) =>
+                                          TilePengeluaran(
+                                              e: (state.pengeluaranlist[tipe]
+                                                  ['list'] as List)[index]))),
+                            ),
+                            // title: Text(
+                            //     state.pengeluaranlist.values.toList()[index]),
+                            // subtitle: Text(state
+                            //     .pengeluaranlist[index].tipePengeluaran.name
+                            //     .firstUpcase()),
+                          );
+                        },
+                      )),
+                    ],
+                  )),
               const Divider(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,8 +268,9 @@ class RangkumanMingguan extends StatelessWidget {
                   Text(
                       'Total income: ${state.totalKotor.toString().numberFormat(currency: true)}'),
                   Text(
-                      'Income-bagihasil: ${(state.totalKotor - state.totalBagiHasil).toString().numberFormat()}'),
-                  Text('Pengeluaran: ${state.pengeluaran}+bon:${state.bon}'),
+                      'Income-bagihasil: ${(state.totalKotor - state.totalBagiHasil).numberFormat(currency: true)}'),
+                  Text(
+                      'Pengeluaran: ${state.pengeluaran.numberFormat(currency: true)}+bon:${state.bon}'),
                 ],
               )
             ]);
@@ -190,18 +300,18 @@ class TileMingguan extends StatelessWidget {
         future: RepositoryProvider.of<BonRepository>(context).getBonFiltered(
             fc.Filter('namaSubjek', isEqualTo: data.namaKaryawan)),
         builder: (context, snapshot) {
-          double cutPercentage(int type) => switch (type) {
-                0 => 0.48,
-                1 => 0.5,
-                2 => 0.5,
-                3 => 0.1,
-                int() => 1,
-              };
-          double tot = 0;
-
-          for (var awo in data.itemCards) {
-            tot += awo.price * cutPercentage(awo.type);
+          double totcut = 0.0;
+          for (var ewe in dataState.dailycut) {
+            totcut += ewe
+                .where((e) => data.namaKaryawan == e.namaKaryawan)
+                .fold(
+                    0,
+                    (previousValue, element) =>
+                        previousValue + element.totalPendapatan);
           }
+          // for (var awo in data.itemCards) {
+          //   tot += awo.price * cutPercentage(awo.type);
+          // }
           num hutang = 0;
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             for (var e in snapshot.data!) {
@@ -215,7 +325,7 @@ class TileMingguan extends StatelessWidget {
                 Text(total.toString()),
                 const Expanded(child: SizedBox()),
                 const Text('Expected payment: '),
-                Text((tot + hutang)
+                Text((totcut + hutang)
                         .toInt()
                         .toString()
                         .numberFormat(currency: true) ??
@@ -264,19 +374,27 @@ class TileMingguan extends StatelessWidget {
                                 var checkdata = await RepositoryProvider.of<
                                         PengeluaranRepository>(context)
                                     .getByOrder(
-                                      TipePengeluaran.gaji,
-                                      starts: DateUtils.dateOnly(te),
-                                      ends: DateUtils.dateOnly(
-                                          te.add(const Duration(days: 1))),
-                                    )
-                                    .then((value) => value
-                                        .map((e) =>
-                                            e.karyawan == data.namaKaryawan
-                                                ? e
-                                                : e)
-                                        .nonNulls
-                                        .toList());
-                                if (boolUtang && (tot + hutang).toInt() < 0) {
+                                  TipePengeluaran.gaji,
+                                  starts: DateUtils.dateOnly(te),
+                                  // ends: DateUtils.dateOnly(
+                                  //     te.add(const Duration(days: 1))),
+                                )
+                                    .then((value) {
+                                  return value
+                                      .map((e) {
+                                        return e.namaPengeluaran ==
+                                                data.namaKaryawan
+                                            ? e
+                                            : null;
+                                      })
+                                      .nonNulls
+                                      .toList();
+                                });
+                                // print(DateUtils.dateOnly(
+                                //     te.add(const Duration(days: 1))));
+                                // print(checkdata);
+                                if (boolUtang &&
+                                    (totcut + hutang).toInt() < 0) {
                                   await Flushbar(
                                     message: 'Mines Pak!',
                                     duration: const Duration(seconds: 2),
@@ -294,8 +412,8 @@ class TileMingguan extends StatelessWidget {
                                           namaPengeluaran: data.namaKaryawan,
                                           tipePengeluaran: TipePengeluaran.gaji,
                                           pcs: 1,
-                                          biaya:
-                                              tot + (boolUtang ? hutang : 0)))
+                                          biaya: totcut +
+                                              (boolUtang ? hutang : 0)))
                                       .then((value) {
                                     if (boolUtang) {
                                       RepositoryProvider.of<BonRepository>(
@@ -331,8 +449,18 @@ class TileMingguan extends StatelessWidget {
                                   if (checkdata.isNotEmpty) {
                                     msgerr = 'sudah tercatat(?)';
                                   }
+                                  // ignore: use_build_context_synchronously
                                   await Flushbar(
                                     message: msgerr,
+                                    mainButton: TextButton(
+                                      child: const Text('check'),
+                                      onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HistoriPengeluaran(),
+                                          )),
+                                    ),
                                     duration: const Duration(seconds: 3),
                                     animationDuration: Durations.long1,
                                   ).show(context);
@@ -361,10 +489,18 @@ class TileMingguan extends StatelessWidget {
                                       awo.price.toString(),
                                       textAlign: TextAlign.end,
                                     ),
-                                    Text(' ${cutPercentage(awo.type)}'),
                                     Text(
-                                      (awo.price * cutPercentage(awo.type))
-                                          .toString(),
+                                        ' ${cutPercentage(awo.type)}${awo.type == 0 ? '-0.5' : ''}'),
+                                    Text(
+                                      dataState.dataPerPersoncut
+                                          .firstWhere((e) =>
+                                              e.namaKaryawan ==
+                                              data.namaKaryawan)
+                                          .itemCards
+                                          .firstWhere(
+                                              (e2) => e2.type == awo.type)
+                                          .price
+                                          .numberFormat(),
                                       textAlign: TextAlign.end,
                                     ),
                                   ])
@@ -376,7 +512,7 @@ class TileMingguan extends StatelessWidget {
                                   children: [
                                     const Text('Total : '),
                                     const Expanded(child: SizedBox()),
-                                    Text(tot
+                                    Text(totcut
                                         .toInt()
                                         .toString()
                                         .numberFormat(currency: true)
@@ -412,7 +548,7 @@ class TileMingguan extends StatelessWidget {
                                       const Text('Expected payment: '),
                                       const Expanded(child: SizedBox()),
                                       Text(
-                                          ' ${(tot + (boolUtang ? hutang : 0)).toInt().toString().numberFormat(currency: true)}'),
+                                          ' ${(totcut + (boolUtang ? hutang : 0)).toInt().toString().numberFormat(currency: true)}'),
                                     ],
                                   ),
                                 ),
@@ -539,7 +675,14 @@ class _SlipGajiState extends State<SlipGaji> {
     );
     List<ItemCardMdl> groundItemCards = List.generate(
         cardType.length, (i) => ItemCardMdl(index: 0, price: 0, type: i));
-    num totHC = 0, totSHV = 0, totCLR = 0, totBRG = 0;
+    num totHC = 0, totSHV = 0, totCLR = 0, totBRG = 0, totLain = 0;
+
+    var singleKaryawan = widget.dataState.dailycut
+        .map((e) => e
+            .map((e2) => e2.namaKaryawan == widget.nama ? e2 : null)
+            .nonNulls
+            .toList())
+        .toList();
     for (var i = 0; i < 7; i++) {
       waw[i] = widget.dataState.daily[i].firstWhere(
         (element) => element.namaKaryawan == widget.nama,
@@ -548,18 +691,61 @@ class _SlipGajiState extends State<SlipGaji> {
             perCategory: groundItemCards,
             totalPendapatan: 0),
       );
-      totHC +=
-          waw[i].perCategory.firstWhere((element) => element.type == 0).price;
-      totSHV +=
-          waw[i].perCategory.firstWhere((element) => element.type == 1).price;
-      totCLR +=
-          waw[i].perCategory.firstWhere((element) => element.type == 2).price;
-      totBRG +=
-          waw[i].perCategory.firstWhere((element) => element.type == 3).price *
-              waw[i]
-                  .perCategory
-                  .firstWhere((element) => element.type == 3)
-                  .pcsBarang;
+
+      totHC += singleKaryawan
+              .elementAtOrNull(i)
+              ?.singleOrNull
+              ?.perCategory
+              .firstWhere((element) => element.type == 0,
+                  orElse: () => ItemCardMdl.empty)
+              .price ??
+          0;
+      totSHV += singleKaryawan
+              .elementAtOrNull(i)
+              ?.singleOrNull
+              ?.perCategory
+              .firstWhere((element) => element.type == 1,
+                  orElse: () => ItemCardMdl.empty)
+              .price ??
+          0;
+      totCLR += singleKaryawan
+              .elementAtOrNull(i)
+              ?.singleOrNull
+              ?.perCategory
+              .firstWhere((element) => element.type == 2,
+                  orElse: () => ItemCardMdl.empty)
+              .price ??
+          0;
+      totLain += singleKaryawan
+              .elementAtOrNull(i)
+              ?.singleOrNull
+              ?.perCategory
+              .firstWhere((element) => element.type == 4,
+                  orElse: () => ItemCardMdl.empty)
+              .price ??
+          0;
+      totBRG += singleKaryawan
+              .elementAtOrNull(i)
+              ?.singleOrNull
+              ?.perCategory
+              .firstWhere((element) => element.type == 3,
+                  orElse: () => ItemCardMdl.empty)
+              .price ??
+          0;
+      // totHC +=
+      //     waw[i].perCategory.firstWhere((element) => element.type == 0).price;
+      // totSHV +=
+      //     waw[i].perCategory.firstWhere((element) => element.type == 1).price;
+      // totCLR +=
+      //     waw[i].perCategory.firstWhere((element) => element.type == 2).price;
+      // totLain +=
+      //     waw[i].perCategory.firstWhere((element) => element.type == 4).price;
+      // totBRG +=
+      //     waw[i].perCategory.firstWhere((element) => element.type == 3).price *
+      //         waw[i]
+      //             .perCategory
+      //             .firstWhere((element) => element.type == 3)
+      //             .pcsBarang;
     }
     return Dialog.fullscreen(
       child: SingleChildScrollView(
@@ -578,33 +764,58 @@ class _SlipGajiState extends State<SlipGaji> {
                   Text('SHV'),
                   Text('SMR'),
                   Text('BRG'),
+                  Text('ETC'),
                 ]),
                 for (var i = 0; i < 7; i++,)
                   TableRow(children: [
                     Text(widget.dataState.tanggalStart
                         .addDays(i)
                         .formatDayMonth()),
-                    Text((waw[i].perCategory[0].price * 0.48).numberFormat()),
-                    Text((waw[i].perCategory[1].price * 0.5).numberFormat()),
-                    Text((waw[i].perCategory[2].price * 0.5).numberFormat()),
-                    Text((waw[i].perCategory[3].price * 0.1).numberFormat()),
+                    // Text((waw[i].perCategory[0].price * cutPercentage(0))
+                    //     .numberFormat()),
+                    Text(singleKaryawan
+                            .elementAtOrNull(i)
+                            ?.singleOrNull
+                            ?.perCategory[0]
+                            .price
+                            .numberFormat() ??
+                        '0'),
+                    // Text((widget.dataState.dailycut[i]
+                    //             .firstWhere((element) =>
+                    //                 element.namaKaryawan == widget.nama)
+                    //             .perCategory[0]
+                    //             .price *
+                    //         cutPercentage(1))
+                    //     .numberFormat()),
+                    Text((waw[i].perCategory[1].price * cutPercentage(1))
+                        .numberFormat()),
+                    Text((waw[i].perCategory[2].price * cutPercentage(2))
+                        .numberFormat()),
+                    Text((waw[i].perCategory[3].price * cutPercentage(3))
+                        .numberFormat()),
+                    Text((waw[i].perCategory[4].price * cutPercentage(4))
+                        .numberFormat()),
                   ]),
                 TableRow(children: [
                   const Text('Total : '),
-                  Text((totHC * 0.48).numberFormat()),
-                  Text((totSHV * 0.5).numberFormat()),
-                  Text((totCLR * 0.5).numberFormat()),
-                  Text((totBRG * 0.1).numberFormat()),
+                  // Text((singleKaryawan.fold(
+                  //         0.0,
+                  //         (previousValue, element) =>
+                  //             previousValue +
+                  //             (element.singleOrNull?.totalPendapatan ?? 0)))
+                  //     .numberFormat()),
+                  Text((totHC).numberFormat()),
+                  Text((totSHV).numberFormat()),
+                  Text((totCLR).numberFormat()),
+                  Text((totBRG).numberFormat()),
+                  Text((totLain).numberFormat()),
                 ])
               ],
             ),
             Row(
               children: [
                 const Text('Total : '),
-                Text(((totHC * 0.48) +
-                        (totSHV * 0.5) +
-                        (totCLR * 0.5) +
-                        (totBRG * 0.1))
+                Text(((totHC) + (totSHV) + (totCLR) + (totBRG) + (totLain))
                     .numberFormat())
               ],
             ),

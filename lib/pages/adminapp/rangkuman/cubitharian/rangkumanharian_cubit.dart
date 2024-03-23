@@ -55,16 +55,18 @@ class RangkumanDayCubit extends Cubit<RangkumanDayState> {
             .totalPendapatan;
         perPerson = perPerson
             .map((ea) => ea.namaKaryawan == e1.namaKaryawan
-                ? ea.copyWith(totalPendapatan: total)
+                ? ea.copyWith(
+                    totalPendapatan: total, datas: () => ea.datas! + [e1])
                 : ea)
             .toList();
-      } else if (perPerson.any((e2) => e2.namaKaryawan == e1.namaKaryawan) ==
+      } else if ((perPerson.any((e2) => e2.namaKaryawan == e1.namaKaryawan)) ==
           false) {
         var total = 0;
         for (var eSum in e1.itemCards) {
           total += eSum.price * (eSum.pcsBarang);
         }
         perPerson.add(PerPerson(
+            datas: [e1],
             namaKaryawan: e1.namaKaryawan,
             totalPendapatan: total,
             perCategory: e1.itemCards));

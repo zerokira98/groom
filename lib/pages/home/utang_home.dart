@@ -98,6 +98,7 @@ class _HutangHomeState extends State<HutangHome> {
                   children: [
                     Expanded(
                         child: TextFormField(
+                      keyboardType: TextInputType.number,
                       controller: jumlahBon,
                       inputFormatters: [uangFormatter],
                       decoration:

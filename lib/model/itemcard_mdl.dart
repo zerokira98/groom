@@ -19,7 +19,8 @@ class ItemCardMdl extends Equatable with FormzMixin {
       required this.price})
       : namaBarang = namaBarang ?? '',
         pcsBarang = pcsBarang ?? 1;
-
+  static ItemCardMdl get empty => const ItemCardMdl(
+      index: 0, price: 0, type: 0, namaBarang: '', pcsBarang: 1);
   @override
   List<Object?> get props => [index, type, price, pcsBarang, namaBarang];
 

@@ -13,7 +13,7 @@ import 'package:weekly_date_picker/datetime_apis.dart';
 
 class AdminPage extends StatelessWidget {
   const AdminPage({super.key});
-
+  static const whitestyle = TextStyle(color: Colors.white);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +46,10 @@ class AdminPage extends StatelessWidget {
                             Theme.of(context).primaryColorDark,
                             Theme.of(context).primaryColorDark.withOpacity(0.45)
                           ])),
-                          child: const Text('Pengeluaran')))
+                          child: const Text(
+                            'Pengeluaran',
+                            style: whitestyle,
+                          )))
                 ],
               ),
             ),
@@ -107,12 +110,22 @@ class AdminPage extends StatelessWidget {
                             Theme.of(context).primaryColorDark,
                             Theme.of(context).primaryColorDark.withOpacity(0.45)
                           ])),
-                          child: const Text('Uang / Rekonsiliasi Bank')))
+                          child: const Text(
+                            'Uang / Rekonsiliasi Bank',
+                            style: whitestyle,
+                          )))
                 ],
               ),
             ),
             ElevatedButton(
-              child: const Text('Uang Masuk'),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.download),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 2)),
+                  Text('Uang Masuk'),
+                ],
+              ),
               onPressed: () {
                 Navigator.push(
                     context,
@@ -122,7 +135,14 @@ class AdminPage extends StatelessWidget {
               },
             ),
             ElevatedButton(
-              child: const Text('Uang Keluar'),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.upload),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 2)),
+                  Text('Uang Keluar'),
+                ],
+              ),
               onPressed: () {
                 Navigator.push(
                     context,
@@ -144,12 +164,21 @@ class AdminPage extends StatelessWidget {
                             Theme.of(context).primaryColorDark,
                             Theme.of(context).primaryColorDark.withOpacity(0.45)
                           ])),
-                          child: const Text('Rangkuman')))
+                          child: const Text(
+                            'Rangkuman',
+                            style: whitestyle,
+                          )))
                 ],
               ),
             ),
             ElevatedButton(
-              child: const Text('Rangkuman Harian'),
+              child: const Row(
+                children: [
+                  Icon(Icons.calendar_view_day),
+                  Padding(padding: EdgeInsets.only(left: 4)),
+                  Text('Rangkuman Harian'),
+                ],
+              ),
               onPressed: () {
                 Navigator.push(
                     context,
@@ -166,7 +195,13 @@ class AdminPage extends StatelessWidget {
               },
             ),
             ElevatedButton(
-              child: const Text('Rangkuman Mingguan'),
+              child: const Row(
+                children: [
+                  Icon(Icons.calendar_view_week),
+                  Padding(padding: EdgeInsets.only(left: 4)),
+                  Text('Rangkuman Mingguan'),
+                ],
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -194,7 +229,13 @@ class AdminPage extends StatelessWidget {
               },
             ),
             ElevatedButton(
-              child: const Text('Rangkuman Bulanan'),
+              child: const Row(
+                children: [
+                  Icon(Icons.calendar_view_month),
+                  Padding(padding: EdgeInsets.only(left: 4)),
+                  Text('Rangkuman Bulanan'),
+                ],
+              ),
               onPressed: () {
                 Navigator.push(
                     context,
@@ -220,12 +261,22 @@ class AdminPage extends StatelessWidget {
                             Theme.of(context).primaryColorDark,
                             Theme.of(context).primaryColorDark.withOpacity(0.45)
                           ])),
-                          child: const Text('Etc')))
+                          child: const Text(
+                            'Etc',
+                            style: whitestyle,
+                          )))
                 ],
               ),
             ),
             ElevatedButton(
-              child: const Text('Atur Karyawan'),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.supervised_user_circle),
+                  Padding(padding: EdgeInsets.only(left: 4)),
+                  Text('Atur Karyawan'),
+                ],
+              ),
               onPressed: () {
                 Navigator.push(
                     context,
@@ -235,7 +286,14 @@ class AdminPage extends StatelessWidget {
               },
             ),
             ElevatedButton(
-              child: const Text('Atur Barang'),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.local_grocery_store_rounded),
+                  Padding(padding: EdgeInsets.only(left: 4)),
+                  Text('Atur Barang'),
+                ],
+              ),
               onPressed: () {
                 Navigator.push(
                     context,

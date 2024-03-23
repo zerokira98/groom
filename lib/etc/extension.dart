@@ -2,6 +2,8 @@ import 'package:intl/intl.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart' as t;
+
 NumberFormat numfor = NumberFormat("###,###", 'ID_id');
 
 extension Uppercasing on String {
@@ -31,6 +33,7 @@ extension Uppercasing on String {
 }
 
 extension TanggalFormat on DateTime {
+  t.Timestamp get timestampFire => t.Timestamp.fromDate(this);
   String formatLengkap() {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat('EEEE, d MMMM yyyy ', 'ID_id');

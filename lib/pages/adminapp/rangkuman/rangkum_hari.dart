@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/etc/extension.dart';
+import 'package:groom/model/itemcard_mdl.dart';
+import 'package:groom/pages/home/riwayat_pemasukan.dart';
 import 'cubitharian/rangkumanharian_cubit.dart';
 import 'package:intl/intl.dart';
 import 'package:weekly_date_picker/datetime_apis.dart';
@@ -52,7 +54,7 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                     ],
                   ),
                   Text(
-                      'Total cash laci: ${(fullTotal - state.qristotal - state.operasional - state.bontotal).toInt().numberFormat(currency: true)}'),
+                      'Total cash masuk laci: ${(fullTotal - state.qristotal - state.operasional - state.bontotal).toInt().numberFormat(currency: true)}'),
                 ],
               ),
             )),
@@ -129,6 +131,29 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                           // perPerson.entries
                           for (var e in state.incomePerPerson)
                             ListTile(
+                              onTap: () => showDialog(
+                                context: context,
+                                builder: (context) => Dialog(
+                                    child: ListView.builder(
+                                  itemCount: e.datas?.length ?? 0,
+                                  itemBuilder: (context, index) {
+                                    var theData = e.datas![index];
+                                    int total = 0;
+                                    StringBuffer servicelist = StringBuffer(
+                                        '${theData.namaKaryawan} : ');
+                                    for (var e in theData.itemCards) {
+                                      servicelist
+                                          .write(cardType[e.type] + ', ');
+                                      total += e.price * (e.pcsBarang);
+                                    }
+                                    return TileStruk(
+                                      e.datas![index],
+                                      servicelist,
+                                      total: total,
+                                    );
+                                  },
+                                )),
+                              ),
                               title: Text(e.namaKaryawan),
                               subtitle: Text(e.totalPendapatan
                                   .numberFormat(currency: true)),
@@ -159,8 +184,20 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                       ),
                       for (var e in state.pengeluaranList)
                         ListTile(
-                          title: Text(e.namaPengeluaran),
-                          subtitle: Text(e.biaya.numberFormat(currency: true)),
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(e.namaPengeluaran.firstUpcase()),
+                              Text(e.tanggal.clockOnly()),
+                            ],
+                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(e.biaya.numberFormat(currency: true)),
+                              Text('By: ${e.karyawan ?? 'Admin'}'),
+                            ],
+                          ),
                         )
                     ],
                   ),

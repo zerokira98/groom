@@ -10,6 +10,8 @@ import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/db/uangmasuk_repo.dart';
+import 'package:groom/etc/globalvar.dart';
+import 'package:groom/pages/adminapp/admin.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
 import 'package:groom/pages/home/home.dart';
 
@@ -103,7 +105,8 @@ class _MyAppState extends State<MyApp> {
         title: 'Flutter Demo',
         themeMode: ThemeMode.system,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme:
+              ColorScheme.fromSeed(seedColor: Colors.deepPurple.shade800),
           useMaterial3: true,
         ),
         darkTheme:
@@ -118,7 +121,7 @@ class _MyAppState extends State<MyApp> {
                   return BlocProvider.value(
                     value: BlocProvider.of<InputserviceBloc>(context)
                       ..add(Initiate()),
-                    child: Home(),
+                    child: adminonly ? const AdminPage() : Home(),
                   );
                 }
               }

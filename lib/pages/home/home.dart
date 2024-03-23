@@ -93,8 +93,9 @@ class Home extends StatelessWidget {
                     ? const Color(0xFF00EE44)
                     : const Color(0xFFEE4400),
                 child: Center(
-                  child: Text(
-                      value != ConnectivityResult.none ? 'ONLINE' : 'OFFLINE MODE'),
+                  child: Text(value != ConnectivityResult.none
+                      ? 'ONLINE'
+                      : 'OFFLINE MODE'),
                 ),
               ),
             ),
@@ -116,89 +117,107 @@ class Home extends StatelessWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    const Text('Karyawan : '),
-                    Expanded(
-                        child: BlocBuilder<InputserviceBloc, InputserviceState>(
-                      builder: (context, state) {
-                        if (state is InputserviceLoaded) {
-                          dropdownC.text = state.karyawanName;
-                          return FutureBuilder(
-                              future: RepositoryProvider.of<KaryawanRepository>(
-                                      context)
-                                  .getAllKaryawan(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData &&
-                                    snapshot.data!.isNotEmpty) {
-                                  List<DropdownMenuEntry<String?>> a = snapshot
-                                      .data!
-                                      .map((e) => e.aktif
-                                          ? DropdownMenuEntry(
-                                              value: e.id,
-                                              label: e.namaKaryawan)
-                                          : null)
-                                      .nonNulls
-                                      .toList();
-                                  return DropdownMenu<String?>(
-                                    dropdownMenuEntries: a,
-                                    controller: dropdownC,
-                                    initialSelection: a
-                                        .firstWhere(
-                                          (element) =>
-                                              element.label ==
-                                              state.karyawanName,
-                                          orElse: () => const DropdownMenuEntry(
-                                              value: '-1', label: 'error'),
-                                        )
-                                        .value,
-                                    onSelected: (value) {
-                                      BlocProvider.of<InputserviceBloc>(context)
-                                          .add(ChangeKaryawan(a
-                                              .firstWhere(
-                                                  (e) => e.value == value!)
-                                              .label));
-                                    },
-                                  );
-                                } else {
-                                  return const Text('error snapshot');
-                                }
-                              });
-                        } else {
-                          return const Text('error');
-                        }
-                      },
-                    )),
-                    BlocBuilder<InputserviceBloc, InputserviceState>(
-                      builder: (context, state) {
-                        if (state is InputserviceLoaded) {
-                          // debugPrint(state.karyawanName);
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text('${state.karyawanName} '),
-                              GestureDetector(
-                                  onLongPress: () async {
-                                    var a = await showDatePicker(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      const Text('Karyawan : '),
+                      Expanded(child:
+                          BlocBuilder<InputserviceBloc, InputserviceState>(
+                        builder: (context, state) {
+                          if (state is InputserviceLoaded) {
+                            dropdownC.text = state.karyawanName;
+                            return FutureBuilder(
+                                future:
+                                    RepositoryProvider.of<KaryawanRepository>(
+                                            context)
+                                        .getAllKaryawan(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.data!.isNotEmpty) {
+                                    List<DropdownMenuEntry<String?>> a =
+                                        snapshot.data!
+                                            .map((e) => e.aktif
+                                                ? DropdownMenuEntry(
+                                                    value: e.id,
+                                                    label: e.namaKaryawan)
+                                                : null)
+                                            .nonNulls
+                                            .toList();
+                                    return DropdownMenu<String?>(
+                                      dropdownMenuEntries: a,
+                                      controller: dropdownC,
+                                      initialSelection: a
+                                          .firstWhere(
+                                            (element) =>
+                                                element.label ==
+                                                state.karyawanName,
+                                            orElse: () =>
+                                                const DropdownMenuEntry(
+                                                    value: '-1',
+                                                    label: 'error'),
+                                          )
+                                          .value,
+                                      onSelected: (value) {
+                                        BlocProvider.of<InputserviceBloc>(
+                                                context)
+                                            .add(ChangeKaryawan(a
+                                                .firstWhere(
+                                                    (e) => e.value == value!)
+                                                .label));
+                                      },
+                                    );
+                                  } else {
+                                    return const Text('error snapshot');
+                                  }
+                                });
+                          } else {
+                            return const CircularProgressIndicator.adaptive();
+                          }
+                        },
+                      )),
+                      BlocBuilder<InputserviceBloc, InputserviceState>(
+                        builder: (context, state) {
+                          if (state is InputserviceLoaded) {
+                            // debugPrint(state.karyawanName);
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text('${state.karyawanName} '),
+                                GestureDetector(
+                                    onLongPress: () async {
+                                      showDialog(
                                         context: context,
-                                        firstDate: DateTime(2020),
-                                        lastDate: DateTime.now());
-                                    if (a != null) {
-                                      BlocProvider.of<InputserviceBloc>(context)
-                                          .add(ChangeTanggal(a));
-                                    }
-                                  },
-                                  child: Text(
-                                      DateFormat('dd/M/yyyy hh:mm', 'id_ID')
-                                          .format(state.tanggal)
-                                          .toString()))
-                            ],
-                          );
-                        }
-                        return Container();
-                      },
-                    ),
-                  ],
+                                        builder: (context) => KeyLock(
+                                            tendigits: '12340', title: 'Admin'),
+                                      ).then((value) {
+                                        if (value != null && value) {
+                                          showDatePicker(
+                                                  context: context,
+                                                  firstDate: DateTime(2020),
+                                                  lastDate: DateTime.now())
+                                              .then((v) {
+                                            if (v != null) {
+                                              BlocProvider.of<InputserviceBloc>(
+                                                      context)
+                                                  .add(ChangeTanggal(v));
+                                            }
+                                          });
+                                        }
+                                      });
+                                    },
+                                    child: Text(
+                                        DateFormat('dd/M/yyyy hh:mm', 'id_ID')
+                                            .format(state.tanggal)
+                                            .toString()))
+                              ],
+                            );
+                          }
+                          return Container();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 const Padding(padding: EdgeInsets.all(6)),
                 BlocBuilder<InputserviceBloc, InputserviceState>(

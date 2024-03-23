@@ -204,7 +204,7 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
                       RepositoryProvider.of<BarangRepository>(context)
                           .edit(widget.data.copyWith(
                               tglUpdate: () => DateTime.now(),
-                              hargajual: int.tryParse(hargaJual.text),
+                              hargajual: uangFormatter.getUnformattedValue(),
                               pcs: int.tryParse(jumlahStock.text),
                               namaBarang: namaBarang.text))
                           .then((value) {
