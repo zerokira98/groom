@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
@@ -87,7 +88,7 @@ class _SideDrawerState extends State<SideDrawer> {
                     return FutureBuilder(
                         future:
                             RepositoryProvider.of<KaryawanRepository>(context)
-                                .getAllKaryawan(),
+                                .getAllKaryawan(kIsWeb ? true : false),
                         builder: (context, snapshot) {
                           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                             List<DropdownMenuEntry<String?>> a = snapshot.data!

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/barang_repo.dart';
 import 'package:groom/db/pemasukan_repo.dart';
+import 'package:groom/etc/extension.dart';
 
 import 'package:groom/model/model.dart';
 
@@ -46,9 +48,7 @@ class ItemCard extends StatelessWidget {
               2 => ItemCardColoring(data),
               3 => ItemCardGoods(data),
               4 => ItemCardOthers(data),
-              int() => Container(
-                  child: const Text('error switch'),
-                )
+              int() => const Text('error switch')
             }
           ],
         ),
@@ -168,7 +168,18 @@ class ItemCardColoring extends StatelessWidget {
           children: [
             const Text('Biaya : '),
             Expanded(
-              child: TextField(
+              child: TextFormField(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if ((int.tryParse(value ?? '') ?? 0) < 1000) {
+                    return 'kurang dari 1000';
+                  }
+                  return null;
+                },
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  FilteringTextInputFormatter.deny(RegExp('^0+'))
+                ],
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
                   BlocProvider.of<InputserviceBloc>(context).add(
@@ -176,10 +187,9 @@ class ItemCardColoring extends StatelessWidget {
                 },
               ),
             ),
-
-            // Text('xxx'),
           ],
-        )
+        ),
+        Text(data.price.numberFormat(currency: true)),
       ],
     );
   }
@@ -302,8 +312,19 @@ class _ItemCardGoodsState extends State<ItemCardGoods> {
                 children: [
                   const Text('Harga per pcs : '),
                   Expanded(
-                      child: TextField(
+                      child: TextFormField(
                     controller: priceController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if ((int.tryParse(value ?? '') ?? 0) < 1000) {
+                        return 'kurang dari 1000';
+                      }
+                      return null;
+                    },
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      FilteringTextInputFormatter.deny(RegExp('^0+'))
+                    ],
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       BlocProvider.of<InputserviceBloc>(context).add(
@@ -368,6 +389,10 @@ class ItemCardOthers extends StatelessWidget {
           children: [
             Expanded(
                 child: TextFormField(
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.deny(RegExp('^0+'))
+              ],
               validator: (value) {
                 if (value == null) {
                   return 'null';

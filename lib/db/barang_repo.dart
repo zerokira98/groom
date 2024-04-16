@@ -10,7 +10,7 @@ class BarangRepository {
       intMapStoreFactory.store('barang');
   late CollectionReference<BarangMdl> ref;
   FirebaseFirestore firestore;
-  BarangRepository({required this.db, required this.firestore}) {
+  BarangRepository({required this.firestore}) {
     ref = firestore.collection('barang').withConverter(
           fromFirestore: (snapshot, options) =>
               BarangMdl.fromJson(snapshot.data()!).copyWith(
@@ -19,7 +19,7 @@ class BarangRepository {
           toFirestore: (value, options) => value.toJson(),
         );
   }
-  Database db;
+  // Database db;
   Future<int> edit(BarangMdl data) {
     return ref
         .doc(data.id)

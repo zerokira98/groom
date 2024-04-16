@@ -1,11 +1,11 @@
 import 'dart:io';
-
+import 'package:universal_html/html.dart' as webFile;
 // import 'package:excel/excel.dart';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/karyawan_repo.dart';
-import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,7 +22,7 @@ class PrintMingguan extends StatelessWidget {
   ) async {
     var karyawanListfr =
         await RepositoryProvider.of<KaryawanRepository>(context)
-            .getAllKaryawan();
+            .getAllKaryawan(true);
     karyawanListfr =
         karyawanListfr.map((e) => e.aktif ? e : null).nonNulls.toList();
     var karyawanList = karyawanListfr.map((e) => e.namaKaryawan).toList();
@@ -49,7 +49,6 @@ class PrintMingguan extends StatelessWidget {
     final Workbook workbook = Workbook();
 
     final Worksheet sheet = workbook.worksheets[0];
-    Directory docDir = await getApplicationDocumentsDirectory();
 
     sheet.getRangeByName('A1:A2')
       ..merge()
@@ -75,12 +74,12 @@ class PrintMingguan extends StatelessWidget {
               .backColorRgb =
           Color(int.parse("FF${karyawanColorList[i]}", radix: 16));
     } //end loop
-
+//data inserts
     for (var idx = 0; idx < perDay.length; idx++) {
       var element = perDay[idx];
-      List insertRow =
+      List<Object> insertRow =
           List.filled((karyawanList.length * colperPerson.length) + 1, '');
-      insertRow[0] = startDate.addDays(idx).formatDayMonth();
+      insertRow[0] = startDate.addDays(idx);
 
       for (var e in element) {
         var index = karyawanList.indexWhere(
@@ -90,8 +89,7 @@ class PrintMingguan extends StatelessWidget {
         for (var i = 0; i < colperPerson.length; i++) {
           var getprice =
               e.perCategory.firstWhere((wew) => wew.type == i).price / 1000;
-          insertRow[startIndex + i] =
-              getprice == 0 ? '' : getprice.toInt().toString();
+          insertRow[startIndex + i] = getprice == 0 ? '' : getprice.toInt();
         }
       }
 
@@ -104,12 +102,25 @@ class PrintMingguan extends StatelessWidget {
 
     sheet.autoFitColumn(1);
 
-    final List<int> bytes = workbook.saveAsStream();
+    final List<int> bytes = workbook.saveSync();
     // return;
-    File theFile = File('${docDir.path}/Backup_${DateTime.now().day}.xlsx');
-    theFile.createSync(recursive: true);
-    theFile.writeAsBytesSync(bytes, mode: FileMode.write);
-    if (Platform.isAndroid) {
+    if (kIsWeb) {
+      // File theFile = File('Backup_${DateTime.now().day}.xlsx');
+      // theFile.createSync(recursive: true);
+      // theFile.writeAsBytesSync(bytes, mode: FileMode.write);
+      var filebytes = Uint8List.fromList(bytes);
+      var blob =
+          webFile.Blob([filebytes], 'application/vnd.ms-excel', 'native');
+      var anchorElement = webFile.AnchorElement(
+        href: webFile.Url.createObjectUrlFromBlob(blob).toString(),
+      )
+        ..setAttribute("download", "data.xlsx")
+        ..click();
+    } else if (Platform.isAndroid) {
+      Directory docDir = await getApplicationDocumentsDirectory();
+      File theFile = File('${docDir.path}/Backup_${DateTime.now().day}.xlsx');
+      theFile.createSync(recursive: true);
+      theFile.writeAsBytesSync(bytes, mode: FileMode.write);
       // final params = SaveFileDialogParams(sourceFilePath: theFile.path);
       // final filePath = await FlutterFileDialog.saveFile(params: params);
       // if (filePath != null) {
@@ -117,6 +128,7 @@ class PrintMingguan extends StatelessWidget {
       debugPrint(x.message);
       // }
     }
+
     workbook.dispose();
   }
 

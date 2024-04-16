@@ -3,7 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:groom/model/pengeluaran_mdl.dart';
-import 'package:sembast/sembast.dart' as s;
+// import 'package:sembast/sembast.dart' as s;
 
 abstract class _PengeluaranRepo {
   FirebaseFirestore firestore;
@@ -239,7 +239,9 @@ abstract class _PengeluaranRepo {
 // }
 class PengeluaranRepository implements _PengeluaranRepo {
   late CollectionReference<PengeluaranMdl> storeRef;
-  PengeluaranRepository({required this.firestore, required this.db}) {
+  PengeluaranRepository({
+    required this.firestore,
+  }) {
     storeRef = firestore.collection('pengeluaran').withConverter(
           fromFirestore: (snapshot, options) =>
               PengeluaranMdl.fromJson(snapshot.data()!).copyWith(
@@ -250,16 +252,15 @@ class PengeluaranRepository implements _PengeluaranRepo {
   }
   @override
   FirebaseFirestore firestore;
-  s.Database db;
-  var storePengeluaran = s.intMapStoreFactory.store('strukPengeluaran');
+  // s.Database db;
+  // var storePengeluaran = s.intMapStoreFactory.store('strukPengeluaran');
 
   @override
   Future<int> delete(PengeluaranMdl data) {
-    return storeRef
-        .doc(data.id)
-        .delete()
-        .then((value) => 1)
-        .onError((error, stackTrace) => -1);
+    return storeRef.doc(data.id).delete().then((value) {
+      firestore.collection('pengeluaranDeleted').add(data.toJson());
+      return 1;
+    }).onError((error, stackTrace) => -1);
   }
 
   @override
@@ -308,7 +309,7 @@ class PengeluaranRepository implements _PengeluaranRepo {
 
   Future<List<String>> getNamaBarang(String queryText) async {
     return storeRef
-        .where(('tipePengeluaran', isEqualTo: 'barangjual'))
+        .where('tipePengeluaran', isEqualTo: 'barangjual')
         .get()
         .then((value) => value.docs
             .map((e) => RegExp(queryText, caseSensitive: false)
@@ -321,7 +322,7 @@ class PengeluaranRepository implements _PengeluaranRepo {
 
   Future<List<String>> getOperational(String queryText) async {
     return storeRef
-        .where(('tipePengeluaran', isEqualTo: 'operasional'))
+        .where('tipePengeluaran', isEqualTo: 'operasional')
         .get()
         .then((value) => value.docs
             .map((e) => RegExp(queryText, caseSensitive: false)
@@ -397,7 +398,6 @@ class PengeluaranRepository implements _PengeluaranRepo {
     if (tipe != null) {
       newStoreRef = newStoreRef.where('tipePengeluaran', isEqualTo: tipe.name);
     }
-    print(newStoreRef.parameters);
     // if (tipe != null) {
     //   if (starts != null) {
     //     return storeRef

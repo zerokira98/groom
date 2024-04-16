@@ -3,12 +3,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:groom/model/ekuitas_mdl.dart';
-import 'package:sembast/sembast.dart' hide Filter;
+// import 'package:sembast/sembast.dart' hide Filter;
 
 abstract class _EkuitasRepo {
-  Database db;
-  _EkuitasRepo(this.db);
-  var store = intMapStoreFactory.store('ekuitas');
+  // Database db;
+  _EkuitasRepo();
+  // var store = intMapStoreFactory.store('ekuitas');
 
   ///
   Future<List<EkuitasMdl>> getAll();
@@ -20,7 +20,7 @@ abstract class _EkuitasRepo {
 class EkuitasRepository extends _EkuitasRepo {
   late CollectionReference<EkuitasMdl> ref;
   FirebaseFirestore firestore;
-  EkuitasRepository(super.db, this.firestore) {
+  EkuitasRepository(this.firestore) {
     ref = firestore.collection('uangMasuk').withConverter(
           fromFirestore: (snapshot, options) =>
               EkuitasMdl.fromJson(snapshot.data()!).copyWith(
@@ -41,11 +41,10 @@ class EkuitasRepository extends _EkuitasRepo {
 
   @override
   Future<int> delete(EkuitasMdl data) {
-    return ref
-        .doc(data.id)
-        .delete()
-        .then((value) => 1)
-        .onError((error, stackTrace) => -1);
+    return ref.doc(data.id).delete().then((value) {
+      firestore.collection('uangMasukDeleted').add(data.toJson());
+      return 1;
+    }).onError((error, stackTrace) => -1);
     // return store.delete(db,
     //     finder: Finder(filter: Filter.equals('id', data.id)));
   }

@@ -157,6 +157,5 @@ class BonRepository implements _BonRepo {
                   (e) => BonData.fromJson(e.data()).copyWith(idKey: () => e.id))
               .toList());
     }
-    return [];
   }
 }

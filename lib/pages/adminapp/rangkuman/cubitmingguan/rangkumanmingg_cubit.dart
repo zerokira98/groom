@@ -160,22 +160,24 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
             if (eSum.type == 0 && eSum.price == 20000) {
               totalwithCut += eSum.price * (eSum.pcsBarang) * 0.5;
 
-              groundItemCardscut = groundItemCards.map((e) {
+              groundItemCardscut = groundItemCardscut.map((e) {
                 return e.type == eSum.type
                     ? e.copyWith(
-                        price: (eSum.price * (eSum.pcsBarang) * 0.5).toInt())
+                        price: e.price +
+                            (eSum.price * (eSum.pcsBarang) * 0.5).toInt())
                     : e;
               }).toList();
             } else {
               totalwithCut +=
                   eSum.price * (eSum.pcsBarang) * cutPercentage(eSum.type);
-              groundItemCardscut = groundItemCards.map((e) {
+              groundItemCardscut = groundItemCardscut.map((e) {
                 return e.type == eSum.type
                     ? e.copyWith(
-                        price: (eSum.price *
-                                (eSum.pcsBarang) *
-                                cutPercentage(eSum.type))
-                            .toInt())
+                        price: e.price +
+                            (eSum.price *
+                                    (eSum.pcsBarang) *
+                                    cutPercentage(eSum.type))
+                                .toInt())
                     : e;
               }).toList();
             }
@@ -200,7 +202,7 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
       perDay.add(perPerson);
       perDay2.add(perPersonwithCut);
     }
-    print('aw$perDay2');
+    // print('aw$perDay2');
 
     var totalIncomeKotor = 0;
     var totalIncomewithcut = 0;
@@ -276,18 +278,42 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
           }
         } //endloop
       } else {
-        perPerson.addAll({e1.namaKaryawan: e1.itemCards});
-        perPersoncut.addAll({
-          e1.namaKaryawan: e1.itemCards.map((e) {
-            num totcut = 0.0;
-            if (e.type == 0 && e.price == 20000) {
-              totcut = (e.pcsBarang * e.price * 0.5);
-            } else {
-              totcut = (e.pcsBarang * e.price * cutPercentage(e.type));
-            }
-            return e.copyWith(price: totcut.toInt());
-          }).toList()
-        });
+        ///here
+        ///
+        List<ItemCardMdl> groundItemCards = List.generate(
+            cardType.length, (i) => ItemCardMdl(index: 0, price: 0, type: i));
+        List<ItemCardMdl> groundItemCardscut = List.generate(
+            cardType.length, (i) => ItemCardMdl(index: 0, price: 0, type: i));
+        for (var telo in e1.itemCards) {
+          groundItemCards = groundItemCards
+              .map((e) => e.type == telo.type
+                  ? e.copyWith(price: e.price + (telo.pcsBarang * telo.price))
+                  : e)
+              .toList();
+          if (telo.type == 0 && telo.price == 20000) {
+            groundItemCardscut = groundItemCardscut.map((e) {
+              return e.type == telo.type
+                  ? e.copyWith(
+                      price: e.price +
+                          (telo.price * (telo.pcsBarang) * 0.5).toInt())
+                  : e;
+            }).toList();
+          } else {
+            groundItemCardscut = groundItemCardscut.map((e) {
+              return e.type == telo.type
+                  ? e.copyWith(
+                      price: e.price +
+                          (telo.price *
+                                  (telo.pcsBarang) *
+                                  cutPercentage(telo.type))
+                              .toInt())
+                  : e;
+            }).toList();
+          }
+        }
+        perPerson.addAll({e1.namaKaryawan: groundItemCards});
+
+        perPersoncut.addAll({e1.namaKaryawan: groundItemCardscut});
       }
     }
     List<StrukMdl> dataPerPerson = [];
@@ -313,7 +339,7 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
     // perDay2.forEachIndexed(
     //   (i, element) => print(i.toString() + element.toString()),
     // );
-    // print(perDay2.length);
+    print(dataPerPerson);
     emit(RangkumanWeekLoaded(
       bon: jumlahPiutangTerbayar - jumlahPiutang,
       groupBy: groupBy,

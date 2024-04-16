@@ -77,8 +77,7 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
             ElevatedButton(
                 onPressed: () async {
                   if (selectedIdx != null && nama != null) {
-                    var a = await RepositoryProvider.of<KaryawanRepository>(
-                            context)
+                    await RepositoryProvider.of<KaryawanRepository>(context)
                         .update(nama!.copyWith(password: () => passcon.text))
                         .then((value) {
                       setState(() {});
@@ -90,8 +89,7 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
                     });
                   } else {
                     if (formkey.currentState!.validate()) {
-                      var a = await RepositoryProvider.of<KaryawanRepository>(
-                              context)
+                      await RepositoryProvider.of<KaryawanRepository>(context)
                           .addKaryawan(KaryawanData(
                               namaKaryawan: namaController.text,
                               password: passcon.text,

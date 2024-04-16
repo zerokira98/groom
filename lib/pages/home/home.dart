@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_offline/flutter_offline.dart';
@@ -20,244 +21,348 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: BlocListener<InputserviceBloc, InputserviceState>(
-          listenWhen: (pre, cur) =>
-              (pre is InputserviceLoaded) && (cur is InputserviceLoaded),
-          listener: (context, state) {
-            if (state is InputserviceLoaded) {
-              if (state.success != null) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RiwayatPemasukan(),
-                    ));
-                BlocProvider.of<InputserviceBloc>(context).add(Initiate());
-              } else if (state.err != null) {
-                Flushbar(
-                  message: state.err,
-                  duration: const Duration(seconds: 2),
-                  animationDuration: Durations.long1,
-                ).show(context);
-              }
-            }
-          },
-          child: const Text('Groom'),
-        ),
-        // actions: [
-        //   IconButton(
-        //       onPressed: () async {
-        //         debugPrint(await RepositoryProvider.of<PemasukanRepository>(context)
-        //             .getAllStruk());
-        //       },
-        //       icon: const Icon(Icons.bug_report))
-        // ],
-      ),
+      drawerEdgeDragWidth: 48,
       drawer: const SideDrawer(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
+      endDrawer: const SideDrawer(),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       floatingActionButton: FloatingButton(),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          children: [
-            BlocBuilder<InputserviceBloc, InputserviceState>(
-              builder: (context, state) {
+      // bottomNavigationBar: Padding(
+      //   padding: MediaQuery.of(context).viewInsets,
+      //   child:
+      // ),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (kIsWeb &&
+              MediaQuery.of(context).orientation == Orientation.portrait)
+            Builder(builder: (context) {
+              return IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: const Icon(Icons.view_list_sharp),
+              );
+            }),
+          if (kIsWeb &&
+              MediaQuery.of(context).orientation == Orientation.landscape)
+            const SideDrawer(),
+          Expanded(
+            child: BlocListener<InputserviceBloc, InputserviceState>(
+              listenWhen: (pre, cur) =>
+                  (pre is InputserviceLoaded) && (cur is InputserviceLoaded),
+              listener: (context, state) {
                 if (state is InputserviceLoaded) {
-                  var total = 0;
-                  for (var element in state.itemCards) {
-                    total += element.price * (element.pcsBarang);
+                  if (state.success != null) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RiwayatPemasukan(),
+                        ));
+                    BlocProvider.of<InputserviceBloc>(context).add(Initiate());
+                  } else if (state.err != null) {
+                    Flushbar(
+                      message: state.err,
+                      duration: const Duration(seconds: 2),
+                      animationDuration: Durations.long1,
+                    ).show(context);
                   }
-                  return Text(
-                    'Total : ${total.toString().numberFormat(currency: true)}',
-                    textScaler: const TextScaler.linear(1.5),
-                  );
-                } else {
-                  return const SizedBox();
                 }
               },
-            )
-          ],
-        ),
-      ),
-      body: OfflineBuilder(
-        connectivityBuilder: (context, value, child) => Stack(
-          fit: StackFit.expand,
-          children: [
-            AnimatedPositioned(
-              duration: Durations.extralong4,
-              curve: const Interval(0.5, 1.0, curve: Curves.easeInOut),
-              height: value != ConnectivityResult.none ? 0 : 24,
-              left: 0.0,
-              right: 0.0,
-              child: Container(
-                color: value != ConnectivityResult.none
-                    ? const Color(0xFF00EE44)
-                    : const Color(0xFFEE4400),
-                child: Center(
-                  child: Text(value != ConnectivityResult.none
-                      ? 'ONLINE'
-                      : 'OFFLINE MODE'),
-                ),
+              child: Stack(
+                children: [
+                  OfflineBuilder(
+                    connectivityBuilder: (context, value, child) => Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        AnimatedPositioned(
+                          duration: Durations.extralong4,
+                          curve:
+                              const Interval(0.5, 1.0, curve: Curves.easeInOut),
+                          height: value != ConnectivityResult.none ? 0 : 24,
+                          left: 0.0,
+                          right: 0.0,
+                          child: Container(
+                            color: value != ConnectivityResult.none
+                                ? const Color(0xFF00EE44)
+                                : const Color(0xFFEE4400),
+                            child: Center(
+                              child: Text(value != ConnectivityResult.none
+                                  ? 'ONLINE'
+                                  : 'OFFLINE MODE'),
+                            ),
+                          ),
+                        ),
+                        AnimatedContainer(
+                          duration: Durations.extralong4,
+                          curve:
+                              const Interval(0.5, 1.0, curve: Curves.easeInOut),
+                          padding: EdgeInsets.only(
+                              top: value != ConnectivityResult.none
+                                  ? 0.0
+                                  : 26.0),
+                          child: child,
+                        )
+                      ],
+                    ),
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        BlocProvider.of<InputserviceBloc>(context)
+                            .add(Initiate());
+                        return Future.delayed(Durations.extralong4, () => true);
+                      },
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.vertical(
+                                      bottom: Radius.circular(24)),
+                                  gradient: LinearGradient(
+                                      colors: [
+                                        Theme.of(context).primaryColor,
+                                        Theme.of(context).primaryColorDark,
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter)),
+                              padding: const EdgeInsets.all(8.0).add(
+                                  EdgeInsets.only(
+                                      top: MediaQuery.of(context)
+                                          .viewPadding
+                                          .top,
+                                      bottom: 8)),
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    'Karyawan : ',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  Expanded(child: BlocBuilder<InputserviceBloc,
+                                      InputserviceState>(
+                                    builder: (context, state) {
+                                      if (state is InputserviceLoaded) {
+                                        dropdownC.text = state.karyawanName;
+                                        return FutureBuilder(
+                                            future: RepositoryProvider.of<
+                                                    KaryawanRepository>(context)
+                                                .getAllKaryawan(
+                                                    kIsWeb ? true : false),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData &&
+                                                  snapshot.data!.isNotEmpty) {
+                                                List<
+                                                    DropdownMenuEntry<
+                                                        String?>> a = snapshot
+                                                    .data!
+                                                    .map((e) => e.aktif
+                                                        ? DropdownMenuEntry(
+                                                            value: e.id,
+                                                            label:
+                                                                e.namaKaryawan)
+                                                        : null)
+                                                    .nonNulls
+                                                    .toList();
+                                                return DropdownMenu<String?>(
+                                                  inputDecorationTheme:
+                                                      const InputDecorationTheme(
+                                                    outlineBorder: BorderSide(
+                                                        color: Colors.red),
+                                                    border: OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            width: 2,
+                                                            color: Colors.red)),
+                                                  ),
+                                                  textStyle: const TextStyle(
+                                                      color: Colors.white),
+                                                  menuStyle: const MenuStyle(),
+                                                  dropdownMenuEntries: a,
+                                                  controller: dropdownC,
+                                                  initialSelection: a
+                                                      .firstWhere(
+                                                        (element) =>
+                                                            element.label ==
+                                                            state.karyawanName,
+                                                        orElse: () =>
+                                                            const DropdownMenuEntry(
+                                                                value: '-1',
+                                                                label: 'error'),
+                                                      )
+                                                      .value,
+                                                  onSelected: (value) {
+                                                    BlocProvider.of<
+                                                                InputserviceBloc>(
+                                                            context)
+                                                        .add(ChangeKaryawan(a
+                                                            .firstWhere((e) =>
+                                                                e.value ==
+                                                                value!)
+                                                            .label));
+                                                  },
+                                                );
+                                              } else {
+                                                return const Text(
+                                                    'error snapshot');
+                                              }
+                                            });
+                                      } else {
+                                        return const CircularProgressIndicator
+                                            .adaptive();
+                                      }
+                                    },
+                                  )),
+                                  BlocBuilder<InputserviceBloc,
+                                      InputserviceState>(
+                                    builder: (context, state) {
+                                      if (state is InputserviceLoaded) {
+                                        // debugPrint(state.karyawanName);
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              '${state.karyawanName} ',
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            GestureDetector(
+                                                onLongPress: () async {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        KeyLock(
+                                                            tendigits: '12340',
+                                                            title: 'Admin'),
+                                                  ).then((value) {
+                                                    if (value != null &&
+                                                        value) {
+                                                      showDatePicker(
+                                                              context: context,
+                                                              firstDate:
+                                                                  DateTime(
+                                                                      2020),
+                                                              lastDate: DateTime
+                                                                  .now())
+                                                          .then((v) {
+                                                        if (v != null) {
+                                                          BlocProvider.of<
+                                                                      InputserviceBloc>(
+                                                                  context)
+                                                              .add(
+                                                                  ChangeTanggal(
+                                                                      v));
+                                                        }
+                                                      });
+                                                    }
+                                                  });
+                                                },
+                                                child: Text(
+                                                  DateFormat('dd/M/yyyy hh:mm',
+                                                          'id_ID')
+                                                      .format(state.tanggal)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ))
+                                          ],
+                                        );
+                                      }
+                                      return Container();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Padding(padding: EdgeInsets.all(6)),
+                            BlocBuilder<InputserviceBloc, InputserviceState>(
+                              builder: (context, state) {
+                                if (state is InputserviceLoaded) {
+                                  return Column(
+                                    children: [
+                                      for (var a = 0;
+                                          a < state.itemCards.length;
+                                          a++)
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Stack(children: [
+                                            ItemCard(data: state.itemCards[a]),
+                                            Positioned(
+                                                child: Card(
+                                                    elevation: 2,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              2.0),
+                                                      child: Text('${a + 1}'),
+                                                    ))),
+                                          ]),
+                                        ),
+                                    ],
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
+                            // ItemCard(),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16.0),
+                                    child: ElevatedButton(
+                                        onPressed: () {
+                                          FocusManager.instance.primaryFocus
+                                              ?.unfocus();
+                                          BlocProvider.of<InputserviceBloc>(
+                                                  context)
+                                              .add(AddCard());
+                                        },
+                                        child: const Text('+')),
+                                  ),
+                                )
+                              ],
+                            ),
+                            const Padding(padding: EdgeInsets.all(12)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      child: Row(
+                        children: [
+                          BlocBuilder<InputserviceBloc, InputserviceState>(
+                            builder: (context, state) {
+                              if (state is InputserviceLoaded) {
+                                var total = 0;
+                                for (var element in state.itemCards) {
+                                  total += element.price * (element.pcsBarang);
+                                }
+                                return Text(
+                                  'Total : ${total.toString().numberFormat(currency: true)}',
+                                  textScaler: const TextScaler.linear(1.5),
+                                );
+                              } else {
+                                return const SizedBox();
+                              }
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            AnimatedContainer(
-              duration: Durations.extralong4,
-              curve: const Interval(0.5, 1.0, curve: Curves.easeInOut),
-              padding: EdgeInsets.only(
-                  top: value != ConnectivityResult.none ? 0.0 : 26.0),
-              child: child,
-            )
-          ],
-        ),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            BlocProvider.of<InputserviceBloc>(context).add(Initiate());
-            return Future.delayed(Durations.extralong4, () => true);
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      const Text('Karyawan : '),
-                      Expanded(child:
-                          BlocBuilder<InputserviceBloc, InputserviceState>(
-                        builder: (context, state) {
-                          if (state is InputserviceLoaded) {
-                            dropdownC.text = state.karyawanName;
-                            return FutureBuilder(
-                                future:
-                                    RepositoryProvider.of<KaryawanRepository>(
-                                            context)
-                                        .getAllKaryawan(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData &&
-                                      snapshot.data!.isNotEmpty) {
-                                    List<DropdownMenuEntry<String?>> a =
-                                        snapshot.data!
-                                            .map((e) => e.aktif
-                                                ? DropdownMenuEntry(
-                                                    value: e.id,
-                                                    label: e.namaKaryawan)
-                                                : null)
-                                            .nonNulls
-                                            .toList();
-                                    return DropdownMenu<String?>(
-                                      dropdownMenuEntries: a,
-                                      controller: dropdownC,
-                                      initialSelection: a
-                                          .firstWhere(
-                                            (element) =>
-                                                element.label ==
-                                                state.karyawanName,
-                                            orElse: () =>
-                                                const DropdownMenuEntry(
-                                                    value: '-1',
-                                                    label: 'error'),
-                                          )
-                                          .value,
-                                      onSelected: (value) {
-                                        BlocProvider.of<InputserviceBloc>(
-                                                context)
-                                            .add(ChangeKaryawan(a
-                                                .firstWhere(
-                                                    (e) => e.value == value!)
-                                                .label));
-                                      },
-                                    );
-                                  } else {
-                                    return const Text('error snapshot');
-                                  }
-                                });
-                          } else {
-                            return const CircularProgressIndicator.adaptive();
-                          }
-                        },
-                      )),
-                      BlocBuilder<InputserviceBloc, InputserviceState>(
-                        builder: (context, state) {
-                          if (state is InputserviceLoaded) {
-                            // debugPrint(state.karyawanName);
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text('${state.karyawanName} '),
-                                GestureDetector(
-                                    onLongPress: () async {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => KeyLock(
-                                            tendigits: '12340', title: 'Admin'),
-                                      ).then((value) {
-                                        if (value != null && value) {
-                                          showDatePicker(
-                                                  context: context,
-                                                  firstDate: DateTime(2020),
-                                                  lastDate: DateTime.now())
-                                              .then((v) {
-                                            if (v != null) {
-                                              BlocProvider.of<InputserviceBloc>(
-                                                      context)
-                                                  .add(ChangeTanggal(v));
-                                            }
-                                          });
-                                        }
-                                      });
-                                    },
-                                    child: Text(
-                                        DateFormat('dd/M/yyyy hh:mm', 'id_ID')
-                                            .format(state.tanggal)
-                                            .toString()))
-                              ],
-                            );
-                          }
-                          return Container();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const Padding(padding: EdgeInsets.all(6)),
-                BlocBuilder<InputserviceBloc, InputserviceState>(
-                  builder: (context, state) {
-                    if (state is InputserviceLoaded) {
-                      return Column(
-                        children: [
-                          for (var a in state.itemCards)
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ItemCard(data: a),
-                            ),
-                        ],
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                // ItemCard(),
-                const Padding(padding: EdgeInsets.all(8)),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              BlocProvider.of<InputserviceBloc>(context)
-                                  .add(AddCard());
-                            },
-                            child: const Text('+')),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -13,19 +13,23 @@ final class BulananState extends Equatable {
       required this.totalPemasukan,
       required this.incomePerHari,
       required this.groupAndSumPengeluaran,
-      required this.pendapatanTertinggi});
+      required this.pendapatanTertinggi,
+      required this.jumlahCustomerTertinggi});
   final Map<String, num> pendapatanTertinggi;
+  final Map<String, num> jumlahCustomerTertinggi;
   final Map groupAndSumPengeluaran;
   final num totalPengeluaran;
   final num totalPemasukan;
   final List<num> incomePerHari;
 
   static BulananState initial() => const BulananState(
-      totalPengeluaran: 0,
-      totalPemasukan: 0,
-      incomePerHari: [],
-      groupAndSumPengeluaran: {},
-      pendapatanTertinggi: {});
+        totalPengeluaran: 0,
+        totalPemasukan: 0,
+        incomePerHari: [],
+        groupAndSumPengeluaran: {},
+        pendapatanTertinggi: {},
+        jumlahCustomerTertinggi: {},
+      );
 
   @override
   List<Object> get props => [
@@ -33,6 +37,7 @@ final class BulananState extends Equatable {
         totalPemasukan,
         incomePerHari,
         groupAndSumPengeluaran,
-        pendapatanTertinggi
+        pendapatanTertinggi,
+        jumlahCustomerTertinggi
       ];
 }

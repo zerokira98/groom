@@ -2,11 +2,11 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groom/model/karyawan_mdl.dart';
-import 'package:sembast/sembast.dart' hide Filter;
+// import 'package:sembast/sembast.dart' hide Filter;
 
 abstract class _KaryawanRepo {
-  Database db;
-  _KaryawanRepo(this.db);
+  // Database db;
+  _KaryawanRepo();
 
   ///----- Karyawan data -----
   ///
@@ -19,7 +19,7 @@ abstract class _KaryawanRepo {
 }
 
 class KaryawanRepository implements _KaryawanRepo {
-  KaryawanRepository({required this.db, required this.firestore}) {
+  KaryawanRepository({required this.firestore}) {
     ref = firestore.collection('karyawan').withConverter(
           fromFirestore: (snapshot, options) =>
               KaryawanData.fromJson(snapshot.data()!).copyWith(
@@ -31,10 +31,10 @@ class KaryawanRepository implements _KaryawanRepo {
   FirebaseFirestore firestore;
   late CollectionReference<KaryawanData> ref;
   @override
-  Database db;
+  // Database db;
 
-  StoreRef<int, Map<String, Object?>> storeKaryawan =
-      intMapStoreFactory.store('karyawanData');
+  // StoreRef<int, Map<String, Object?>> storeKaryawan =
+  //     intMapStoreFactory.store('karyawanData');
 
   @override
   Future<int> addKaryawan(KaryawanData data) {

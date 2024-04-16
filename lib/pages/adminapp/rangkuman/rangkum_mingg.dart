@@ -751,10 +751,19 @@ class _SlipGajiState extends State<SlipGaji> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('Karyawan : ${widget.nama}',
-                  textScaler: const TextScaler.linear(1.75)),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Karyawan : ${widget.nama}',
+                        textScaler: const TextScaler.linear(1.75)),
+                  ),
+                ),
+                IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close))
+              ],
             ),
             Table(
               children: [
