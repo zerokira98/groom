@@ -23,7 +23,6 @@ class Home extends StatelessWidget {
     return Scaffold(
       drawerEdgeDragWidth: 48,
       drawer: const SideDrawer(),
-      endDrawer: const SideDrawer(),
       // floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       floatingActionButton: FloatingButton(),
       // bottomNavigationBar: Padding(
@@ -335,7 +334,11 @@ class Home extends StatelessWidget {
                     right: 0,
                     child: Container(
                       padding: const EdgeInsets.all(2),
-                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(4)),
+                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      ),
                       child: Row(
                         children: [
                           BlocBuilder<InputserviceBloc, InputserviceState>(

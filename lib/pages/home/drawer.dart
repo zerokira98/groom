@@ -172,43 +172,44 @@ class _SideDrawerState extends State<SideDrawer> {
         ListTile(
           leading: const Icon(Icons.note_alt),
           title: const Text('Catat Pengeluaran Toko'),
-          onTap: () async {
+          onTap: () {
             var name = (BlocProvider.of<InputserviceBloc>(context).state
                     as InputserviceLoaded)
                 .karyawanName;
-            var listallkaryawan =
-                await RepositoryProvider.of<KaryawanRepository>(context)
-                    .getAllKaryawan();
-            var pass = listallkaryawan
-                .firstWhere(
-                  (element) => element.namaKaryawan == name,
-                )
-                .password;
-            if (pass != null) {
-              showDialog<bool?>(
-                context: context,
-                builder: (context) => KeyLock(
-                  tendigits: pass,
-                  title: 'Karyawan: $name',
-                ),
-              ).then((value) {
-                if (value != null && value) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PengeluaranHome(),
-                      ));
-                } else {
-                  // Navigator.pop(context);
-                }
-              });
-            } else {
-              Flushbar(
-                message: 'no password is set',
-                duration: const Duration(seconds: 3),
-                animationDuration: Durations.long1,
-              ).show(context);
-            }
+            RepositoryProvider.of<KaryawanRepository>(context)
+                .getAllKaryawan()
+                .then((listallkaryawan) {
+              var pass = listallkaryawan
+                  .firstWhere(
+                    (element) => element.namaKaryawan == name,
+                  )
+                  .password;
+              if (pass != null) {
+                showDialog<bool?>(
+                  context: context,
+                  builder: (context) => KeyLock(
+                    tendigits: pass,
+                    title: 'Karyawan: $name',
+                  ),
+                ).then((value) {
+                  if (value != null && value) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PengeluaranHome(),
+                        ));
+                  } else {
+                    // Navigator.pop(context);
+                  }
+                });
+              } else {
+                Flushbar(
+                  message: 'no password is set',
+                  duration: const Duration(seconds: 3),
+                  animationDuration: Durations.long1,
+                ).show(context);
+              }
+            });
           },
         ),
         ListTile(
@@ -257,24 +258,25 @@ class _SideDrawerState extends State<SideDrawer> {
           ListTile(
             leading: const Icon(Icons.admin_panel_settings),
             title: const Text('Admin'),
-            onTap: () async {
+            onTap: () {
               InputController ic = InputController();
               final FocusNode focusNode = FocusNode();
               focusNode.requestFocus();
-              bool dia = await showDialog<bool>(
-                    context: context,
-                    builder: (context) {
-                      return KeyLock(tendigits: '12340', title: 'Admin');
-                    },
-                  ) ??
-                  false;
-              if (dia) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AdminPage(),
-                    ));
-              }
+              showDialog<bool>(
+                context: context,
+                builder: (context) {
+                  return KeyLock(tendigits: '12340', title: 'Admin');
+                },
+              ).then((dia) {
+                if (dia == null) return;
+                if (dia) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminPage(),
+                      ));
+                }
+              });
             },
           ),
       ],

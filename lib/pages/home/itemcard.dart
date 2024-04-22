@@ -169,6 +169,7 @@ class ItemCardColoring extends StatelessWidget {
             const Text('Biaya : '),
             Expanded(
               child: TextFormField(
+                initialValue: data.price.toString(),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {
                   if ((int.tryParse(value ?? '') ?? 0) < 1000) {

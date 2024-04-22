@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/etc/extension.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'cubitbulanan/bulanan_cubit.dart';
@@ -15,6 +16,7 @@ class RangkumMonth extends StatefulWidget {
 class _RangkumMonthState extends State<RangkumMonth> {
   bool showincome = true;
   bool showexpense = true;
+  TextEditingController monthC = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BulananCubit, BulananState>(
@@ -22,11 +24,13 @@ class _RangkumMonthState extends State<RangkumMonth> {
         if (state == BulananState.initial()) {
           return const Material(child: CircularProgressIndicator());
         }
-        var now = DateTime.now();
-        var dateHighestIncome = DateTime(
-            now.year, now.month, state.pendapatanTertinggi['day']!.toInt());
-        var dateTotalCustomerperDay = DateTime(
-            now.year, now.month, state.jumlahCustomerTertinggi['day']!.toInt());
+
+        var thedate = state.bulan;
+        monthC.text = thedate.monthName;
+        var dateHighestIncome = DateTime(thedate.year, thedate.month,
+            state.pendapatanTertinggi['day']!.toInt());
+        var dateTotalCustomerperDay = DateTime(thedate.year, thedate.month,
+            state.jumlahCustomerTertinggi['day']!.toInt());
         // var pr = state.groupAndSumPengeluaran;
         // print(pr);
         return Scaffold(
@@ -36,6 +40,33 @@ class _RangkumMonthState extends State<RangkumMonth> {
           body: SingleChildScrollView(
             child: Column(
               children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Bulan :'),
+                    ),
+                    Flexible(
+                      child: TextField(
+                        onTap: () {
+                          showMonthPicker(
+                                  context: context,
+                                  initialDate: thedate,
+                                  dismissible: true)
+                              .then((value) {
+                            if (value != null) {
+                              BlocProvider.of<BulananCubit>(context)
+                                  .loadData(value);
+                            }
+                          });
+                        },
+                        controller: monthC,
+                        readOnly: true,
+                      ),
+                    ),
+                    Expanded(child: SizedBox()),
+                  ],
+                ),
                 Text(
                     'Income : ${state.totalPemasukan.numberFormat(currency: true)}'),
                 Text(
@@ -118,7 +149,6 @@ class _RangkumMonthState extends State<RangkumMonth> {
                       ColumnSeries(
                         color: Colors.blue,
                         xValueMapper: (datum, index) {
-                          print(datum.key);
                           return index;
                         },
                         yValueMapper: (datum, index) {

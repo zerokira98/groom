@@ -1,6 +1,6 @@
-import 'package:groom/etc/timestamp_converter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:groom/etc/timestamp_converter_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sembast/timestamp.dart';
 part 'pelanggan_mdl.g.dart';
 
 @JsonSerializable()
@@ -11,7 +11,7 @@ class PelangganMdl {
   String nama;
   String kontak;
 
-  @TimestampConverter()
+  @TimestampConverterFirestore()
   DateTime dibuat;
   Map<String, dynamic> toJson() => _$PelangganMdlToJson(this);
 

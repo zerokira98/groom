@@ -293,10 +293,12 @@ class PengeluaranRepository implements _PengeluaranRepo {
       String query, TipePengeluaran tipe) async {
     switch (tipe.index) {
       case 1:
-        return getOperational(query);
+        return getOperational(query).then(
+            (value) => value.map((e) => e.namaPengeluaran).toSet().toList());
       // break;
       case 2:
-        return getNamaBarang(query);
+        return getBarang(query).then(
+            (value) => value.map((e) => e.namaPengeluaran).toSet().toList());
       // break;
       case 0:
         return firestore.collection('karyawan').get().then((value) =>
@@ -307,30 +309,32 @@ class PengeluaranRepository implements _PengeluaranRepo {
     }
   }
 
-  Future<List<String>> getNamaBarang(String queryText) async {
+  Future<List<PengeluaranMdl>> getBarang(String queryText) async {
     return storeRef
         .where('tipePengeluaran', isEqualTo: 'barangjual')
         .get()
         .then((value) => value.docs
             .map((e) => RegExp(queryText, caseSensitive: false)
                     .hasMatch(e.data().namaPengeluaran)
-                ? e.data().namaPengeluaran
+                ? e.data()
                 : null)
             .nonNulls
             .toList());
   }
 
-  Future<List<String>> getOperational(String queryText) async {
+  Future<List<PengeluaranMdl>> getOperational(String queryText) async {
     return storeRef
         .where('tipePengeluaran', isEqualTo: 'operasional')
         .get()
-        .then((value) => value.docs
-            .map((e) => RegExp(queryText, caseSensitive: false)
-                    .hasMatch(e.data().namaPengeluaran)
-                ? e.data().namaPengeluaran
-                : null)
-            .nonNulls
-            .toList());
+        .then((value) {
+      return value.docs
+          .map((e) => RegExp(queryText, caseSensitive: false)
+                  .hasMatch(e.data().namaPengeluaran)
+              ? e.data()
+              : null)
+          .nonNulls
+          .toList();
+    });
   }
 
   Future<List<PengeluaranMdl>> getByKaryawan(String karyawan,

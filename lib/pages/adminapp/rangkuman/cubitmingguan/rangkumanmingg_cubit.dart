@@ -339,7 +339,6 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
     // perDay2.forEachIndexed(
     //   (i, element) => print(i.toString() + element.toString()),
     // );
-    print(dataPerPerson);
     emit(RangkumanWeekLoaded(
       bon: jumlahPiutangTerbayar - jumlahPiutang,
       groupBy: groupBy,

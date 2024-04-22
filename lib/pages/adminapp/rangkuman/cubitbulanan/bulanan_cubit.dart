@@ -101,6 +101,7 @@ class BulananCubit extends Cubit<BulananState> {
       totalPengeluaran += e.biaya * e.pcs;
     }
     emit(BulananState(
+        bulan: thismonth,
         pendapatanTertinggi: pendapatanTertinggi,
         jumlahCustomerTertinggi: jumlahCustomerTertinggi,
         groupAndSumPengeluaran: groupAndSum,

@@ -470,14 +470,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  flutter_nfc_kit:
-    dependency: "direct main"
-    description:
-      name: flutter_nfc_kit
-      sha256: "586a8309a7be4d9be307c46d5e9db1460a9f59a37a097c77d53e2f6bfc11be2d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.4.2"
   flutter_offline:
     dependency: "direct main"
     description:
@@ -672,6 +664,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  month_picker_dialog:
+    dependency: "direct main"
+    description:
+      name: month_picker_dialog
+      sha256: c908f78d506a2ef05ca390375f063c56944790de93943923e41fc6b92ae8f602
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.11.2"
   ndef:
     dependency: "direct main"
     description:
@@ -888,14 +888,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.3"
-  sembast:
-    dependency: "direct main"
-    description:
-      name: sembast
-      sha256: "9a9f0c7aca07043fef857b8b365f41592e48832b61462292699b57978e241c11"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.6.0"
   share_plus:
     dependency: "direct main"
     description:
@@ -1093,14 +1085,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "25.1.35"
-  synchronized:
-    dependency: transitive
-    description:
-      name: synchronized
-      sha256: "539ef412b170d65ecdafd780f924e5be3f60032a1128df156adad6c5b373d558"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0+1"
   term_glyph:
     dependency: transitive
     description:

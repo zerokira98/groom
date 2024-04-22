@@ -616,60 +616,62 @@ class _PrintWidgetState extends State<PrintWidget> {
     List<BluetoothDevice> devices = [];
     try {
       devices = await bluetooth.getBondedDevices();
-    } on PlatformException {}
+    } on PlatformException {
+      debugPrint('telo platform exception');
+    }
 
     bluetooth.onStateChanged().listen((state) {
       switch (state) {
         case BlueThermalPrinter.CONNECTED:
           setState(() {
             _connected = true;
-            print("bluetooth device state: connected");
+            debugPrint("bluetooth device state: connected");
           });
           break;
         case BlueThermalPrinter.DISCONNECTED:
           setState(() {
             _connected = false;
-            print("bluetooth device state: disconnected");
+            debugPrint("bluetooth device state: disconnected");
           });
           break;
         case BlueThermalPrinter.DISCONNECT_REQUESTED:
           setState(() {
             _connected = false;
-            print("bluetooth device state: disconnect requested");
+            debugPrint("bluetooth device state: disconnect requested");
           });
           break;
         case BlueThermalPrinter.STATE_TURNING_OFF:
           setState(() {
             _connected = false;
-            print("bluetooth device state: bluetooth turning off");
+            debugPrint("bluetooth device state: bluetooth turning off");
           });
           break;
         case BlueThermalPrinter.STATE_OFF:
           setState(() {
             _connected = false;
-            print("bluetooth device state: bluetooth off");
+            debugPrint("bluetooth device state: bluetooth off");
           });
           break;
         case BlueThermalPrinter.STATE_ON:
           setState(() {
             _connected = false;
-            print("bluetooth device state: bluetooth on");
+            debugPrint("bluetooth device state: bluetooth on");
           });
           break;
         case BlueThermalPrinter.STATE_TURNING_ON:
           setState(() {
             _connected = false;
-            print("bluetooth device state: bluetooth turning on");
+            debugPrint("bluetooth device state: bluetooth turning on");
           });
           break;
         case BlueThermalPrinter.ERROR:
           setState(() {
             _connected = false;
-            print("bluetooth device state: error");
+            debugPrint("bluetooth device state: error");
           });
           break;
         default:
-          print(state);
+          debugPrint(state.toString());
           break;
       }
     });
@@ -708,10 +710,10 @@ class _PrintWidgetState extends State<PrintWidget> {
   void connect(BuildContext context) {
     if (_device != null) {
       bluetooth.isConnected.then((isConnected) {
-        print('here$isConnected');
+        debugPrint('here$isConnected');
         // if (isConnected == false) {
         bluetooth.connect(_device!).catchError((error) {
-          print('here$error');
+          debugPrint('here$error');
           setState(() => _connected = false);
         }).then((value) => setState(() => _connected = true));
         // }
@@ -765,8 +767,8 @@ class _PrintWidgetState extends State<PrintWidget> {
         blue.printCustom(
             'Jl.Gajahmada no.xx', x.Size.medium.val, x.Align.center.val);
         blue.printNewLine();
-        blue.printCustom('${theData.tanggal.formatLengkap()}',
-            x.Size.medium.val, x.Align.right.val);
+        blue.printCustom(theData.tanggal.formatLengkap(), x.Size.medium.val,
+            x.Align.right.val);
         blue.printCustom('  ${theData.tanggal.clockOnly()}', x.Size.medium.val,
             x.Align.right.val);
         blue.printCustom('Karyawan: ${theData.namaKaryawan}', x.Size.medium.val,
@@ -781,9 +783,7 @@ class _PrintWidgetState extends State<PrintWidget> {
                   .numberFormat(currency: true);
 
           var col0 =
-              cardType[theData.itemCards[i].type].toString().toUpperCase() +
-                  " :  " +
-                  theData.itemCards[i].namaBarang.toUpperCase();
+              "${cardType[theData.itemCards[i].type].toString().toUpperCase()} :  ${theData.itemCards[i].namaBarang.toUpperCase()}";
           blue.print3Column(col0, col1, col2, x.Size.boldLarge.val);
         }
         blue.printNewLine();
@@ -798,10 +798,10 @@ class _PrintWidgetState extends State<PrintWidget> {
         blue.paperCut();
         return null;
       }).catchError((e) {
-        print(e);
+        debugPrint(e.toString());
       });
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 

@@ -3,11 +3,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groom/model/barang_mdl.dart';
 import 'package:groom/model/itemcard_mdl.dart';
-import 'package:sembast/sembast.dart';
 
 class BarangRepository {
-  final StoreRef<int, Map<String, Object?>> _storeRef =
-      intMapStoreFactory.store('barang');
+  // final StoreRef<int, Map<String, Object?>> _storeRef =
+  //     intMapStoreFactory.store('barang');
   late CollectionReference<BarangMdl> ref;
   FirebaseFirestore firestore;
   BarangRepository({required this.firestore}) {

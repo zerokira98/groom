@@ -80,7 +80,7 @@ class _EkuitasPageState extends State<EkuitasPage> {
                   }),
             ),
           ),
-          // const ReportCard(),
+          const ReportCard(),
           InputCard(setstate: setState)
         ],
       ),

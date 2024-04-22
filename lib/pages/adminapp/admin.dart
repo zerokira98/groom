@@ -302,7 +302,6 @@ class AdminPage extends StatelessWidget {
                     ));
               },
             ),
-            const ReportCard(),
           ],
         ),
       ),

@@ -114,7 +114,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                         validator: (value) {
                                           if (value == null) return null;
                                           try {
-                                            var ea = DateFormat.yMd('id_ID')
+                                            DateFormat.yMd('id_ID')
                                                 .parseStrict(value);
                                             return null;
                                           } on FormatException catch (e) {
@@ -164,12 +164,21 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                     child: Autocomplete(
                                   onSelected: (option) async {
                                     deskripsi.text = option;
-                                    var a = await RepositoryProvider.of<
-                                            BarangRepository>(context)
-                                        .find(option);
-                                    if (typeValue.index != 0) {
+                                    if (typeValue ==
+                                        TipePengeluaran.operasional) {
+                                      var a = await RepositoryProvider.of<
+                                              PengeluaranRepository>(context)
+                                          .getOperational(option);
                                       uangController.text = uangFormatter
-                                          .format(a.first.hargabeli.toString());
+                                          .format(a.last.biaya.toString());
+                                    }
+                                    if (typeValue ==
+                                        TipePengeluaran.barangjual) {
+                                      var a = await RepositoryProvider.of<
+                                              PengeluaranRepository>(context)
+                                          .getBarang(option);
+                                      uangController.text = uangFormatter
+                                          .format(a.first.biaya.toString());
                                     }
                                   },
                                   optionsBuilder: (textEditingValue) async {

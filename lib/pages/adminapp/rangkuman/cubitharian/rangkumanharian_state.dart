@@ -17,7 +17,7 @@ final class RangkumanDayLoaded extends RangkumanDayState {
   final num qristotal;
   final num operasional;
   final num bontotal;
-  RangkumanDayLoaded(
+  const RangkumanDayLoaded(
       {required this.tanggalStart,
       required this.tanggalEnd,
       required this.incomePerPerson,

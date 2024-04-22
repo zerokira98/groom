@@ -103,57 +103,50 @@ class _BonPageState extends State<BonPage> {
                       BonData i = groupByPerson[index];
                       return Card(
                         elevation: 2,
-                        child: Container(
-                          child: ListTile(
-                            onTap: () {
-                              var ttt = snapshot.data!
-                                  .where((element) =>
-                                      element.namaSubjek == i.namaSubjek)
-                                  .toList();
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return Dialog(
-                                    child: ListView.builder(
-                                      itemCount: ttt.length,
-                                      itemBuilder: (context, index) => ListTile(
-                                        title: Row(
-                                          children: [
-                                            Text(ttt[index]
-                                                .tipe
-                                                .name
-                                                .firstUpcase()),
-                                            Text(ttt[index]
-                                                    .author
-                                                    ?.name
-                                                    .firstUpcase() ??
-                                                ''),
-                                          ],
-                                        ),
-                                        subtitle: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(ttt[index]
-                                                .jumlahBon
-                                                .toString()),
-                                            Text('${ttt[index]
-                                                    .tanggal!
-                                                    .formatDayMonth()} ${ttt[index]
-                                                    .tanggal!
-                                                    .clockOnly()}'),
-                                          ],
-                                        ),
+                        child: ListTile(
+                          onTap: () {
+                            var ttt = snapshot.data!
+                                .where((element) =>
+                                    element.namaSubjek == i.namaSubjek)
+                                .toList();
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  child: ListView.builder(
+                                    itemCount: ttt.length,
+                                    itemBuilder: (context, index) => ListTile(
+                                      title: Row(
+                                        children: [
+                                          Text(ttt[index]
+                                              .tipe
+                                              .name
+                                              .firstUpcase()),
+                                          Text(ttt[index]
+                                                  .author
+                                                  ?.name
+                                                  .firstUpcase() ??
+                                              ''),
+                                        ],
+                                      ),
+                                      subtitle: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(ttt[index].jumlahBon.toString()),
+                                          Text(
+                                              '${ttt[index].tanggal!.formatDayMonth()} ${ttt[index].tanggal!.clockOnly()}'),
+                                        ],
                                       ),
                                     ),
-                                  );
-                                },
-                              );
-                            },
-                            title: Text(i.namaSubjek),
-                            subtitle: Text(i.jumlahBon.toString()),
-                            // Text(i.tipe.toString()),
-                          ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          title: Text(i.namaSubjek),
+                          subtitle: Text(i.jumlahBon.toString()),
+                          // Text(i.tipe.toString()),
                         ),
                       );
                     }),

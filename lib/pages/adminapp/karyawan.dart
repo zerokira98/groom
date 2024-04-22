@@ -156,20 +156,22 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
                               });
                             },
                             trailing: IconButton(
-                                onPressed: () async {
-                                  final connectivityResult =
-                                      await (Connectivity()
-                                          .checkConnectivity());
-                                  if (connectivityResult !=
-                                      ConnectivityResult.none) {
-                                    RepositoryProvider.of<KaryawanRepository>(
-                                            context)
-                                        .update(snapshot.data![index].copyWith(
-                                            aktif:
-                                                !snapshot.data![index].aktif))
-                                        .then(
-                                            (value) => Navigator.pop(context));
-                                  }
+                                onPressed: () {
+                                  Connectivity()
+                                      .checkConnectivity()
+                                      .then((connectivityResult) {
+                                    if (connectivityResult !=
+                                        ConnectivityResult.none) {
+                                      RepositoryProvider.of<KaryawanRepository>(
+                                              context)
+                                          .update(snapshot.data![index]
+                                              .copyWith(
+                                                  aktif: !snapshot
+                                                      .data![index].aktif))
+                                          .then((value) =>
+                                              Navigator.pop(context));
+                                    }
+                                  });
                                 },
                                 icon: const Icon(Icons.power_settings_new)),
                             selectedTileColor: Colors.black38,

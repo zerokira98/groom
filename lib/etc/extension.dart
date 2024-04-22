@@ -40,6 +40,7 @@ extension TanggalFormat on DateTime {
     return tanggalFormat.format(this);
   }
 
+  ///ex: 1 Mar
   String formatDayMonth() {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat('d MMM', 'ID_id');
@@ -55,6 +56,12 @@ extension TanggalFormat on DateTime {
   String get weekdayName {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat('EEE', 'ID_id');
+    return tanggalFormat.format(this);
+  }
+
+  String get monthName {
+    initializeDateFormatting();
+    DateFormat tanggalFormat = DateFormat('MMMM', 'ID_id');
     return tanggalFormat.format(this);
   }
 }
