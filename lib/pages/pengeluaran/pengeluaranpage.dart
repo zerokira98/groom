@@ -1,4 +1,5 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/barang_repo.dart';
@@ -92,7 +93,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                           onPressed: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(
+                                CupertinoPageRoute(
                                   builder: (context) =>
                                       const RangkumanMingguan(),
                                 ));
@@ -324,7 +325,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                     hargajual: 0))
                                 .then((value) => Navigator.push(
                                     context,
-                                    MaterialPageRoute(
+                                    CupertinoPageRoute(
                                       builder: (context) => const BarangPage(),
                                     )));
                           } else {
@@ -336,7 +337,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                 .then((value) {
                               Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  CupertinoPageRoute(
                                     builder: (context) => const BarangPage(),
                                   ));
                             });
@@ -344,7 +345,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                         }
                         Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
+                            CupertinoPageRoute(
                               builder: (context) => const HistoriPengeluaran(),
                             ));
                         setState(() {});

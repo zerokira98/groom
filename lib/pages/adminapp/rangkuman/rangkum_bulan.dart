@@ -42,8 +42,8 @@ class _RangkumMonthState extends State<RangkumMonth> {
               children: [
                 Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text('Bulan :'),
                     ),
                     Flexible(
@@ -64,7 +64,7 @@ class _RangkumMonthState extends State<RangkumMonth> {
                         readOnly: true,
                       ),
                     ),
-                    Expanded(child: SizedBox()),
+                    const Expanded(child: SizedBox()),
                   ],
                 ),
                 Text(

@@ -1,10 +1,12 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/karyawan_repo.dart';
+import 'package:groom/etc/globalvar.dart';
 import 'package:groom/etc/lockscreen_keylock.dart';
 import 'package:groom/pages/home/drawer.dart';
 import 'package:groom/etc/extension.dart';
@@ -54,7 +56,7 @@ class Home extends StatelessWidget {
                   if (state.success != null) {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(
+                        CupertinoPageRoute(
                           builder: (context) => const RiwayatPemasukan(),
                         ));
                     BlocProvider.of<InputserviceBloc>(context).add(Initiate());
@@ -70,6 +72,7 @@ class Home extends StatelessWidget {
               child: Stack(
                 children: [
                   OfflineBuilder(
+                    errorBuilder: (context) => const Text('err no connection'),
                     connectivityBuilder: (context, value, child) => Stack(
                       fit: StackFit.expand,
                       children: [
@@ -229,7 +232,8 @@ class Home extends StatelessWidget {
                                                     context: context,
                                                     builder: (context) =>
                                                         KeyLock(
-                                                            tendigits: '12340',
+                                                            tendigits:
+                                                                adminpass,
                                                             title: 'Admin'),
                                                   ).then((value) {
                                                     if (value != null &&
@@ -389,7 +393,8 @@ class FloatingButton extends StatelessWidget {
                     totalpembayaran += e.pcsBarang * e.price;
                   }
                   uangCustomer.text = totalpembayaran.toString();
-                  showDialog(
+                  showCupertinoDialog(
+                      barrierDismissible: true,
                       context: context,
                       builder: (context) => AlertDialog(
                             actions: [
@@ -441,6 +446,7 @@ class FloatingButton extends StatelessWidget {
                             ],
                             title: Text(state.karyawanName),
                             content: Column(
+                              mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(

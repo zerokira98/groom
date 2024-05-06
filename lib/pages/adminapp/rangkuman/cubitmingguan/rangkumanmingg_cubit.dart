@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:groom/db/bon_repo.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
-import 'package:groom/etc/globalvar.dart';
+import 'package:groom/etc/extension.dart';
 import 'package:groom/model/bondata_mdl.dart';
 import 'package:groom/model/itemcard_mdl.dart';
 import 'package:groom/model/pengeluaran_mdl.dart';
@@ -95,32 +95,17 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
             //     index: eSum.index, type: eSum.type, price: totalPerItemcard);
 
             total += eSum.price * (eSum.pcsBarang);
-            if (eSum.type == 0 && eSum.price == 20000) {
-              totalwithCut += eSum.price * (eSum.pcsBarang) * 0.5;
-
-              awoo2 = awoo2
-                  .map((e) => e.type == eSum.type
-                      ? e.copyWith(
-                          price: e.price +
-                              (eSum.price * (eSum.pcsBarang) * 0.5).toInt())
-                      : e)
-                  .toList();
-            } else {
-              totalwithCut +=
-                  eSum.price * (eSum.pcsBarang) * cutPercentage(eSum.type);
-              awoo2 = awoo2
-                  .map((e) => e.type == eSum.type
-                      ? e.copyWith(
-                          price: e.price +
-                              (eSum.price *
-                                      (eSum.pcsBarang) *
-                                      cutPercentage(eSum.type))
-                                  .toInt())
-                      : e)
-                  .toList();
-            }
-            // totalwithCut +=
-            //     eSum.price * (eSum.pcsBarang) * cutPercentage(eSum.type);
+            totalwithCut +=
+                (eSum.pcsBarang) * eSum.price.cutPercentage(eSum.type);
+            awoo2 = awoo2
+                .map((e) => e.type == eSum.type
+                    ? e.copyWith(
+                        price: e.price +
+                            ((eSum.pcsBarang) *
+                                    eSum.price.cutPercentage(eSum.type))
+                                .toInt())
+                    : e)
+                .toList();
           }
           total += perPerson
               .firstWhere((e3) => e3.namaKaryawan == e1.namaKaryawan)
@@ -141,8 +126,6 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
                   ? ea.copyWith(totalPendapatan: total, perCategory: awoo)
                   : ea)
               .toList();
-          //// end if exist
-          // print(totalwithCut);
         } else if (firstFound.isEmpty) {
           var total = 0;
           var totalwithCut = 0.0;
@@ -157,30 +140,17 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
                   : e;
             }).toList();
             total += eSum.price * (eSum.pcsBarang);
-            if (eSum.type == 0 && eSum.price == 20000) {
-              totalwithCut += eSum.price * (eSum.pcsBarang) * 0.5;
-
-              groundItemCardscut = groundItemCardscut.map((e) {
-                return e.type == eSum.type
-                    ? e.copyWith(
-                        price: e.price +
-                            (eSum.price * (eSum.pcsBarang) * 0.5).toInt())
-                    : e;
-              }).toList();
-            } else {
-              totalwithCut +=
-                  eSum.price * (eSum.pcsBarang) * cutPercentage(eSum.type);
-              groundItemCardscut = groundItemCardscut.map((e) {
-                return e.type == eSum.type
-                    ? e.copyWith(
-                        price: e.price +
-                            (eSum.price *
-                                    (eSum.pcsBarang) *
-                                    cutPercentage(eSum.type))
-                                .toInt())
-                    : e;
-              }).toList();
-            }
+            totalwithCut +=
+                (eSum.pcsBarang) * eSum.price.cutPercentage(eSum.type);
+            groundItemCardscut = groundItemCardscut.map((e) {
+              return e.type == eSum.type
+                  ? e.copyWith(
+                      price: e.price +
+                          ((eSum.pcsBarang) *
+                                  eSum.price.cutPercentage(eSum.type))
+                              .toInt())
+                  : e;
+            }).toList();
           }
 
           perPerson.add(PerPerson(
@@ -193,16 +163,9 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
               perCategory: groundItemCardscut));
         }
       }
-      // Map<DateTime, List<PerPerson>> newMap = {
-      //   DateTime(ts.year, ts.month, ts.day + i): perPerson
-      // };
-      // Map<DateTime, List<PerPerson>> newMap2 = {
-      //   DateTime(ts.year, ts.month, ts.day + i): perPersonwithCut
-      // };
       perDay.add(perPerson);
       perDay2.add(perPersonwithCut);
     }
-    // print('aw$perDay2');
 
     var totalIncomeKotor = 0;
     var totalIncomewithcut = 0;
@@ -216,31 +179,15 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
     }
     Map<String, List<ItemCardMdl>> perPerson = {};
     Map<String, List<ItemCardMdl>> perPersoncut = {};
-    // Map<String, List<PerPerson>> perDay = {};
-    // Map<String, List<PerPerson>> perDay2 = {};
-    // for (var i = 0; i < 7; i++) {
-    //   perDay.addAll({(i + ts.day).toString(): []});
-    //   perDay2.addAll({(i + ts.day).toString(): []});
-    // }
 
     ///weekly
     var a = await repoPemasukan.getStrukFiltered({
       'tanggalStart': DateTime(ts.year, ts.month, ts.day),
       'tanggalEnd': DateTime(te.year, te.month, te.day),
     });
-    // var a2 = a.groupListsBy((element) => element.tanggal.day);
-    // debugPrint(a2.toString());
 
     ///too many loop @_@
     for (var e1 in a) {
-      ///per day
-      // if (perDay.containsKey(e1.tanggal.day)) {
-      //   if (perDay[e1.tanggal.day]?.isNotEmpty ?? false) {
-      //     perDay[e1.tanggal.day].
-      //   }
-      // }
-      // if (perDay2.containsKey(e1.tanggal.day)) {}
-
       ///end per day
       if (perPerson.keys.contains(e1.namaKaryawan)) {
         ///loop
@@ -256,12 +203,8 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
                 perPersoncut[e1.namaKaryawan]!.map((ea) {
               if (ea.type == e2.type) {
                 num totcut = 0.0;
-                if (e2.type == 0 && e2.price == 20000) {
-                  totcut = ea.price + (e2.pcsBarang * e2.price * 0.5);
-                } else {
-                  totcut = ea.price +
-                      (e2.pcsBarang * e2.price * cutPercentage(e2.type));
-                }
+                totcut =
+                    ea.price + (e2.pcsBarang * e2.price.cutPercentage(e2.type));
                 // print(totcut);
                 return ea.copyWith(price: totcut.toInt());
               } else {
@@ -271,10 +214,8 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
           } else {
             perPerson[e1.namaKaryawan]!.add(e2);
             perPersoncut[e1.namaKaryawan]!.add(e2.copyWith(
-                price: (e2.type == 0 && e2.price == 20000)
-                    ? (e2.pcsBarang * e2.price * 0.5).toInt()
-                    : (e2.pcsBarang * e2.price * cutPercentage(e2.type))
-                        .toInt()));
+                price:
+                    (e2.pcsBarang * e2.price.cutPercentage(e2.type)).toInt()));
           }
         } //endloop
       } else {
@@ -290,26 +231,14 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
                   ? e.copyWith(price: e.price + (telo.pcsBarang * telo.price))
                   : e)
               .toList();
-          if (telo.type == 0 && telo.price == 20000) {
-            groundItemCardscut = groundItemCardscut.map((e) {
-              return e.type == telo.type
-                  ? e.copyWith(
-                      price: e.price +
-                          (telo.price * (telo.pcsBarang) * 0.5).toInt())
-                  : e;
-            }).toList();
-          } else {
-            groundItemCardscut = groundItemCardscut.map((e) {
-              return e.type == telo.type
-                  ? e.copyWith(
-                      price: e.price +
-                          (telo.price *
-                                  (telo.pcsBarang) *
-                                  cutPercentage(telo.type))
-                              .toInt())
-                  : e;
-            }).toList();
-          }
+          groundItemCardscut = groundItemCardscut.map((e) {
+            return e.type == telo.type
+                ? e.copyWith(
+                    price: e.price +
+                        ((telo.pcsBarang) * telo.price.cutPercentage(telo.type))
+                            .toInt())
+                : e;
+          }).toList();
         }
         perPerson.addAll({e1.namaKaryawan: groundItemCards});
 
@@ -336,9 +265,6 @@ class RangkumanWeekCubit extends Cubit<RangkumanWeekState> {
             tipePembayaran: TipePembayaran.cash));
       },
     );
-    // perDay2.forEachIndexed(
-    //   (i, element) => print(i.toString() + element.toString()),
-    // );
     emit(RangkumanWeekLoaded(
       bon: jumlahPiutangTerbayar - jumlahPiutang,
       groupBy: groupBy,

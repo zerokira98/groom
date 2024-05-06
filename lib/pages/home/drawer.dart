@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,8 +51,20 @@ class _SideDrawerState extends State<SideDrawer> {
                 duration: Durations.extralong1,
                 curve: Curves.bounceInOut,
                 margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.only(top: 24, bottom: 8),
-                color: Colors.white,
+                padding: const EdgeInsets.only(top: 24, bottom: 18),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.01),
+                        Colors.white,
+                        Colors.white,
+                        Colors.white.withOpacity(0.01),
+                      ],
+                      begin: const Alignment(0, -1),
+                      end: const Alignment(0, 1),
+                      stops: const [0.0, 0.05, 0.95, 1]),
+                ),
+                // color: Colors.white,
                 // transformAlignment: Alignment.center,
                 // transform: Matrix4.identity()..translate(imageHeight - 240),
                 height: imageHeight,
@@ -135,7 +148,7 @@ class _SideDrawerState extends State<SideDrawer> {
         //   onTap: () {
         //     Navigator.push(
         //         context,
-        //         MaterialPageRoute(
+        //         CupertinoPageRoute(
         //           builder: (context) => BlocProvider.value(
         //             value: BlocProvider.of<RangkumanDayCubit>(context)
         //               ..loadData({
@@ -152,7 +165,7 @@ class _SideDrawerState extends State<SideDrawer> {
         //   onTap: () {
         //     Navigator.push(
         //         context,
-        //         MaterialPageRoute(
+        //         CupertinoPageRoute(
         //           builder: (context) => const PlayBox(),
         //         ));
         //   },
@@ -164,7 +177,7 @@ class _SideDrawerState extends State<SideDrawer> {
           onTap: () {
             Navigator.push(
                 context,
-                MaterialPageRoute(
+                CupertinoPageRoute(
                   builder: (context) => const RiwayatPemasukan(),
                 ));
           },
@@ -195,7 +208,7 @@ class _SideDrawerState extends State<SideDrawer> {
                   if (value != null && value) {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(
+                        CupertinoPageRoute(
                           builder: (context) => const PengeluaranHome(),
                         ));
                   } else {
@@ -238,7 +251,7 @@ class _SideDrawerState extends State<SideDrawer> {
                 if (value != null && value) {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      CupertinoPageRoute(
                         builder: (context) => HutangHome(namaKaryawan: name),
                       ));
                 } else {
@@ -265,14 +278,14 @@ class _SideDrawerState extends State<SideDrawer> {
               showDialog<bool>(
                 context: context,
                 builder: (context) {
-                  return KeyLock(tendigits: '12340', title: 'Admin');
+                  return KeyLock(tendigits: adminpass, title: 'Admin');
                 },
               ).then((dia) {
                 if (dia == null) return;
                 if (dia) {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      CupertinoPageRoute(
                         builder: (context) => const AdminPage(),
                       ));
                 }

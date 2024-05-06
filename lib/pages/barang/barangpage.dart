@@ -1,4 +1,5 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/barang_repo.dart';
@@ -27,7 +28,7 @@ class _BarangPageState extends State<BarangPage> {
           IconButton(
               onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      CupertinoPageRoute(
                         builder: (context) => const TambahBarang(),
                       )).then((value) {
                     // if (value != null && value) {

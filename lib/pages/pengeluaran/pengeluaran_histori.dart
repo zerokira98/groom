@@ -260,7 +260,7 @@ class TilePengeluaran extends StatelessWidget {
       onTap: () {
         Flushbar(
           message:
-              'Tanggal post: ${e.tanggalPost?.formatDayMonth()} ${e.tanggalPost?.clockOnly()}',
+              'Tanggal post: ${e.tanggalPost?.formatDayMonth()} ${e.tanggalPost?.clockOnly()}, by :${e.karyawan ?? 'admin'}',
           duration: const Duration(seconds: 2),
           animationDuration: Durations.long1,
         ).show(context);

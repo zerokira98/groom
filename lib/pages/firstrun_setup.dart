@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:groom/etc/globalvar.dart';
 import 'package:groom/etc/lockscreen_keylock.dart';
 import 'package:groom/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,52 +22,16 @@ class FirstRun extends StatelessWidget {
           Center(
             child: ElevatedButton(
                 onPressed: () {
-                  // List karyawanfirst = [
-                  //   const KaryawanData(
-                  //       id: 0,
-                  //       namaKaryawan: 'Mazzany',
-                  //       aktif: true,
-                  //       password: '123456'),
-                  //   const KaryawanData(
-                  //       id: 1,
-                  //       namaKaryawan: 'Rudy',
-                  //       aktif: true,
-                  //       password: '123456'),
-                  //   const KaryawanData(
-                  //       id: 2,
-                  //       namaKaryawan: 'Alfin',
-                  //       aktif: true,
-                  //       password: '123456'),
-                  //   const KaryawanData(
-                  //       id: 3,
-                  //       namaKaryawan: 'Febri',
-                  //       aktif: true,
-                  //       password: '123456'),
-                  //   const KaryawanData(
-                  //       id: 4,
-                  //       namaKaryawan: 'Indra',
-                  //       aktif: true,
-                  //       password: '123456'),
-                  //   const KaryawanData(
-                  //       id: 5,
-                  //       namaKaryawan: 'Yudha',
-                  //       aktif: true,
-                  //       password: '123456'),
-                  // ];
-                  // for (var e in karyawanfirst) {
-                  //   await RepositoryProvider.of<KaryawanRepository>(context)
-                  //       .addKaryawan(e);
-                  // }
                   _setFirstTime().then((value) {
                     showDialog(
                       context: context,
                       builder: (context) =>
-                          KeyLock(tendigits: '12340', title: 'admin pass'),
+                          KeyLock(tendigits: adminpass, title: 'admin pass'),
                     ).then((value) {
                       if (value != null && value) {
                         Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(
+                            CupertinoPageRoute(
                               builder: (context) => const MyApp(),
                             ),
                             (route) => false);

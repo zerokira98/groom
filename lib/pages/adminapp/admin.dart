@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/pages/adminapp/equity/uangkeluar.dart';
@@ -57,7 +58,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => const PengeluaranPage(),
                     ));
               },
@@ -74,7 +75,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => const HistoriPengeluaran(),
                     ));
               },
@@ -92,7 +93,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => const BonPage(),
                     ));
               },
@@ -129,7 +130,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => const EkuitasPage(),
                     ));
               },
@@ -146,7 +147,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => const UangKeluarPage(),
                     ));
               },
@@ -182,7 +183,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => BlocProvider.value(
                         value: BlocProvider.of<RangkumanDayCubit>(context)
                           ..loadData({
@@ -205,7 +206,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  CupertinoPageRoute(
                     builder: (context) => BlocProvider.value(
                       value: BlocProvider.of<RangkumanWeekCubit>(context)
                         ..loadData({
@@ -239,7 +240,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => BlocProvider.value(
                         value: BlocProvider.of<BulananCubit>(context)
                           ..loadData(DateTime.now()),
@@ -280,7 +281,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => const KaryawanConfig(),
                     ));
               },
@@ -297,7 +298,7 @@ class AdminPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    CupertinoPageRoute(
                       builder: (context) => const BarangPage(),
                     ));
               },

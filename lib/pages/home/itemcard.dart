@@ -100,7 +100,7 @@ class _ItemCardHaircutState extends State<ItemCardHaircut> {
 
             ///make it textfield
             Text((keramas ? basicHaircut + keramasPrice : basicHaircut)
-                .toString())
+                .numberFormat(currency: true))
           ],
         ),
       ],
