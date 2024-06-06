@@ -640,6 +640,7 @@ class _SlipGajiState extends State<SlipGaji> {
             ],
           ),
           const Text('Histori catatan utang minggu ini'),
+          if (aWeek.isEmpty) const Text('[Empty: no data]'),
           for (var i in aWeek)
             ListTile(
               title: Text(

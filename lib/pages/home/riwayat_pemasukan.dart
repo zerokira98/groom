@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/services.dart';
+import 'package:groom/db/cust_repo.dart';
 import 'package:universal_html/html.dart' as webFile;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Align;
@@ -348,6 +349,7 @@ class TileStruk extends StatefulWidget {
 }
 
 class _TileStrukState extends State<TileStruk> {
+  TextEditingController nomorhp = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -401,6 +403,80 @@ class _TileStrukState extends State<TileStruk> {
                       theData: widget.theData,
                     ),
                     // if (pdf != null)
+                    Row(
+                      children: [
+                        Expanded(
+                            child: TextFormField(
+                          controller: nomorhp,
+                          decoration:
+                              const InputDecoration(labelText: 'No. WhatsApp'),
+                          keyboardType: TextInputType.phone,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null) return null;
+                            if (value.isNotEmpty) {
+                              bool regex = RegExp(r'^(?:[+0]9)?[0-9]{10,14}$')
+                                  .hasMatch(value);
+                              if (regex == false) {
+                                return 'format salah/kurang dari 10digit';
+                              }
+                            } else {
+                              return null;
+                            }
+                            return null;
+                          },
+                          onChanged: (value) {
+                            setState(() {});
+                          },
+                        )),
+                        ElevatedButton(
+                            onPressed: (nomorhp.text.isEmpty)
+                                ? null
+                                : () {
+                                    var idnPhone = nomorhp.text[0] == '0'
+                                        ? nomorhp.text.replaceRange(0, 1, '62')
+                                        : nomorhp.text;
+                                    // FilePicker.platform.pickFiles().then((value) {
+                                    //   if (value == null) return;
+                                    //   if (value.isSinglePick) {
+                                    RepositoryProvider.of<CustomerRepo>(context)
+                                        .addCustDate(idnPhone, DateTime.now());
+                                    // RepositoryProvider.of<WhatsApp>(context)
+                                    //     .messagesTemplate(to: 6289509855934
+                                    //         // mediaFilepath: value.paths[0],
+                                    //         // mediaType: value.xFiles[0].mimeType,
+                                    //         // mediaName: int.parse(idnPhone),
+                                    //         )
+                                    //     .then((value) {
+                                    //   print(value);
+                                    // }).catchError((e) => print(e));
+                                    //   }
+                                    // });
+                                    // var urlString =
+
+                                    // launchUrl(Uri.parse(urlString));
+                                    //     .then((value) {
+                                    //   print(value);
+                                    // });
+                                    // WhatsappShare.isInstalled().then((value) {
+                                    //   if (true) {
+                                    //     var idnPhone = nomorhp.text[0] == '0'
+                                    //         ? nomorhp.text.replaceRange(0, 1, '62')
+                                    //         : nomorhp.text;
+                                    //     print(idnPhone);
+                                    //     WhatsappShare.share(
+                                    //             phone: idnPhone, text: 'hello')
+                                    //         .then((value) {
+                                    //       return null;
+                                    //     }).catchError((e) {
+                                    //       print(e);
+                                    //     });
+                                    //   }
+                                    // });
+                                  },
+                            child: const Text('OpenWa'))
+                      ],
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Wrap(
@@ -409,7 +485,6 @@ class _TileStrukState extends State<TileStruk> {
                           ElevatedButton(
                               onPressed: () {
                                 generatePDF(true, widget.theData);
-                                // pdf!(true, theData);
                               },
                               child: const Text('Share PDF')),
                           ElevatedButton(
@@ -491,7 +566,7 @@ class _TileStrukState extends State<TileStruk> {
         PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
     page.graphics.drawString(
       'Groom Barbershop',
-      PdfStandardFont(PdfFontFamily.helvetica, 16),
+      PdfStandardFont(PdfFontFamily.helvetica, 14),
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 4, pageSize.width, 20),
       format: PdfStringFormat(
@@ -517,10 +592,19 @@ class _TileStrukState extends State<TileStruk> {
           lineAlignment: PdfVerticalAlignment.middle),
     );
     page.graphics.drawString(
+      theData.id ?? 'null',
+      PdfStandardFont(PdfFontFamily.helvetica, 6, style: PdfFontStyle.regular),
+      brush: PdfSolidBrush(PdfColor(0, 0, 0)),
+      bounds: Rect.fromLTWH(0, 60, pageSize.width, 10),
+      format: PdfStringFormat(
+          alignment: PdfTextAlignment.right,
+          lineAlignment: PdfVerticalAlignment.middle),
+    );
+    page.graphics.drawString(
       '${theData.tanggal.formatLengkap()} ${theData.tanggal.clockOnly()}',
       PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.regular),
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-      bounds: Rect.fromLTWH(0, 60, pageSize.width, 12),
+      bounds: Rect.fromLTWH(0, 68, pageSize.width, 12),
       format: PdfStringFormat(
           alignment: PdfTextAlignment.right,
           lineAlignment: PdfVerticalAlignment.middle),
@@ -529,7 +613,7 @@ class _TileStrukState extends State<TileStruk> {
       'Karyawan: ${theData.namaKaryawan}',
       PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.regular),
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
-      bounds: Rect.fromLTWH(0, 72, pageSize.width, 12),
+      bounds: Rect.fromLTWH(0, 80, pageSize.width, 12),
       format: PdfStringFormat(
           alignment: PdfTextAlignment.right,
           lineAlignment: PdfVerticalAlignment.middle),
@@ -537,7 +621,7 @@ class _TileStrukState extends State<TileStruk> {
     var drawed = grid.draw(
         page: page,
         bounds: Rect.fromLTWH(
-            0, 96, page.getClientSize().width, page.getClientSize().height));
+            0, 104, page.getClientSize().width, page.getClientSize().height));
 
     page.graphics.drawString(
       'terimakasih~!',
@@ -549,10 +633,8 @@ class _TileStrukState extends State<TileStruk> {
           lineAlignment: PdfVerticalAlignment.middle),
     );
     if (kIsWeb) {
-// Save the document.
+      /// Save the document.
       var pdfinbytes = Uint8List.fromList(await document.save());
-      // var thefile =
-      //     await File(join('invoice.pdf')).writeAsBytes(await document.save());
       var blob = webFile.Blob([pdfinbytes], 'application/pdf', 'native');
       var anchorElement = webFile.AnchorElement(
         href: webFile.Url.createObjectUrlFromBlob(blob).toString(),
@@ -561,7 +643,8 @@ class _TileStrukState extends State<TileStruk> {
         ..click();
     } else {
       var appdoc = await getApplicationDocumentsDirectory();
-// Save the document.
+
+      /// Save the document.
       var thefile = await File(join(appdoc.path, 'invoice.pdf'))
           .writeAsBytes(await document.save());
       try {
@@ -573,24 +656,10 @@ class _TileStrukState extends State<TileStruk> {
             return null;
           });
         }
-        // debugPrint(thefile.absolute);
-        // await OpenAppFile.open(thefile.path);
       } catch (e) {
         debugPrint(e.toString());
       }
     }
-    // if (Platform.isAndroid || Platform.isIOS) {
-    //   final Map<String, String> argument = <String, String>{
-    //     'file_path': thefile.uri.toFilePath()
-    //   };
-    //   try {
-    //     //ignore: unused_local_variable
-    //     final Future<Map<String, String>?> result =
-    //         _platformCall.invokeMethod('viewPdf', argument);
-    //   } catch (e) {
-    //     throw Exception(e);
-    //   }
-    // }
 // Dispose the document.
     document.dispose();
   }
@@ -753,20 +822,18 @@ class _PrintWidgetState extends State<PrintWidget> {
   void printThermal(StrukMdl theData) {
     var blue = BlueThermalPrinter.instance;
     try {
-      // var telo = await blue.getBondedDevices().then((value) {
-      //   // print();
-      //   return value.singleWhere((element) => element.name == 'RPP02');
-      // });
-      // await blue.connect(telo);
       blue.isConnected.then((value) {
         if (value == null || value == false) return;
         var sumtotal = 0;
 
+        blue.printCustom('Groom', x.Size.extraLarge.val, x.Align.center.val);
         blue.printCustom(
-            'Groom Barbershop', x.Size.extraLarge.val, x.Align.center.val);
+            'Barbershop', x.Size.extraLarge.val, x.Align.center.val);
         blue.printCustom(
             'Jl.Gajahmada no.xx', x.Size.medium.val, x.Align.center.val);
         blue.printNewLine();
+        blue.printCustom(
+            theData.id ?? 'null', x.Size.medium.val, x.Align.right.val);
         blue.printCustom(theData.tanggal.formatLengkap(), x.Size.medium.val,
             x.Align.right.val);
         blue.printCustom('  ${theData.tanggal.clockOnly()}', x.Size.medium.val,
@@ -784,7 +851,7 @@ class _PrintWidgetState extends State<PrintWidget> {
 
           var col0 =
               "${cardType[theData.itemCards[i].type].toString().toUpperCase()} :  ${theData.itemCards[i].namaBarang.toUpperCase()}";
-          blue.print3Column(col0, col1, col2, x.Size.boldLarge.val);
+          blue.print3Column(col0, col1, col2, x.Size.bold.val);
         }
         blue.printNewLine();
         blue.printLeftRight("TOTAL :", sumtotal.numberFormat(currency: true),

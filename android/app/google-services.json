@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "644442202771",
-    "firebase_url": "https://groom-c6593-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "groom-c6593",
-    "storage_bucket": "groom-c6593.appspot.com"
+    "project_number": "27883078232",
+    "project_id": "groom-dev-33492",
+    "storage_bucket": "groom-dev-33492.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:644442202771:android:17c8637904cc6a6b3b6366",
+        "mobilesdk_app_id": "1:27883078232:android:d3ba91117de0f11f3d002d",
         "android_client_info": {
           "package_name": "com.zerokira98.groom"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAA-vBAZLuzQg5LYhO6DfESkiahMbTmiLg"
+          "current_key": "AIzaSyD9CmCM5pAjHiJexIbZw0DPSc0ZynMbYjk"
         }
       ],
       "services": {

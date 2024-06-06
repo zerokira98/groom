@@ -19,8 +19,9 @@ class _PengeluaranHomeState extends State<PengeluaranHome> {
   final TextEditingController deskripsi = TextEditingController();
   final TextEditingController uangController = TextEditingController();
 
-  final uangFormatter = CurrencyTextInputFormatter(
+  final uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
+  // locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
   @override
   Widget build(BuildContext context) {

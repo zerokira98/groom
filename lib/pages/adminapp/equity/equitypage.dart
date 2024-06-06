@@ -104,7 +104,7 @@ class _InputCardState extends State<InputCard> {
   final TextEditingController tanggal = TextEditingController(
       text: DateFormat.yMd('id_ID').format(DateTime.now()));
 
-  final uangFormatter = CurrencyTextInputFormatter(
+  final uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
   final GlobalKey<FormState> formKey = GlobalKey();

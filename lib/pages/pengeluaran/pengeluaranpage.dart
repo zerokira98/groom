@@ -26,7 +26,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
   TextEditingController uangController = TextEditingController();
   TextEditingController deskripsi = TextEditingController();
   TextEditingController pcs = TextEditingController(text: '1');
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&
@@ -35,7 +35,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
 
   @override
   void initState() {
-    uangFormatter.format('0');
+    uangFormatter.formatString('0');
     deskripsi.text = '';
     tanggal.text = DateFormat.yMd('id_ID').format(DateTime.now());
 
@@ -170,16 +170,18 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                       var a = await RepositoryProvider.of<
                                               PengeluaranRepository>(context)
                                           .getOperational(option);
-                                      uangController.text = uangFormatter
-                                          .format(a.last.biaya.toString());
+                                      uangController.text =
+                                          uangFormatter.formatString(
+                                              a.last.biaya.toString());
                                     }
                                     if (typeValue ==
                                         TipePengeluaran.barangjual) {
                                       var a = await RepositoryProvider.of<
                                               PengeluaranRepository>(context)
                                           .getBarang(option);
-                                      uangController.text = uangFormatter
-                                          .format(a.first.biaya.toString());
+                                      uangController.text =
+                                          uangFormatter.formatString(
+                                              a.first.biaya.toString());
                                     }
                                   },
                                   optionsBuilder: (textEditingValue) async {

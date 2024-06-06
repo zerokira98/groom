@@ -186,7 +186,7 @@ class _BonAddPageState extends State<BonAddPage> {
   String? namaKaryawan;
   // TextEditingController jumlahBon = TextEditingController();
 
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&
@@ -348,7 +348,7 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
   String? namaKaryawan;
   // TextEditingController jumlahBon = TextEditingController();
 
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&

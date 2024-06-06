@@ -20,9 +20,9 @@ class _TambahBarangState extends State<TambahBarang> {
   final TextEditingController hargaBeli = TextEditingController();
 
   final TextEditingController jumlahStock = TextEditingController();
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
-  var uangFormatter2 = CurrencyTextInputFormatter(
+  var uangFormatter2 = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
   GlobalKey<FormState> formkey = GlobalKey<FormState>();

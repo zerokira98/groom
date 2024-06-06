@@ -9,6 +9,7 @@ class FirstRun extends StatelessWidget {
   const FirstRun({super.key});
   Future _setFirstTime() async {
     var a = await SharedPreferences.getInstance();
+    await a.setString('adminpass', '12340');
     return await a.setBool('firstTime', false);
   }
 
@@ -18,7 +19,7 @@ class FirstRun extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('Welcome!'),
+          const Text('Welcome!, admin pass is reset'),
           Center(
             child: ElevatedButton(
                 onPressed: () {
@@ -26,7 +27,7 @@ class FirstRun extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) =>
-                          KeyLock(tendigits: adminpass, title: 'admin pass'),
+                          KeyLock(tendigits: adminpass, title: 'Software pass'),
                     ).then((value) {
                       if (value != null && value) {
                         Navigator.pushAndRemoveUntil(

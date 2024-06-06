@@ -104,7 +104,7 @@ class BarangEditDialog extends StatefulWidget {
 }
 
 class _BarangEditDialogState extends State<BarangEditDialog> {
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   final TextEditingController namaBarang = TextEditingController();
 

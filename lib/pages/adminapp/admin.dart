@@ -9,6 +9,7 @@ import 'package:groom/pages/adminapp/bon/bon_page.dart';
 import 'package:groom/pages/adminapp/equity/equitypage.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:groom/pages/pengeluaran/pengeluaranpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:groom/pages/rangkuman/cubitharian/rangkumanharian_cubit.dart';
 import 'package:weekly_date_picker/datetime_apis.dart';
 
@@ -284,6 +285,75 @@ class AdminPage extends StatelessWidget {
                     CupertinoPageRoute(
                       builder: (context) => const KaryawanConfig(),
                     ));
+              },
+            ),
+            ElevatedButton(
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.supervised_user_circle),
+                  Padding(padding: EdgeInsets.only(left: 4)),
+                  Text('Ganti Password Admin'),
+                ],
+              ),
+              onPressed: () {
+                TextEditingController tc = TextEditingController();
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Caution!'),
+                    actions: [
+                      ElevatedButton(
+                          onPressed: () {
+                            SharedPreferences.getInstance().then((spref) {
+                              spref.setString('adminpass', tc.text).then(
+                                  (value) => value
+                                      ? Navigator.pop(context)
+                                      : Navigator.pop(context));
+                              return null;
+                            });
+                          },
+                          child: const Text('Ubah')),
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Batal')),
+                    ],
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('jangan sampai terlupa'),
+                        const Text('Password baru'),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null) return null;
+                            if (value.length <= 3) {
+                              return '4 or more char';
+                            }
+                            return null;
+                          },
+                          controller: tc,
+                        ),
+                        const Text('Ketik ulang'),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null) return null;
+                            if (value != tc.text) {
+                              return 'not same';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+                // Navigator.push(
+                //     context,
+                //     CupertinoPageRoute(
+                //       builder: (context) => const KaryawanConfig(),
+                //     ));
               },
             ),
             ElevatedButton(

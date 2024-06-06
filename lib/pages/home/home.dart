@@ -15,18 +15,20 @@ import 'package:groom/pages/home/itemcard.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/home/riwayat_pemasukan.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatelessWidget {
   Home({super.key});
 
   final TextEditingController dropdownC = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawerEdgeDragWidth: 48,
       drawer: const SideDrawer(),
       // floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
-      floatingActionButton: FloatingButton(),
+      floatingActionButton: FloatingButton(formstate: formKey),
       // bottomNavigationBar: Padding(
       //   padding: MediaQuery.of(context).viewInsets,
       //   child:
@@ -228,34 +230,41 @@ class Home extends StatelessWidget {
                                             ),
                                             GestureDetector(
                                                 onLongPress: () async {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        KeyLock(
-                                                            tendigits:
-                                                                adminpass,
-                                                            title: 'Admin'),
-                                                  ).then((value) {
-                                                    if (value != null &&
-                                                        value) {
-                                                      showDatePicker(
-                                                              context: context,
-                                                              firstDate:
-                                                                  DateTime(
-                                                                      2020),
-                                                              lastDate: DateTime
-                                                                  .now())
-                                                          .then((v) {
-                                                        if (v != null) {
-                                                          BlocProvider.of<
-                                                                      InputserviceBloc>(
-                                                                  context)
-                                                              .add(
-                                                                  ChangeTanggal(
-                                                                      v));
-                                                        }
-                                                      });
-                                                    }
+                                                  SharedPreferences
+                                                          .getInstance()
+                                                      .then((spref) {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) => KeyLock(
+                                                          tendigits:
+                                                              spref.getString(
+                                                                      'adminpass') ??
+                                                                  adminpass,
+                                                          title: 'Admin'),
+                                                    ).then((value) {
+                                                      if (value != null &&
+                                                          value) {
+                                                        showDatePicker(
+                                                                context:
+                                                                    context,
+                                                                firstDate:
+                                                                    DateTime(
+                                                                        2020),
+                                                                lastDate:
+                                                                    DateTime
+                                                                        .now())
+                                                            .then((v) {
+                                                          if (v != null) {
+                                                            BlocProvider.of<
+                                                                        InputserviceBloc>(
+                                                                    context)
+                                                                .add(
+                                                                    ChangeTanggal(
+                                                                        v));
+                                                          }
+                                                        });
+                                                      }
+                                                    });
                                                   });
                                                 },
                                                 child: Text(
@@ -279,27 +288,31 @@ class Home extends StatelessWidget {
                             BlocBuilder<InputserviceBloc, InputserviceState>(
                               builder: (context, state) {
                                 if (state is InputserviceLoaded) {
-                                  return Column(
-                                    children: [
-                                      for (var a = 0;
-                                          a < state.itemCards.length;
-                                          a++)
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Stack(children: [
-                                            ItemCard(data: state.itemCards[a]),
-                                            Positioned(
-                                                child: Card(
-                                                    elevation: 2,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              2.0),
-                                                      child: Text('${a + 1}'),
-                                                    ))),
-                                          ]),
-                                        ),
-                                    ],
+                                  return Form(
+                                    key: formKey,
+                                    child: Column(
+                                      children: [
+                                        for (var a = 0;
+                                            a < state.itemCards.length;
+                                            a++)
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Stack(children: [
+                                              ItemCard(
+                                                  data: state.itemCards[a]),
+                                              Positioned(
+                                                  child: Card(
+                                                      elevation: 2,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(2.0),
+                                                        child: Text('${a + 1}'),
+                                                      ))),
+                                            ]),
+                                          ),
+                                      ],
+                                    ),
                                   );
                                 } else {
                                   return Container();
@@ -376,8 +389,8 @@ class Home extends StatelessWidget {
 }
 
 class FloatingButton extends StatelessWidget {
-  FloatingButton({super.key});
-
+  FloatingButton({super.key, required this.formstate});
+  final GlobalKey<FormState> formstate;
   final TextEditingController uangCustomer = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -388,6 +401,11 @@ class FloatingButton extends StatelessWidget {
               child: const Icon(Icons.upload),
               onPressed: () {
                 if (state.itemCards.isNotEmpty) {
+                  if ((formstate.currentState?.validate() ?? false) == false) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Ada kesalahan pengisian data.')));
+                    return;
+                  }
                   num totalpembayaran = 0;
                   for (var e in state.itemCards) {
                     totalpembayaran += e.pcsBarang * e.price;

@@ -24,6 +24,12 @@ class _RangkumMonthState extends State<RangkumMonth> {
         if (state == BulananState.initial()) {
           return const Material(child: CircularProgressIndicator());
         }
+        if (state.incomePerHari.isEmpty) {
+          return const Material(
+              child: Center(
+            child: Text('Empty: no data'),
+          ));
+        }
 
         var thedate = state.bulan;
         monthC.text = thedate.monthName;

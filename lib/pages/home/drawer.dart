@@ -15,6 +15,7 @@ import 'package:groom/pages/home/utang_home.dart';
 
 // import 'package:groom/pages/rangkuman/cubitharian/rangkumanharian_cubit.dart';
 import 'package:groom/pages/home/riwayat_pemasukan.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SideDrawer extends StatefulWidget {
   const SideDrawer({super.key});
@@ -275,21 +276,27 @@ class _SideDrawerState extends State<SideDrawer> {
               InputController ic = InputController();
               final FocusNode focusNode = FocusNode();
               focusNode.requestFocus();
-              showDialog<bool>(
-                context: context,
-                builder: (context) {
-                  return KeyLock(tendigits: adminpass, title: 'Admin');
+              SharedPreferences.getInstance().then(
+                (spref) {
+                  showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return KeyLock(
+                          tendigits: spref.getString('adminpass') ?? adminpass,
+                          title: 'Admin');
+                    },
+                  ).then((dia) {
+                    if (dia == null) return;
+                    if (dia) {
+                      Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => const AdminPage(),
+                          ));
+                    }
+                  });
                 },
-              ).then((dia) {
-                if (dia == null) return;
-                if (dia) {
-                  Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => const AdminPage(),
-                      ));
-                }
-              });
+              );
             },
           ),
       ],

@@ -5,11 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/barang_repo.dart';
 import 'package:groom/db/bon_repo.dart';
+import 'package:groom/db/cust_repo.dart';
 import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/db/uangmasuk_repo.dart';
 import 'package:groom/etc/globalvar.dart';
+import 'package:groom/etc/lib/whatsapp.dart';
 import 'package:groom/pages/adminapp/admin.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
 import 'package:groom/pages/home/home.dart';
@@ -26,11 +28,23 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   var fInstance = FirebaseFirestore.instance;
+  var wa = WhatsApp()
+    ..setup(
+      accessToken:
+          "EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD",
+      fromNumberId: 318587001335322,
+    );
   // var db = await SembastDB.init();
   // var db2 = await SembastDB.init2();
   runApp(
     MultiRepositoryProvider(
         providers: [
+          RepositoryProvider(
+            create: (context) => CustomerRepo(firestore: fInstance),
+          ),
+          RepositoryProvider(
+            create: (context) => wa,
+          ),
           RepositoryProvider(
               create: (context) => PemasukanRepository(db: fInstance)),
           RepositoryProvider(
