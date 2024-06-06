@@ -1,16 +1,9 @@
 # groom
 
-A new Flutter project.
+A Flutter project.
 
-## Getting Started
+Aplikasi Pencatatan Barbershop
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+https://github.com/zerokira98/groom/assets/31804242/a558634d-3324-41ce-9a41-92e294d2f3f1
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
