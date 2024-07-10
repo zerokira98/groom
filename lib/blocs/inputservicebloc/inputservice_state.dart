@@ -11,6 +11,11 @@ final class InputserviceInitial extends InputserviceState {
   List<Object?> get props => [];
 }
 
+final class InputserviceLoading extends InputserviceState {
+  @override
+  List<Object?> get props => [];
+}
+
 final class InputserviceLoaded extends InputserviceState {
   final String karyawanName;
   final List<ItemCardMdl> itemCards;

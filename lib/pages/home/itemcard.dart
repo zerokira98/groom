@@ -100,7 +100,7 @@ class _ItemCardHaircutState extends State<ItemCardHaircut> {
 
             ///make it textfield
             Text((keramas ? basicHaircut + keramasPrice : basicHaircut)
-                .toString())
+                .numberFormat(currency: true))
           ],
         ),
       ],
@@ -227,6 +227,14 @@ class _ItemCardGoodsState extends State<ItemCardGoods> {
                         onFieldSubmitted) =>
                     TextFormField(
                   controller: textEditingController,
+                  validator: (value) {
+                    if (value == null) return null;
+                    if (value.isEmpty) {
+                      return 'tidak boleh kosong';
+                    } else {
+                      return null;
+                    }
+                  },
                   onFieldSubmitted: (value) {
                     onFieldSubmitted();
                   },

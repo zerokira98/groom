@@ -50,21 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBGyc7Qdofoyz2lgD-Z9gTf4e79YxAADoI',
-    appId: '1:644442202771:web:ed4530b41a6b808d3b6366',
-    messagingSenderId: '644442202771',
-    projectId: 'groom-c6593',
-    authDomain: 'groom-c6593.firebaseapp.com',
-    databaseURL: 'https://groom-c6593-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'groom-c6593.appspot.com',
+    apiKey: 'AIzaSyALOYfvaQer0z45koQXjT-T5Pr2pO6kmJI',
+    appId: '1:27883078232:web:97b890cc300f735f3d002d',
+    messagingSenderId: '27883078232',
+    projectId: 'groom-dev-33492',
+    authDomain: 'groom-dev-33492.firebaseapp.com',
+    storageBucket: 'groom-dev-33492.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAA-vBAZLuzQg5LYhO6DfESkiahMbTmiLg',
-    appId: '1:644442202771:android:17c8637904cc6a6b3b6366',
-    messagingSenderId: '644442202771',
-    projectId: 'groom-c6593',
-    databaseURL: 'https://groom-c6593-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'groom-c6593.appspot.com',
+    apiKey: 'AIzaSyD9CmCM5pAjHiJexIbZw0DPSc0ZynMbYjk',
+    appId: '1:27883078232:android:d3ba91117de0f11f3d002d',
+    messagingSenderId: '27883078232',
+    projectId: 'groom-dev-33492',
+    storageBucket: 'groom-dev-33492.appspot.com',
   );
 }

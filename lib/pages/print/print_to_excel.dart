@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:universal_html/html.dart' as webFile;
+import 'package:universal_html/html.dart' as html;
 // import 'package:excel/excel.dart';
 
 import 'package:flutter/foundation.dart';
@@ -109,10 +109,9 @@ class PrintMingguan extends StatelessWidget {
       // theFile.createSync(recursive: true);
       // theFile.writeAsBytesSync(bytes, mode: FileMode.write);
       var filebytes = Uint8List.fromList(bytes);
-      var blob =
-          webFile.Blob([filebytes], 'application/vnd.ms-excel', 'native');
-      var anchorElement = webFile.AnchorElement(
-        href: webFile.Url.createObjectUrlFromBlob(blob).toString(),
+      var blob = html.Blob([filebytes], 'application/vnd.ms-excel', 'native');
+      var anchorElement = html.AnchorElement(
+        href: html.Url.createObjectUrlFromBlob(blob).toString(),
       )
         ..setAttribute("download", "data.xlsx")
         ..click();

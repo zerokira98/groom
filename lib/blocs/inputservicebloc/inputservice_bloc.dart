@@ -1,11 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:groom/db/barang_repo.dart';
 import 'package:groom/db/karyawan_repo.dart';
+import 'package:groom/db/midapi.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/model/itemcard_mdl.dart';
 import 'package:groom/model/struk_mdl.dart';
+import 'package:http/http.dart' as http;
 
 part 'inputservice_event.dart';
 part 'inputservice_state.dart';
@@ -14,11 +20,13 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
   PemasukanRepository strukrepo;
   KaryawanRepository karyawanrepo;
   BarangRepository barangrepo;
-  InputserviceBloc(
-      {required this.strukrepo,
-      required this.karyawanrepo,
-      required this.barangrepo})
-      : super(InputserviceInitial()) {
+  MidApi midApi;
+  InputserviceBloc({
+    required this.strukrepo,
+    required this.midApi,
+    required this.karyawanrepo,
+    required this.barangrepo,
+  }) : super(InputserviceInitial()) {
     on<Initiate>((event, emit) async {
       if (state is InputserviceLoaded) {
         var theState = state as InputserviceLoaded;
@@ -45,9 +53,10 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
               ? DateTime.now()
               : theState.tanggal,
           itemCards: theState.itemCards);
-
+      Timestamp tanggal = a.toJson().remove('tanggal');
+      var jsonA = a.toJson()..remove('tanggal');
+      jsonA.addAll({'tanggal': tanggal.toDate().toIso8601String()});
       try {
-        strukrepo.insertStruk(a);
         for (var e in a.itemCards) {
           if (e.type == 3) {
             barangrepo.find(e.namaBarang).then((v) {
@@ -58,14 +67,48 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
             });
           }
         }
-        emit(InputserviceLoaded(
-            tipePembayaran: TipePembayaran.cash,
-            tanggal: DateTime.now(),
-            karyawanName: theState.karyawanName,
-            itemCards: const [],
-            success: 'input success'));
+        emit(InputserviceLoading());
+        if (a.tipePembayaran == TipePembayaran.qris) {
+          var value = await strukrepo.insertStruk(a);
+          var res = await midApi
+              .getFlutterTest(jsonEncode(jsonA..update('id', (v) => value.id)))
+              .then(
+            (value) {
+              print(value.headers['content-type']);
+              if (!(value.headers['content-type']
+                      ?.contains("application/json") ??
+                  true)) {
+                print('here!');
+                return http.Response('{}', 400);
+              }
+              return value;
+            },
+          ).timeout(
+            Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('no connection to midtrans');
+            },
+          );
+          print(jsonDecode(res.body));
+          emit(InputserviceLoaded(
+              tipePembayaran: a.tipePembayaran,
+              tanggal: DateTime.now(),
+              karyawanName: theState.karyawanName,
+              itemCards: const [],
+              success: a.tipePembayaran == TipePembayaran.qris
+                  ? '{"qrcode_url":"${jsonDecode(res.body)['qrcode_url']}"}'
+                  : 'sukses !'));
+        } else {
+          var value = await strukrepo.insertStruk(a);
+          emit(InputserviceLoaded(
+              tipePembayaran: a.tipePembayaran,
+              tanggal: DateTime.now(),
+              karyawanName: theState.karyawanName,
+              itemCards: const [],
+              success: 'sukses !'));
+        }
       } catch (e) {
-        debugPrint('catched err');
+        debugPrint('catched err' + e.toString());
         emit(theState.copyWith(err: () => e.toString()));
       }
     });

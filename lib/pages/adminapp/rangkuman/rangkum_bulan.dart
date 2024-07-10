@@ -24,9 +24,15 @@ class _RangkumMonthState extends State<RangkumMonth> {
         if (state == BulananState.initial()) {
           return const Material(child: CircularProgressIndicator());
         }
+        if (state.incomePerHari.isEmpty) {
+          return const Material(
+              child: Center(
+            child: Text('Empty: no data'),
+          ));
+        }
 
         var thedate = state.bulan;
-        monthC.text = thedate.monthName;
+        monthC.text = '${thedate.monthName} ${thedate.year}';
         var dateHighestIncome = DateTime(thedate.year, thedate.month,
             state.pendapatanTertinggi['day']!.toInt());
         var dateTotalCustomerperDay = DateTime(thedate.year, thedate.month,
@@ -42,12 +48,14 @@ class _RangkumMonthState extends State<RangkumMonth> {
               children: [
                 Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text('Bulan :'),
                     ),
-                    Flexible(
+                    Expanded(
                       child: TextField(
+                        textAlign: TextAlign.end,
+                        decoration: const InputDecoration(),
                         onTap: () {
                           showMonthPicker(
                                   context: context,
@@ -64,7 +72,7 @@ class _RangkumMonthState extends State<RangkumMonth> {
                         readOnly: true,
                       ),
                     ),
-                    Expanded(child: SizedBox()),
+                    const Expanded(child: SizedBox()),
                   ],
                 ),
                 Text(

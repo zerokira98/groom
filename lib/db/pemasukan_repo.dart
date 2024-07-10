@@ -11,8 +11,8 @@ abstract class _PemasukanRepo {
   ///----- Pemasukan ------
   Future<List<StrukMdl>> getAllStruk();
   Future<List<StrukMdl>> getStrukFiltered(Map filter);
-  Future<int> insertStruk(StrukMdl data);
-  Future<int> deleteStruk(StrukMdl data);
+  Future<DocumentReference> insertStruk(StrukMdl data);
+  Future<DocumentReference> deleteStruk(StrukMdl data);
 
   ///------ end pemasukan ------
   ///
@@ -128,17 +128,16 @@ class PemasukanRepository implements _PemasukanRepo {
   FirebaseFirestore db;
 
   @override
-  Future<int> deleteStruk(StrukMdl data) {
+  Future<DocumentReference> deleteStruk(StrukMdl data) {
     return db
         .collection('strukMasuk')
         .doc(data.id)
         .delete()
         .then((value) async {
-      await db
+      return await db
           .collection('strukMasukDeleted')
           .add(data.toJson()..addAll({'time': DateTime.now().timestampFire}));
-      return 1;
-    }).onError((error, stackTrace) => -1);
+    });
   }
 
   @override
@@ -146,6 +145,7 @@ class PemasukanRepository implements _PemasukanRepo {
     return db.collection('strukMasuk').get().then((value) => value.docs
         .map((e) => StrukMdl.fromJson(e.data()).copyWith(
               id: () => e.id,
+              fromCache: () => e.metadata.isFromCache,
             ))
         .toList());
   }
@@ -194,6 +194,7 @@ class PemasukanRepository implements _PemasukanRepo {
     return reff.get().then((value) => value.docs
         .map((e) => StrukMdl.fromJson(e.data()).copyWith(
               id: () => e.id,
+              fromCache: () => e.metadata.isFromCache,
             ))
         .toList());
     // var fil = [
@@ -244,17 +245,20 @@ class PemasukanRepository implements _PemasukanRepo {
   }
 
   @override
-  Future<int> insertStruk(StrukMdl data) {
+  Future<DocumentReference> insertStruk(StrukMdl data) {
     for (ItemCardMdl ew in data.itemCards) {
       if (ew.type == cardType.length - 1) {
         // await storeLainnya.add(db, ew.toJson());
         db.collection('strukLainnya').add(ew.toJson());
       }
     }
-    return db.collection('strukMasuk').add(data.toJson()).then((v) {
-      return 1;
-    }).onError((error, stackTrace) {
-      return -1;
-    });
+    var thedata = data.toJson();
+    if (data.tipePembayaran == TipePembayaran.qris) {
+      thedata.putIfAbsent(
+        'midstatus',
+        () => 'pending',
+      );
+    }
+    return db.collection('strukMasuk').add(thedata);
   }
 }

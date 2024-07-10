@@ -16,7 +16,7 @@ class HutangHome extends StatefulWidget {
 
 class _HutangHomeState extends State<HutangHome> {
   // final textControl = TextEditingController();
-  final uangFormatter = CurrencyTextInputFormatter(
+  final uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
   final TextEditingController jumlahBon = TextEditingController();
@@ -107,7 +107,7 @@ class _HutangHomeState extends State<HutangHome> {
                     ElevatedButton(
                         style: ButtonStyle(
                             backgroundColor:
-                                MaterialStateProperty.all(Colors.green)),
+                                WidgetStateProperty.all(Colors.green)),
                         onPressed: () async {
                           ///make safety var
                           if (jumlahBon.text.isNotEmpty) {

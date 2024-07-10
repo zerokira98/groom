@@ -1,4 +1,5 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/barang_repo.dart';
@@ -25,7 +26,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
   TextEditingController uangController = TextEditingController();
   TextEditingController deskripsi = TextEditingController();
   TextEditingController pcs = TextEditingController(text: '1');
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&
@@ -34,7 +35,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
 
   @override
   void initState() {
-    uangFormatter.format('0');
+    uangFormatter.formatString('0');
     deskripsi.text = '';
     tanggal.text = DateFormat.yMd('id_ID').format(DateTime.now());
 
@@ -92,7 +93,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                           onPressed: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(
+                                CupertinoPageRoute(
                                   builder: (context) =>
                                       const RangkumanMingguan(),
                                 ));
@@ -107,51 +108,51 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                             Row(
                               children: [
                                 Expanded(
-                                    child: TextFormField(
-                                        controller: tanggal,
-                                        autovalidateMode:
-                                            AutovalidateMode.onUserInteraction,
-                                        validator: (value) {
-                                          if (value == null) return null;
-                                          try {
-                                            DateFormat.yMd('id_ID')
-                                                .parseStrict(value);
-                                            return null;
-                                          } on FormatException catch (e) {
-                                            return e.message.toString();
-                                          }
-                                        },
-                                        onChanged: (value) {
-                                          setState(() {});
-                                          debugPrint(DateFormat.yMd('id_ID')
-                                              .tryParseStrict(value)
-                                              .toString());
-                                        },
-                                        decoration: InputDecoration(
-                                            label: const Text('Tanggal'),
-                                            errorMaxLines: 2,
-                                            suffixIcon: InkWell(
-                                              onTap: () {
-                                                showDatePicker(
-                                                        context: context,
-                                                        firstDate:
-                                                            DateTime(2020),
-                                                        lastDate:
-                                                            DateTime.now())
-                                                    .then((value) {
-                                                  if (value != null) {
-                                                    setState(() {
-                                                      tanggal.text =
-                                                          DateFormat.yMd(
-                                                                  'id_ID')
-                                                              .format(value);
-                                                    });
-                                                  }
-                                                });
-                                              },
-                                              child: const Icon(
-                                                  Icons.calendar_today),
-                                            )))),
+                                    child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                      controller: tanggal,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      validator: (value) {
+                                        if (value == null) return null;
+                                        try {
+                                          DateFormat.yMd('id_ID')
+                                              .parseStrict(value);
+                                          return null;
+                                        } on FormatException catch (e) {
+                                          return e.message.toString();
+                                        }
+                                      },
+                                      onChanged: (value) {
+                                        setState(() {});
+                                        debugPrint(DateFormat.yMd('id_ID')
+                                            .tryParseStrict(value)
+                                            .toString());
+                                      },
+                                      decoration: InputDecoration(
+                                          label: const Text('Tanggal'),
+                                          errorMaxLines: 2,
+                                          suffixIcon: InkWell(
+                                            onTap: () {
+                                              showDatePicker(
+                                                      context: context,
+                                                      firstDate: DateTime(2020),
+                                                      lastDate: DateTime.now())
+                                                  .then((value) {
+                                                if (value != null) {
+                                                  setState(() {
+                                                    tanggal.text =
+                                                        DateFormat.yMd('id_ID')
+                                                            .format(value);
+                                                  });
+                                                }
+                                              });
+                                            },
+                                            child: const Icon(
+                                                Icons.calendar_today),
+                                          ))),
+                                )),
                                 Text(DateFormat.yMMMEd('id_ID').format(
                                     DateFormat.yMd('id_ID')
                                             .tryParseStrict(tanggal.text) ??
@@ -161,62 +162,70 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                             Row(
                               children: [
                                 Expanded(
-                                    child: Autocomplete(
-                                  onSelected: (option) async {
-                                    deskripsi.text = option;
-                                    if (typeValue ==
-                                        TipePengeluaran.operasional) {
-                                      var a = await RepositoryProvider.of<
-                                              PengeluaranRepository>(context)
-                                          .getOperational(option);
-                                      uangController.text = uangFormatter
-                                          .format(a.last.biaya.toString());
-                                    }
-                                    if (typeValue ==
-                                        TipePengeluaran.barangjual) {
-                                      var a = await RepositoryProvider.of<
-                                              PengeluaranRepository>(context)
-                                          .getBarang(option);
-                                      uangController.text = uangFormatter
-                                          .format(a.first.biaya.toString());
-                                    }
-                                  },
-                                  optionsBuilder: (textEditingValue) async {
-                                    if (textEditingValue.text == '') {
-                                      return const Iterable<String>.empty();
-                                    }
-                                    List<String> xxx = await RepositoryProvider
-                                            .of<PengeluaranRepository>(context)
-                                        .getAutoComplete(
-                                            textEditingValue.text, typeValue);
-                                    return xxx;
-                                  },
-                                  fieldViewBuilder: (context,
-                                          textEditingController,
-                                          focusNode,
-                                          onFieldSubmitted) =>
-                                      TextFormField(
-                                    focusNode: focusNode,
-                                    onChanged: (value) =>
-                                        deskripsi.text = value,
-                                    onFieldSubmitted: (value) =>
-                                        onFieldSubmitted,
-                                    validator: (value) {
-                                      if (value == null) return null;
-                                      if (value.isEmpty) {
-                                        return 'Can\'t be empty';
+                                    child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Autocomplete(
+                                    onSelected: (option) async {
+                                      deskripsi.text = option;
+                                      if (typeValue ==
+                                          TipePengeluaran.operasional) {
+                                        var a = await RepositoryProvider.of<
+                                                PengeluaranRepository>(context)
+                                            .getOperational(option);
+                                        uangController.text =
+                                            uangFormatter.formatString(
+                                                a.last.biaya.toString());
                                       }
-                                      return null;
+                                      if (typeValue ==
+                                          TipePengeluaran.barangjual) {
+                                        var a = await RepositoryProvider.of<
+                                                PengeluaranRepository>(context)
+                                            .getBarang(option);
+                                        uangController.text =
+                                            uangFormatter.formatString(
+                                                a.first.biaya.toString());
+                                      }
                                     },
-                                    controller: textEditingController,
-                                    decoration: InputDecoration(
-                                        label: Text(switch (typeValue.index) {
-                                      0 => 'Nama Karyawan',
-                                      1 => 'Deskripsi pengeluaran',
-                                      2 => 'Nama Barang',
-                                      3 => 'Deskripsi',
-                                      int() => ''
-                                    })),
+                                    optionsBuilder: (textEditingValue) async {
+                                      if (textEditingValue.text == '') {
+                                        return const Iterable<String>.empty();
+                                      }
+                                      List<String> xxx =
+                                          await RepositoryProvider.of<
+                                                      PengeluaranRepository>(
+                                                  context)
+                                              .getAutoComplete(
+                                                  textEditingValue.text,
+                                                  typeValue);
+                                      return xxx;
+                                    },
+                                    fieldViewBuilder: (context,
+                                            textEditingController,
+                                            focusNode,
+                                            onFieldSubmitted) =>
+                                        TextFormField(
+                                      focusNode: focusNode,
+                                      onChanged: (value) =>
+                                          deskripsi.text = value,
+                                      onFieldSubmitted: (value) =>
+                                          onFieldSubmitted,
+                                      validator: (value) {
+                                        if (value == null) return null;
+                                        if (value.isEmpty) {
+                                          return 'Can\'t be empty';
+                                        }
+                                        return null;
+                                      },
+                                      controller: textEditingController,
+                                      decoration: InputDecoration(
+                                          label: Text(switch (typeValue.index) {
+                                        0 => 'Nama Karyawan',
+                                        1 => 'Deskripsi pengeluaran',
+                                        2 => 'Nama Barang',
+                                        3 => 'Deskripsi',
+                                        int() => ''
+                                      })),
+                                    ),
                                   ),
                                 ))
                               ],
@@ -225,29 +234,32 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                               children: [
                                 Expanded(
                                     flex: 2,
-                                    child: TextFormField(
-                                      controller: uangController,
-                                      keyboardType: TextInputType.number,
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
-                                      validator: (value) {
-                                        if (value == null) return null;
-                                        if (value.isEmpty) {
-                                          return "can't be empty";
-                                        }
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextFormField(
+                                        controller: uangController,
+                                        keyboardType: TextInputType.number,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (value) {
+                                          if (value == null) return null;
+                                          if (value.isEmpty) {
+                                            return "can't be empty";
+                                          }
 
-                                        return null;
-                                      },
-                                      inputFormatters: [uangFormatter],
-                                      onChanged: (value) {
-                                        setState(() {});
-                                        // debugPrint(uangFormatter
-                                        //     .getUnformattedValue());
-                                      },
-                                      decoration: InputDecoration(
-                                          label: Text((typeValue.index == 2)
-                                              ? 'Harga beli perPcs'
-                                              : 'Jumlah Uang')),
+                                          return null;
+                                        },
+                                        inputFormatters: [uangFormatter],
+                                        onChanged: (value) {
+                                          setState(() {});
+                                          // debugPrint(uangFormatter
+                                          //     .getUnformattedValue());
+                                        },
+                                        decoration: InputDecoration(
+                                            label: Text((typeValue.index == 2)
+                                                ? 'Harga beli perPcs'
+                                                : 'Jumlah Uang')),
+                                      ),
                                     )),
                                 if (typeValue.index == 2)
                                   Expanded(
@@ -292,10 +304,9 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
           ),
           ElevatedButton(
               style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.green)),
+                  backgroundColor: WidgetStateProperty.all(Colors.green)),
               onPressed: () async {
                 ///make safety var
-
                 if (valid()) {
                   try {
                     await RepositoryProvider.of<PengeluaranRepository>(context)
@@ -324,7 +335,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                     hargajual: 0))
                                 .then((value) => Navigator.push(
                                     context,
-                                    MaterialPageRoute(
+                                    CupertinoPageRoute(
                                       builder: (context) => const BarangPage(),
                                     )));
                           } else {
@@ -336,7 +347,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                                 .then((value) {
                               Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  CupertinoPageRoute(
                                     builder: (context) => const BarangPage(),
                                   ));
                             });
@@ -344,7 +355,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
                         }
                         Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
+                            CupertinoPageRoute(
                               builder: (context) => const HistoriPengeluaran(),
                             ));
                         setState(() {});

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/model/pengeluaran_mdl.dart';
-import 'package:groom/model/struk_mdl.dart';
 import 'package:collection/collection.dart' as c;
 
 part 'bulanan_state.dart';
@@ -20,7 +19,7 @@ class BulananCubit extends Cubit<BulananState> {
     DateTime nextmonth = DateTime(dateTime.year, dateTime.month + 1);
     num totalPengeluaran = 0;
     num totalPemasukan = 0;
-    num totalPemasukanqris = 0;
+    // num totalPemasukanqris = 0;
 
     ///pemasukan
     var dataPemasukan = await repoPemasukan.getStrukFiltered({
@@ -46,8 +45,8 @@ class BulananCubit extends Cubit<BulananState> {
         totalPerStruk += card.pcsBarang * card.price;
       }
       totalPemasukan += totalPerStruk;
-      totalPemasukanqris +=
-          e.tipePembayaran == TipePembayaran.qris ? totalPerStruk : 0;
+      // totalPemasukanqris +=
+      //     e.tipePembayaran == TipePembayaran.qris ? totalPerStruk : 0;
       incomePerHari[e.tanggal.day] += totalPerStruk;
       customerPerHari[e.tanggal.day] += 1;
     }

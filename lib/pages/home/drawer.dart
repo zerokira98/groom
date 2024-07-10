@@ -1,10 +1,13 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screen_lock/flutter_screen_lock.dart';
+import 'package:groom/blocs/cubit/theme_cubit.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/karyawan_repo.dart';
+import 'package:groom/etc/extension.dart';
 import 'package:groom/etc/globalvar.dart';
 import 'package:groom/etc/lockscreen_keylock.dart';
 
@@ -13,7 +16,8 @@ import 'package:groom/pages/home/pengeluaran_home.dart';
 import 'package:groom/pages/home/utang_home.dart';
 
 // import 'package:groom/pages/rangkuman/cubitharian/rangkumanharian_cubit.dart';
-import 'package:groom/pages/home/riwayat_pemasukan.dart';
+import 'package:groom/pages/home/riwayat_pemasukan/riwayat_masuk_home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SideDrawer extends StatefulWidget {
   const SideDrawer({super.key});
@@ -23,6 +27,8 @@ class SideDrawer extends StatefulWidget {
 }
 
 class _SideDrawerState extends State<SideDrawer> {
+  FlexScheme? dropdownvalue;
+
   final TextEditingController dropdownC = TextEditingController();
   double imageHeight = 220.0;
   double _opacity = 0.0;
@@ -50,8 +56,20 @@ class _SideDrawerState extends State<SideDrawer> {
                 duration: Durations.extralong1,
                 curve: Curves.bounceInOut,
                 margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.only(top: 24, bottom: 8),
-                color: Colors.white,
+                padding: const EdgeInsets.only(top: 24, bottom: 18),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.01),
+                        Colors.white,
+                        Colors.white,
+                        Colors.white.withOpacity(0.01),
+                      ],
+                      begin: const Alignment(0, -1),
+                      end: const Alignment(0, 1),
+                      stops: const [0.0, 0.05, 0.95, 1]),
+                ),
+                // color: Colors.white,
                 // transformAlignment: Alignment.center,
                 // transform: Matrix4.identity()..translate(imageHeight - 240),
                 height: imageHeight,
@@ -135,7 +153,7 @@ class _SideDrawerState extends State<SideDrawer> {
         //   onTap: () {
         //     Navigator.push(
         //         context,
-        //         MaterialPageRoute(
+        //         CupertinoPageRoute(
         //           builder: (context) => BlocProvider.value(
         //             value: BlocProvider.of<RangkumanDayCubit>(context)
         //               ..loadData({
@@ -152,7 +170,7 @@ class _SideDrawerState extends State<SideDrawer> {
         //   onTap: () {
         //     Navigator.push(
         //         context,
-        //         MaterialPageRoute(
+        //         CupertinoPageRoute(
         //           builder: (context) => const PlayBox(),
         //         ));
         //   },
@@ -164,7 +182,7 @@ class _SideDrawerState extends State<SideDrawer> {
           onTap: () {
             Navigator.push(
                 context,
-                MaterialPageRoute(
+                CupertinoPageRoute(
                   builder: (context) => const RiwayatPemasukan(),
                 ));
           },
@@ -195,7 +213,7 @@ class _SideDrawerState extends State<SideDrawer> {
                   if (value != null && value) {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(
+                        CupertinoPageRoute(
                           builder: (context) => const PengeluaranHome(),
                         ));
                   } else {
@@ -238,7 +256,7 @@ class _SideDrawerState extends State<SideDrawer> {
                 if (value != null && value) {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      CupertinoPageRoute(
                         builder: (context) => HutangHome(namaKaryawan: name),
                       ));
                 } else {
@@ -259,26 +277,76 @@ class _SideDrawerState extends State<SideDrawer> {
             leading: const Icon(Icons.admin_panel_settings),
             title: const Text('Admin'),
             onTap: () {
-              InputController ic = InputController();
+              // InputController ic = InputController();
               final FocusNode focusNode = FocusNode();
               focusNode.requestFocus();
-              showDialog<bool>(
-                context: context,
-                builder: (context) {
-                  return KeyLock(tendigits: '12340', title: 'Admin');
+              SharedPreferences.getInstance().then(
+                (spref) {
+                  showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return KeyLock(
+                          tendigits: spref.getString('adminpass') ?? adminpass,
+                          title: 'Admin');
+                    },
+                  ).then((dia) {
+                    if (dia == null) return;
+                    if (dia) {
+                      Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => const AdminPage(),
+                          ));
+                    }
+                  });
                 },
-              ).then((dia) {
-                if (dia == null) return;
-                if (dia) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminPage(),
-                      ));
-                }
-              });
+              );
             },
           ),
+
+        InkWell(
+          child: const Column(
+            children: [Text('DarkMode'), Icon(Icons.dark_mode)],
+          ),
+          onTap: () async {
+            context.read<ThemeCubit>().changeDarkLight();
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              const Text('Color : '),
+              Expanded(
+                  child: BlocBuilder<ThemeCubit, ThemeState>(
+                buildWhen: (previous, current) =>
+                    previous.currentScheme != current.currentScheme,
+                builder: (context, state) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: DropdownButton<FlexScheme>(
+                      isExpanded: true,
+                      items: [
+                        for (FlexScheme a in FlexScheme.values)
+                          DropdownMenuItem(
+                            value: a,
+                            child: Text(a.name.firstUpcase()),
+                          ),
+                      ],
+                      value: state.currentScheme,
+                      onChanged: (value) {
+                        if (value != null) {
+                          BlocProvider.of<ThemeCubit>(context)
+                              .changeColorScheme(value);
+                        }
+                      },
+                    ),
+                  );
+                },
+              )),
+            ],
+          ),
+        )
       ],
     );
   }

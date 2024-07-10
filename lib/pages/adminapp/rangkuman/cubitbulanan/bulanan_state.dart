@@ -29,10 +29,10 @@ final class BulananState extends Equatable {
         bulan: DateTime.now(),
         totalPengeluaran: 0,
         totalPemasukan: 0,
-        incomePerHari: [],
-        groupAndSumPengeluaran: {},
-        pendapatanTertinggi: {},
-        jumlahCustomerTertinggi: {},
+        incomePerHari: const [],
+        groupAndSumPengeluaran: const {},
+        pendapatanTertinggi: const {},
+        jumlahCustomerTertinggi: const {},
       );
 
   @override

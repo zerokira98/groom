@@ -186,7 +186,7 @@ class _BonAddPageState extends State<BonAddPage> {
   String? namaKaryawan;
   // TextEditingController jumlahBon = TextEditingController();
 
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&
@@ -294,7 +294,7 @@ class _BonAddPageState extends State<BonAddPage> {
         ),
         ElevatedButton(
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.green)),
+                backgroundColor: WidgetStateProperty.all(Colors.green)),
             onPressed: () async {
               ///make safety var
               if (valid()) {
@@ -348,7 +348,7 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
   String? namaKaryawan;
   // TextEditingController jumlahBon = TextEditingController();
 
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&
@@ -453,7 +453,7 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
         ),
         ElevatedButton(
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.green)),
+                backgroundColor: WidgetStateProperty.all(Colors.green)),
             onPressed: () async {
               ///make safety var
               var get = await RepositoryProvider.of<BonRepository>(context)

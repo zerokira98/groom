@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/bon_repo.dart';
@@ -6,12 +7,14 @@ import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/etc/globalvar.dart';
 import 'package:groom/model/model.dart';
+import 'package:groom/pages/adminapp/rangkuman/cubitharian/rangkumanharian_cubit.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:groom/pages/print/print_to_excel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fc;
 import 'package:intl/intl.dart';
 import 'package:weekly_date_picker/datetime_apis.dart';
 import 'cubitmingguan/rangkumanmingg_cubit.dart';
+import 'rangkum_hari.dart';
 
 class RangkumanMingguan extends StatelessWidget {
   const RangkumanMingguan({super.key});
@@ -310,7 +313,7 @@ class TileMingguan extends StatelessWidget {
                         previousValue + element.totalPendapatan);
           }
           // for (var awo in data.itemCards) {
-          //   tot += awo.price * cutPercentage(awo.type);
+          //   tot += awo.price .cutPercentage(awo.type);
           // }
           num hutang = 0;
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -364,10 +367,9 @@ class TileMingguan extends StatelessWidget {
                         actions: [
                           ElevatedButton(
                               style: ButtonStyle(
-                                  foregroundColor:
-                                      const MaterialStatePropertyAll(
-                                          Colors.white),
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  foregroundColor: const WidgetStatePropertyAll(
+                                      Colors.white),
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Colors.green[800])),
                               onPressed: () async {
                                 var te = dataState.tanggalEnd;
@@ -426,7 +428,7 @@ class TileMingguan extends StatelessWidget {
                                           .then((value) =>
                                               Navigator.pushReplacement(
                                                   context,
-                                                  MaterialPageRoute(
+                                                  CupertinoPageRoute(
                                                     builder: (context) =>
                                                         const HistoriPengeluaran(
                                                       sortBy:
@@ -436,7 +438,7 @@ class TileMingguan extends StatelessWidget {
                                     } else {
                                       Navigator.push(
                                           context,
-                                          MaterialPageRoute(
+                                          CupertinoPageRoute(
                                             builder: (context) =>
                                                 const HistoriPengeluaran(
                                               sortBy: TipePengeluaran.gaji,
@@ -456,7 +458,7 @@ class TileMingguan extends StatelessWidget {
                                       child: const Text('check'),
                                       onPressed: () => Navigator.push(
                                           context,
-                                          MaterialPageRoute(
+                                          CupertinoPageRoute(
                                             builder: (context) =>
                                                 const HistoriPengeluaran(),
                                           )),
@@ -637,6 +639,7 @@ class _SlipGajiState extends State<SlipGaji> {
             ],
           ),
           const Text('Histori catatan utang minggu ini'),
+          if (aWeek.isEmpty) const Text('[Empty: no data]'),
           for (var i in aWeek)
             ListTile(
               title: Text(
@@ -732,21 +735,8 @@ class _SlipGajiState extends State<SlipGaji> {
                   orElse: () => ItemCardMdl.empty)
               .price ??
           0;
-      // totHC +=
-      //     waw[i].perCategory.firstWhere((element) => element.type == 0).price;
-      // totSHV +=
-      //     waw[i].perCategory.firstWhere((element) => element.type == 1).price;
-      // totCLR +=
-      //     waw[i].perCategory.firstWhere((element) => element.type == 2).price;
-      // totLain +=
-      //     waw[i].perCategory.firstWhere((element) => element.type == 4).price;
-      // totBRG +=
-      //     waw[i].perCategory.firstWhere((element) => element.type == 3).price *
-      //         waw[i]
-      //             .perCategory
-      //             .firstWhere((element) => element.type == 3)
-      //             .pcsBarang;
     }
+    // print(waw[1]);
     return Dialog.fullscreen(
       child: SingleChildScrollView(
         child: Column(
@@ -766,6 +756,7 @@ class _SlipGajiState extends State<SlipGaji> {
               ],
             ),
             Table(
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
                 const TableRow(children: [
                   Text('Tgl'),
@@ -776,12 +767,35 @@ class _SlipGajiState extends State<SlipGaji> {
                   Text('ETC'),
                 ]),
                 for (var i = 0; i < 7; i++,)
-                  TableRow(children: [
-                    Text(widget.dataState.tanggalStart
-                        .addDays(i)
-                        .formatDayMonth()),
-                    // Text((waw[i].perCategory[0].price * cutPercentage(0))
-                    //     .numberFormat()),
+                  TableRow(decoration: const BoxDecoration(), children: [
+                    Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => BlocProvider.value(
+                                  value: BlocProvider.of<RangkumanDayCubit>(
+                                      context)
+                                    ..loadData({
+                                      'tanggalStart': widget
+                                          .dataState.tanggalStart
+                                          .addDays(i),
+                                      'tanggalEnd': widget
+                                          .dataState.tanggalStart
+                                          .addDays(i)
+                                          .addDays(1),
+                                    }),
+                                  child: const RangkumanHarian(),
+                                ),
+                              ));
+                        },
+                        child: Text(widget.dataState.tanggalStart
+                            .addDays(i)
+                            .formatDayMonth()),
+                      ),
+                    ),
                     Text(singleKaryawan
                             .elementAtOrNull(i)
                             ?.singleOrNull
@@ -789,30 +803,17 @@ class _SlipGajiState extends State<SlipGaji> {
                             .price
                             .numberFormat() ??
                         '0'),
-                    // Text((widget.dataState.dailycut[i]
-                    //             .firstWhere((element) =>
-                    //                 element.namaKaryawan == widget.nama)
-                    //             .perCategory[0]
-                    //             .price *
-                    //         cutPercentage(1))
-                    //     .numberFormat()),
-                    Text((waw[i].perCategory[1].price * cutPercentage(1))
+                    Text((waw[i].perCategory[1].price.cutPercentage(1))
                         .numberFormat()),
-                    Text((waw[i].perCategory[2].price * cutPercentage(2))
+                    Text((waw[i].perCategory[2].price.cutPercentage(2))
                         .numberFormat()),
-                    Text((waw[i].perCategory[3].price * cutPercentage(3))
+                    Text((waw[i].perCategory[3].price.cutPercentage(3))
                         .numberFormat()),
-                    Text((waw[i].perCategory[4].price * cutPercentage(4))
+                    Text((waw[i].perCategory[4].price.cutPercentage(4))
                         .numberFormat()),
                   ]),
                 TableRow(children: [
                   const Text('Total : '),
-                  // Text((singleKaryawan.fold(
-                  //         0.0,
-                  //         (previousValue, element) =>
-                  //             previousValue +
-                  //             (element.singleOrNull?.totalPendapatan ?? 0)))
-                  //     .numberFormat()),
                   Text((totHC).numberFormat()),
                   Text((totSHV).numberFormat()),
                   Text((totCLR).numberFormat()),

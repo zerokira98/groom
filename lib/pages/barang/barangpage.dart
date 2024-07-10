@@ -1,4 +1,5 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/barang_repo.dart';
@@ -27,7 +28,7 @@ class _BarangPageState extends State<BarangPage> {
           IconButton(
               onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      CupertinoPageRoute(
                         builder: (context) => const TambahBarang(),
                       )).then((value) {
                     // if (value != null && value) {
@@ -103,7 +104,7 @@ class BarangEditDialog extends StatefulWidget {
 }
 
 class _BarangEditDialogState extends State<BarangEditDialog> {
-  var uangFormatter = CurrencyTextInputFormatter(
+  var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   final TextEditingController namaBarang = TextEditingController();
 
@@ -141,8 +142,8 @@ class _BarangEditDialogState extends State<BarangEditDialog> {
                 },
                 onPressed: () {},
                 style: const ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Colors.red),
-                    foregroundColor: MaterialStatePropertyAll(Colors.white)),
+                    backgroundColor: WidgetStatePropertyAll(Colors.red),
+                    foregroundColor: WidgetStatePropertyAll(Colors.white)),
                 child: const Text('Hapus barang'),
               )
             ],

@@ -8,7 +8,7 @@ part of 'bondata_mdl.dart';
 
 BonData _$BonDataFromJson(Map<String, dynamic> json) => BonData(
       namaSubjek: json['namaSubjek'] as String,
-      jumlahBon: json['jumlahBon'] as int,
+      jumlahBon: (json['jumlahBon'] as num).toInt(),
       tipe: $enumDecode(_$BonTypeEnumMap, json['tipe']),
       idKey: json['idKey'] as String?,
       tanggal: _$JsonConverterFromJson<Timestamp, DateTime>(

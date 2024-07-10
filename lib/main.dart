@@ -2,14 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:groom/blocs/cubit/theme_cubit.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/barang_repo.dart';
 import 'package:groom/db/bon_repo.dart';
+import 'package:groom/db/cust_repo.dart';
 import 'package:groom/db/karyawan_repo.dart';
+import 'package:groom/db/midapi.dart';
 import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/db/uangmasuk_repo.dart';
 import 'package:groom/etc/globalvar.dart';
+import 'package:groom/etc/lib/whatsapp.dart';
+import 'package:groom/model/themedatas.dart';
 import 'package:groom/pages/adminapp/admin.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
 import 'package:groom/pages/home/home.dart';
@@ -25,12 +31,44 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  var fInstance = FirebaseFirestore.instance;
+
+  // print(env.map);
+  await dotenv.load();
+  // print(env.map);
+  // print(env);
   // var db = await SembastDB.init();
   // var db2 = await SembastDB.init2();
-  runApp(
-    MultiRepositoryProvider(
+  runApp(RootApp());
+}
+
+class RootApp extends StatelessWidget {
+  RootApp({super.key});
+  var fInstance = FirebaseFirestore.instance;
+  var wa = WhatsApp()
+    ..setup(
+      accessToken:
+          "EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD",
+      fromNumberId: 318587001335322,
+    );
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiRepositoryProvider(
         providers: [
+          RepositoryProvider(
+            create: (context) {
+              return MidApi(
+                  apiKey: dotenv.env['SERVER_API_KEY'] ?? '',
+                  baseUrl: dotenv.env['SERVER_BASE_URL'] ?? '');
+            },
+            child: Container(),
+          ),
+          RepositoryProvider(
+            create: (context) => CustomerRepo(firestore: fInstance),
+          ),
+          RepositoryProvider(
+            create: (context) => wa,
+          ),
           RepositoryProvider(
               create: (context) => PemasukanRepository(db: fInstance)),
           RepositoryProvider(
@@ -47,12 +85,8 @@ void main() async {
         child: MultiBlocProvider(
           providers: [
             BlocProvider(
-              create: (context) => InputserviceBloc(
-                  strukrepo:
-                      RepositoryProvider.of<PemasukanRepository>(context),
-                  karyawanrepo:
-                      RepositoryProvider.of<KaryawanRepository>(context),
-                  barangrepo: RepositoryProvider.of<BarangRepository>(context)),
+              create: (context) =>
+                  ThemeCubit(themeDatas: ThemeDatas())..getThemeData(),
             ),
             BlocProvider(
               create: (context) => RangkumanWeekCubit(
@@ -73,8 +107,8 @@ void main() async {
             )
           ],
           child: const MyApp(),
-        )),
-  );
+        ));
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -104,32 +138,33 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Groom Barbershop',
-      themeMode: ThemeMode.system,
-      theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: Colors.deepPurple.shade800),
-        useMaterial3: true,
-      ),
-      darkTheme:
-          ThemeData.dark().copyWith(primaryColorDark: Colors.purple[800]),
-      home: FutureBuilder(
-          future: theFuture,
-          builder: (context, snap) {
-            if (snap.hasData) {
-              if (snap.data) {
-                return const FirstRun();
-              } else {
-                return BlocProvider.value(
-                  value: BlocProvider.of<InputserviceBloc>(context)
-                    ..add(Initiate()),
-                  child: adminonly ? const AdminPage() : Home(),
-                );
-              }
-            }
-            return const CircularProgressIndicator.adaptive();
-          }),
+    return BlocBuilder<ThemeCubit, ThemeState>(
+      builder: (context, state) {
+        return MaterialApp(
+            title: 'Groom Barbershop',
+            theme: state.themeData,
+            home: BlocProvider(
+                create: (context) => InputserviceBloc(
+                    strukrepo:
+                        RepositoryProvider.of<PemasukanRepository>(context),
+                    midApi: RepositoryProvider.of<MidApi>(context),
+                    karyawanrepo:
+                        RepositoryProvider.of<KaryawanRepository>(context),
+                    barangrepo:
+                        RepositoryProvider.of<BarangRepository>(context)),
+                child: FutureBuilder(
+                    future: theFuture,
+                    builder: (context, snap) {
+                      if (snap.hasData) {
+                        if (snap.data) {
+                          return const FirstRun();
+                        } else {
+                          return adminonly ? const AdminPage() : Home();
+                        }
+                      }
+                      return const CircularProgressIndicator.adaptive();
+                    })));
+      },
     );
   }
 }

@@ -7,11 +7,11 @@ part of 'itemcard_mdl.dart';
 // **************************************************************************
 
 ItemCardMdl _$ItemCardMdlFromJson(Map<String, dynamic> json) => ItemCardMdl(
-      index: json['index'] as int,
-      type: json['type'] as int,
-      pcsBarang: json['pcsBarang'] as int?,
+      index: (json['index'] as num).toInt(),
+      type: (json['type'] as num).toInt(),
+      pcsBarang: (json['pcsBarang'] as num?)?.toInt(),
       namaBarang: json['namaBarang'] as String?,
-      price: json['price'] as int,
+      price: (json['price'] as num).toInt(),
     );
 
 Map<String, dynamic> _$ItemCardMdlToJson(ItemCardMdl instance) =>

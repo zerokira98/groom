@@ -16,6 +16,9 @@ StrukMdl _$StrukMdlFromJson(Map<String, dynamic> json) => StrukMdl(
           .map((e) => ItemCardMdl.fromJson(e as Map<String, dynamic>))
           .toList(),
       id: json['id'] as String?,
+      fromCache: json['fromCache'] as bool?,
+      midstatus: json['midstatus'] as String?,
+      midId: json['midId'] as String?,
       pelanggan: json['pelanggan'] == null
           ? null
           : PelangganMdl.fromJson(json['pelanggan'] as Map<String, dynamic>),
@@ -23,7 +26,10 @@ StrukMdl _$StrukMdlFromJson(Map<String, dynamic> json) => StrukMdl(
 
 Map<String, dynamic> _$StrukMdlToJson(StrukMdl instance) => <String, dynamic>{
       'id': instance.id,
+      'fromCache': instance.fromCache,
       'namaKaryawan': instance.namaKaryawan,
+      'midstatus': instance.midstatus,
+      'midId': instance.midId,
       'tanggal': const TimestampConverterFirestore().toJson(instance.tanggal),
       'pelanggan': instance.pelanggan?.toJson(),
       'tipePembayaran': _$TipePembayaranEnumMap[instance.tipePembayaran]!,

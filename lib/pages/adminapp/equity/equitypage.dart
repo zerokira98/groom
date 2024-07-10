@@ -104,7 +104,7 @@ class _InputCardState extends State<InputCard> {
   final TextEditingController tanggal = TextEditingController(
       text: DateFormat.yMd('id_ID').format(DateTime.now()));
 
-  final uangFormatter = CurrencyTextInputFormatter(
+  final uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
 
   final GlobalKey<FormState> formKey = GlobalKey();
@@ -293,13 +293,13 @@ class _ReportCardState extends State<ReportCard> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       totalpemasukan = 0;
-                      num totalqris = 0;
+                      // num totalqris = 0;
                       for (var e in snapshot.data!) {
                         for (var a in e.itemCards) {
                           totalpemasukan += a.pcsBarang * a.price;
-                          totalqris += e.tipePembayaran == TipePembayaran.qris
-                              ? a.pcsBarang * a.price
-                              : 0;
+                          // totalqris += e.tipePembayaran == TipePembayaran.qris
+                          //     ? a.pcsBarang * a.price
+                          //     : 0;
                         }
                       }
                       return Text(
