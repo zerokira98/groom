@@ -11,7 +11,7 @@ class DoNothingButton extends StatelessWidget {
       onPressed: () async {
         RepositoryProvider.of<MidApi>(context).getFlutterTest();
       },
-      child: Text('Do Nothing Button'),
+      child: const Text('Do Nothing Button'),
     );
   }
 }

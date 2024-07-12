@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -84,7 +83,7 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
               return value;
             },
           ).timeout(
-            Duration(seconds: 10),
+            const Duration(seconds: 10),
             onTimeout: () {
               throw Exception('no connection to midtrans');
             },
@@ -108,7 +107,7 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
               success: 'sukses !'));
         }
       } catch (e) {
-        debugPrint('catched err' + e.toString());
+        debugPrint('catched err$e');
         emit(theState.copyWith(err: () => e.toString()));
       }
     });

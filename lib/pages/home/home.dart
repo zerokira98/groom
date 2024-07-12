@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:groom/blocs/cubit/theme_cubit.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
@@ -20,7 +19,7 @@ import 'package:groom/model/model.dart';
 import 'package:groom/pages/home/riwayat_pemasukan/riwayat_masuk_home.dart';
 
 class Home extends StatefulWidget {
-  Home({super.key});
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -456,7 +455,7 @@ class FloatingButton extends StatelessWidget {
                       ),
                     );
                   } else {
-                    return SizedBox();
+                    return const SizedBox();
                   }
                 },
               ),

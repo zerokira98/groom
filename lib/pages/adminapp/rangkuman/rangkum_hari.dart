@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/itemcard_mdl.dart';
-import 'package:groom/pages/home/riwayat_pemasukan/riwayat_masuk_home.dart';
 import 'package:groom/pages/home/riwayat_pemasukan/tile_struk.dart';
 import 'cubitharian/rangkumanharian_cubit.dart';
 import 'package:intl/intl.dart';

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "27883078232",
+    "project_id": "groom-dev-33492",
+    "storage_bucket": "groom-dev-33492.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27883078232:android:d3ba91117de0f11f3d002d",
+        "android_client_info": {
+          "package_name": "com.zerokira98.groom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9CmCM5pAjHiJexIbZw0DPSc0ZynMbYjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -47,7 +47,7 @@ class _TileStrukState extends State<TileStruk> {
                   ),
                 );
               },
-              icon: Icon(Icons.qr_code_2))
+              icon: const Icon(Icons.qr_code_2))
           : null,
       tileColor: widget.theData.fromCache != null
           ? widget.theData.fromCache!

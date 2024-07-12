@@ -159,7 +159,7 @@ class _MyAppState extends State<MyApp> {
                         if (snap.data) {
                           return const FirstRun();
                         } else {
-                          return adminonly ? const AdminPage() : Home();
+                          return adminonly ? const AdminPage() : const Home();
                         }
                       }
                       return const CircularProgressIndicator.adaptive();

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 
 import 'package:groom/etc/timestamp_converter_firestore.dart';
 import 'package:groom/model/pelanggan_mdl.dart';
@@ -28,7 +26,7 @@ class StrukMdl extends Equatable {
   final TipePembayaran tipePembayaran;
   final List<ItemCardMdl> itemCards;
 
-  StrukMdl(
+  const StrukMdl(
       {required this.namaKaryawan,
       required this.tanggal,
       required this.tipePembayaran,
