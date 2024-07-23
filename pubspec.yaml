@@ -71,14 +71,11 @@ dependencies:
   url_launcher: ^6.2.6
   http: ^1.2.0 
   file_picker: ^8.0.3
-<<<<<<< HEAD
   flex_color_scheme: ^7.3.1
   google_fonts: ^6.2.1
   flutter_screen_lock: ^9.1.0
   collection: ^1.18.0  
   flutter_dotenv: ^5.1.0
-=======
->>>>>>> 4f3730de384278352dd63a14b0c024923a1bb8f8
 
 dependency_overrides:
   intl: ^0.19.0
