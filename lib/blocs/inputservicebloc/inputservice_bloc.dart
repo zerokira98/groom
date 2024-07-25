@@ -72,19 +72,20 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
           var res = await midApi
               .getFlutterTest(jsonEncode(jsonA..update('id', (v) => value.id)))
               .then(
-            (value) {
-              print(value.headers['content-type']);
-              if (!(value.headers['content-type']
-                      ?.contains("application/json") ??
+            (val) {
+              print(val.headers['content-type']);
+              if (!(val.headers['content-type']?.contains("application/json") ??
                   true)) {
-                print('here!');
+                value.delete();
+                print('not json!');
                 return http.Response('{}', 400);
               }
-              return value;
+              return val;
             },
           ).timeout(
             const Duration(seconds: 10),
             onTimeout: () {
+              value.delete();
               throw Exception('no connection to midtrans');
             },
           );
@@ -94,9 +95,8 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
               tanggal: DateTime.now(),
               karyawanName: theState.karyawanName,
               itemCards: const [],
-              success: a.tipePembayaran == TipePembayaran.qris
-                  ? '{"qrcode_url":"${jsonDecode(res.body)['qrcode_url']}"}'
-                  : 'sukses !'));
+              success:
+                  '{"qrcode_url":"${jsonDecode(res.body)['qrcode_url']}"}'));
         } else {
           var value = await strukrepo.insertStruk(a);
           emit(InputserviceLoaded(

@@ -38,12 +38,23 @@ class _TileStrukState extends State<TileStruk> {
       isThreeLine: false,
       leading: widget.theData.tipePembayaran == TipePembayaran.qris
           ? IconButton(
+              style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                switch (widget.theData.midstatus) {
+                  'pending' => Colors.yellow.withOpacity(0.5),
+                  'settlement' => Colors.green.withOpacity(0.5),
+                  'expired' => Colors.red.withOpacity(0.5),
+                  String() => Colors.grey.withOpacity(0.5),
+                  null => null,
+                },
+              )),
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: Text('Status : ${widget.theData}'),
-                    content: Image.network(''),
+                    title: Text('Status : ${widget.theData.midstatus}'),
+                    content: Image.network(
+                        'https://api.sandbox.midtrans.com/v2/qris/${widget.theData.midId}/qr-code'),
                   ),
                 );
               },
