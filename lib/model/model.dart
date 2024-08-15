@@ -7,3 +7,4 @@ export 'pelanggan_mdl.dart';
 export 'pengeluaran_mdl.dart';
 export 'struk_mdl.dart';
 export 'perperson.dart';
+export './themedatas.dart';

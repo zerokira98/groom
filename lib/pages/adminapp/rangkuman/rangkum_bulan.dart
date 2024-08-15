@@ -58,10 +58,9 @@ class _RangkumMonthState extends State<RangkumMonth> {
                         decoration: const InputDecoration(),
                         onTap: () {
                           showMonthPicker(
-                                  context: context,
-                                  initialDate: thedate,
-                                  dismissible: true)
-                              .then((value) {
+                            context: context,
+                            initialDate: thedate,
+                          ).then((value) {
                             if (value != null) {
                               BlocProvider.of<BulananCubit>(context)
                                   .loadData(value);

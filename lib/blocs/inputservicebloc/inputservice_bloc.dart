@@ -4,13 +4,9 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:groom/db/barang_repo.dart';
-import 'package:groom/db/karyawan_repo.dart';
-import 'package:groom/db/midapi.dart';
-import 'package:groom/db/pemasukan_repo.dart';
+import 'package:groom/db/db.dart';
 import 'package:groom/model/itemcard_mdl.dart';
 import 'package:groom/model/struk_mdl.dart';
-import 'package:http/http.dart' as http;
 
 part 'inputservice_event.dart';
 part 'inputservice_state.dart';
@@ -68,37 +64,43 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
         }
         emit(InputserviceLoading());
         if (a.tipePembayaran == TipePembayaran.qris) {
-          var value = await strukrepo.insertStruk(a);
-          var res = await midApi
-              .getFlutterTest(jsonEncode(jsonA..update('id', (v) => value.id)))
-              .then(
-            (val) {
-              print(val.headers['content-type']);
-              if (!(val.headers['content-type']?.contains("application/json") ??
-                  true)) {
-                value.delete();
-                print('not json!');
-                return http.Response('{}', 400);
-              }
-              return val;
-            },
-          ).timeout(
-            const Duration(seconds: 10),
-            onTimeout: () {
-              value.delete();
-              throw Exception('no connection to midtrans');
+          await strukrepo.insertStruk(a).then(
+            (value) async {
+              var res = await midApi
+                  .getFlutterTest(
+                      jsonEncode(jsonA..update('id', (v) => value.id)))
+                  .then(
+                (val) {
+                  print(val.headers['content-type']);
+                  if (!(val.headers['content-type']
+                          ?.contains("application/json") ??
+                      true)) {
+                    value.delete();
+                    print('not json!');
+                    throw Exception('not json. code : ${val.statusCode}');
+                  }
+                  return val;
+                },
+              ).timeout(
+                const Duration(seconds: 15),
+                onTimeout: () {
+                  value.delete();
+                  throw Exception('no connection to midtrans');
+                },
+              );
+              print(jsonDecode(res.body));
+              emit(InputserviceLoaded(
+                  tipePembayaran: a.tipePembayaran,
+                  tanggal: DateTime.now(),
+                  karyawanName: theState.karyawanName,
+                  itemCards: const [],
+                  success:
+                      '{"qrcode_url":"${jsonDecode(res.body)['qrcode_url']}"}'));
+              return value;
             },
           );
-          print(jsonDecode(res.body));
-          emit(InputserviceLoaded(
-              tipePembayaran: a.tipePembayaran,
-              tanggal: DateTime.now(),
-              karyawanName: theState.karyawanName,
-              itemCards: const [],
-              success:
-                  '{"qrcode_url":"${jsonDecode(res.body)['qrcode_url']}"}'));
         } else {
-          var value = await strukrepo.insertStruk(a);
+          await strukrepo.insertStruk(a);
           emit(InputserviceLoaded(
               tipePembayaran: a.tipePembayaran,
               tanggal: DateTime.now(),

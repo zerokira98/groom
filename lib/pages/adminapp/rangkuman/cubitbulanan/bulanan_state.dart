@@ -8,7 +8,7 @@ part of 'bulanan_cubit.dart';
 // }
 
 final class BulananState extends Equatable {
-  BulananState(
+  const BulananState(
       {required this.pendapatanTertinggi,
       required this.jumlahCustomerTertinggi,
       required this.bulan,

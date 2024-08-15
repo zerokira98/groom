@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
-import 'package:groom/db/barang_repo.dart';
-import 'package:groom/db/pemasukan_repo.dart';
+import 'package:groom/db/db.dart';
 import 'package:groom/etc/extension.dart';
 
 import 'package:groom/model/model.dart';

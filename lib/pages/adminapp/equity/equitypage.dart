@@ -1,10 +1,7 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:groom/db/bon_repo.dart';
-import 'package:groom/db/pemasukan_repo.dart';
-import 'package:groom/db/pengeluaran_repo.dart';
-import 'package:groom/db/uangmasuk_repo.dart';
+import 'package:groom/db/db.dart';
 import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 import 'package:intl/intl.dart';

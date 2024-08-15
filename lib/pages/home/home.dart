@@ -68,8 +68,6 @@ class _HomeState extends State<Home> {
                 if (state is InputserviceLoaded) {
                   if (state.success != null) {
                     if (state.tipePembayaran == TipePembayaran.qris) {
-                      print('listener');
-                      print(state.success);
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
@@ -94,8 +92,8 @@ class _HomeState extends State<Home> {
                       animationDuration: Durations.long1,
                     ).show(context).then(
                       (value) {
-                        BlocProvider.of<InputserviceBloc>(context)
-                            .add(Initiate());
+                        //     BlocProvider.of<InputserviceBloc>(context)
+                        //        .add(Initiate());
                       },
                     );
                   }
@@ -112,17 +110,19 @@ class _HomeState extends State<Home> {
                           duration: Durations.extralong4,
                           curve:
                               const Interval(0.5, 1.0, curve: Curves.easeInOut),
-                          height: value != ConnectivityResult.none ? 0 : 24,
+                          height:
+                              !value.contains(ConnectivityResult.none) ? 0 : 24,
                           left: 0.0,
                           right: 0.0,
                           child: Container(
-                            color: value != ConnectivityResult.none
+                            color: !value.contains(ConnectivityResult.none)
                                 ? const Color(0xFF00EE44)
                                 : const Color(0xFFEE4400),
                             child: Center(
-                              child: Text(value != ConnectivityResult.none
-                                  ? 'ONLINE'
-                                  : 'OFFLINE MODE'),
+                              child: Text(
+                                  !value.contains(ConnectivityResult.none)
+                                      ? 'ONLINE'
+                                      : 'OFFLINE MODE'),
                             ),
                           ),
                         ),
@@ -131,7 +131,7 @@ class _HomeState extends State<Home> {
                           curve:
                               const Interval(0.5, 1.0, curve: Curves.easeInOut),
                           padding: EdgeInsets.only(
-                              top: value != ConnectivityResult.none
+                              top: !value.contains(ConnectivityResult.none)
                                   ? 0.0
                                   : 26.0),
                           child: child,

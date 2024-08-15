@@ -160,8 +160,8 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
                                   Connectivity()
                                       .checkConnectivity()
                                       .then((connectivityResult) {
-                                    if (connectivityResult !=
-                                        ConnectivityResult.none) {
+                                    if (!connectivityResult
+                                        .contains(ConnectivityResult.none)) {
                                       RepositoryProvider.of<KaryawanRepository>(
                                               context)
                                           .update(snapshot.data![index]

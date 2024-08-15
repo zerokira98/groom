@@ -1,21 +1,19 @@
+import 'dart:io';
+
+import 'package:android_id/android_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:groom/blocs/cubit/theme_cubit.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
-import 'package:groom/db/barang_repo.dart';
-import 'package:groom/db/bon_repo.dart';
-import 'package:groom/db/cust_repo.dart';
-import 'package:groom/db/karyawan_repo.dart';
-import 'package:groom/db/midapi.dart';
-import 'package:groom/db/pemasukan_repo.dart';
-import 'package:groom/db/pengeluaran_repo.dart';
-import 'package:groom/db/uangmasuk_repo.dart';
+import 'package:groom/db/db.dart';
 import 'package:groom/etc/globalvar.dart';
 import 'package:groom/etc/lib/whatsapp.dart';
-import 'package:groom/model/themedatas.dart';
+import 'package:groom/model/model.dart';
 import 'package:groom/pages/adminapp/admin.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
 import 'package:groom/pages/home/home.dart';
@@ -25,26 +23,53 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
+@pragma('vm:entry-point')
+Future<void> _messageHandler(RemoteMessage message) async {
+  print('message:$message');
+  var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  const AndroidNotificationDetails androidNotificationDetails =
+      AndroidNotificationDetails('your channel id', 'your channel name',
+          channelDescription: 'your channel description',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker');
+  const NotificationDetails notificationDetails =
+      NotificationDetails(android: androidNotificationDetails);
+  await flutterLocalNotificationsPlugin.show(
+      0,
+      message.notification?.title ?? 'no-title',
+      message.notification?.body ?? 'no body',
+      notificationDetails,
+      payload: 'item x');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeDateFormatting('id_ID', null);
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('ic_launcher');
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  InitializationSettings initializationSettings = const InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (details) {},
+  );
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseMessaging.onBackgroundMessage(_messageHandler);
 
-  // print(env.map);
   await dotenv.load();
-  // print(env.map);
-  // print(env);
-  // var db = await SembastDB.init();
-  // var db2 = await SembastDB.init2();
   runApp(RootApp());
 }
 
 class RootApp extends StatelessWidget {
   RootApp({super.key});
-  var fInstance = FirebaseFirestore.instance;
-  var wa = WhatsApp()
+  final fInstance = FirebaseFirestore.instance;
+  final wa = WhatsApp()
     ..setup(
       accessToken:
           "EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD",
@@ -132,6 +157,37 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    FirebaseMessaging.instance.getToken().then(
+      (token) async {
+        print("token:$token");
+        if (Platform.isAndroid) {
+          var androidId = await const AndroidId().getId();
+          DeviceRepo(firestore: FirebaseFirestore.instance)
+              .updateToken((androidId ?? 'unknownid'), token!);
+        }
+      },
+    );
+
+    FirebaseMessaging.onMessage.listen(
+      (event) async {
+        print(event.notification?.title ?? 'empty');
+        var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+        const AndroidNotificationDetails androidNotificationDetails =
+            AndroidNotificationDetails('notifid', 'notifchan',
+                channelDescription: 'All notification is here',
+                importance: Importance.max,
+                priority: Priority.high,
+                ticker: 'ticker');
+        const NotificationDetails notificationDetails =
+            NotificationDetails(android: androidNotificationDetails);
+        await flutterLocalNotificationsPlugin.show(
+            0,
+            event.notification?.title ?? 'no-title',
+            event.notification?.body ?? 'no body',
+            notificationDetails,
+            payload: 'item x');
+      },
+    );
     theFuture = _getFirstTime();
     super.initState();
   }

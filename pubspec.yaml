@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.1+2
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  sdk: '>=3.4.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -45,40 +45,43 @@ dependencies:
   intl: ^0.19.0
   weekly_date_picker: ^1.4.2
   currency_text_input_formatter: ^2.1.13
-  another_flushbar: ^1.12.30
-  # excel: ^4.0.2
+  another_flushbar: ^1.12.30 
   flutter_file_dialog: ^3.0.2 
-  ndef: ^0.3.3
-  # flutter_nfc_kit: ^3.4.2
+  ndef: ^0.3.3 
   flutter_typeahead: ^5.1.0
   formz: ^0.7.0
   open_app_file: ^4.0.2
   change_app_package_name: ^1.1.0
-  firebase_auth: ^4.17.4
-  cloud_firestore: ^4.15.5
-  firebase_core: ^2.25.4
+  firebase_core: ^3.3.0
+  firebase_auth: ^5.1.4
+  cloud_firestore: ^5.2.1
+  firebase_messaging: ^15.0.4
   json_annotation: ^4.8.1
-  syncfusion_flutter_xlsio: ^25.1.35
-  syncfusion_flutter_pdf: ^25.1.35
-  syncfusion_flutter_charts: ^25.1.35
+  syncfusion_flutter_xlsio: ^26.2.9
+  syncfusion_flutter_pdf: ^26.2.9
+  syncfusion_flutter_charts: ^26.2.9
   open_filex: ^4.4.0
-  share_plus: ^7.2.2
-  connectivity_plus: ^5.0.2
-  flutter_offline: ^3.0.1
+  share_plus: ^10.0.1
+  connectivity_plus: ^6.0.5
+  flutter_offline: ^4.0.0
   universal_html: ^2.2.4
+  # kotlin ngent
   blue_thermal_printer: ^1.2.3
-  month_picker_dialog: ^2.11.2 
+  month_picker_dialog: ^5.0.0
   url_launcher: ^6.2.6
   http: ^1.2.0 
-  file_picker: ^8.0.3
+  file_picker: ^8.1.1
   flex_color_scheme: ^7.3.1
   google_fonts: ^6.2.1
   flutter_screen_lock: ^9.1.0
   collection: ^1.18.0  
   flutter_dotenv: ^5.1.0
+  flutter_local_notifications: ^17.2.1+2
+  android_id: ^0.4.0
 
-dependency_overrides:
-  intl: ^0.19.0
+dependency_overrides: 
+  syncfusion_flutter_core: ^26.2.9
+  web: ^1.0.0
 
 dev_dependencies:
   # flutter_test:
@@ -89,7 +92,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.1
+  flutter_lints: ^4.0.0
   json_serializable: ^6.7.1
   build_runner: ^2.4.8
 

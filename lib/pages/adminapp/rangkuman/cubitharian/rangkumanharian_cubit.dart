@@ -2,13 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:groom/db/bon_repo.dart';
-import 'package:groom/db/pemasukan_repo.dart';
-import 'package:groom/db/pengeluaran_repo.dart';
-import 'package:groom/model/bondata_mdl.dart';
-import 'package:groom/model/pengeluaran_mdl.dart';
-import 'package:groom/model/perperson.dart';
-import 'package:groom/model/struk_mdl.dart';
+import 'package:groom/db/db.dart';
+import 'package:groom/model/model.dart';
 
 part 'rangkumanharian_state.dart';
 
