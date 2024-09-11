@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/model/model.dart';
 
+import 'package:flutter/foundation.dart';
+
 class KaryawanConfig extends StatefulWidget {
   const KaryawanConfig({super.key});
 
@@ -127,67 +129,71 @@ class _KaryawanConfigState extends State<KaryawanConfig> {
         ),
         body: Column(
           children: [
-            FutureBuilder(
-              future: RepositoryProvider.of<KaryawanRepository>(context)
-                  .getAllKaryawan(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                }
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.data == null) {
-                    return const SizedBox();
-                  } else {
-                    return Expanded(
-                      flex: 4,
-                      child: ListView.builder(
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            selected: selectedIdx == index,
-                            onTap: () {
-                              setState(() {
-                                nama = selectedIdx == index
-                                    ? null
-                                    : snapshot.data![index];
-                                namaController.text = nama?.namaKaryawan ?? '';
-                                selectedIdx =
-                                    selectedIdx == index ? null : index;
-                                passcon.text = nama?.password ?? '';
-                              });
-                            },
-                            trailing: IconButton(
-                                onPressed: () {
-                                  Connectivity()
-                                      .checkConnectivity()
-                                      .then((connectivityResult) {
-                                    if (!connectivityResult
-                                        .contains(ConnectivityResult.none)) {
-                                      RepositoryProvider.of<KaryawanRepository>(
-                                              context)
-                                          .update(snapshot.data![index]
-                                              .copyWith(
-                                                  aktif: !snapshot
-                                                      .data![index].aktif))
-                                          .then((value) =>
-                                              Navigator.pop(context));
-                                    }
-                                  });
-                                },
-                                icon: const Icon(Icons.power_settings_new)),
-                            selectedTileColor: Colors.black38,
-                            title: Text(snapshot.data![index].namaKaryawan),
-                            subtitle: Text(snapshot.data![index].aktif
-                                ? 'aktif'
-                                : 'nonaktif'),
-                          );
-                        },
-                        itemCount: snapshot.data!.length,
-                      ),
-                    );
+            Expanded(
+              child: FutureBuilder(
+                future: RepositoryProvider.of<KaryawanRepository>(context)
+                    .getAllKaryawan(kIsWeb),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
                   }
-                }
-                return const CircularProgressIndicator();
-              },
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.data == null) {
+                      return const SizedBox();
+                    } else {
+                      print(snapshot.data);
+                      return Expanded(
+                        flex: 4,
+                        child: ListView.builder(
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              selected: selectedIdx == index,
+                              onTap: () {
+                                setState(() {
+                                  nama = selectedIdx == index
+                                      ? null
+                                      : snapshot.data![index];
+                                  namaController.text =
+                                      nama?.namaKaryawan ?? '';
+                                  selectedIdx =
+                                      selectedIdx == index ? null : index;
+                                  passcon.text = nama?.password ?? '';
+                                });
+                              },
+                              trailing: IconButton(
+                                  onPressed: () {
+                                    Connectivity()
+                                        .checkConnectivity()
+                                        .then((connectivityResult) {
+                                      if (!connectivityResult
+                                          .contains(ConnectivityResult.none)) {
+                                        RepositoryProvider.of<
+                                                KaryawanRepository>(context)
+                                            .update(snapshot.data![index]
+                                                .copyWith(
+                                                    aktif: !snapshot
+                                                        .data![index].aktif))
+                                            .then((value) =>
+                                                Navigator.pop(context));
+                                      }
+                                    });
+                                  },
+                                  icon: const Icon(Icons.power_settings_new)),
+                              selectedTileColor: Colors.black38,
+                              title: Text(snapshot.data![index].namaKaryawan),
+                              subtitle: Text(snapshot.data![index].aktif
+                                  ? 'aktif'
+                                  : 'nonaktif'),
+                            );
+                          },
+                          itemCount: snapshot.data!.length,
+                        ),
+                      );
+                    }
+                  }
+                  return const CircularProgressIndicator();
+                },
+              ),
             ),
             options()
           ],

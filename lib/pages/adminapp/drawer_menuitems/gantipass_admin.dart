@@ -1,7 +1,8 @@
 part of '../admin.dart';
 
 class GantiPassAdmin extends StatelessWidget {
-  const GantiPassAdmin({super.key});
+  const GantiPassAdmin({super.key, this.onTap});
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {

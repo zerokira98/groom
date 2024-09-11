@@ -4,6 +4,7 @@ import 'package:android_id/android_id.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -46,17 +47,20 @@ Future<void> _messageHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeDateFormatting('id_ID', null);
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('ic_launcher');
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  InitializationSettings initializationSettings = const InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-  await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-    onDidReceiveNotificationResponse: (details) {},
-  );
+  if (!kIsWeb) {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('ic_launcher');
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    InitializationSettings initializationSettings =
+        const InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (details) {},
+    );
+  }
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -157,37 +161,39 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    FirebaseMessaging.instance.getToken().then(
-      (token) async {
-        print("token:$token");
-        if (Platform.isAndroid) {
-          var androidId = await const AndroidId().getId();
-          DeviceRepo(firestore: FirebaseFirestore.instance)
-              .updateToken((androidId ?? 'unknownid'), token!);
-        }
-      },
-    );
-
-    FirebaseMessaging.onMessage.listen(
-      (event) async {
-        print(event.notification?.title ?? 'empty');
-        var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-        const AndroidNotificationDetails androidNotificationDetails =
-            AndroidNotificationDetails('notifid', 'notifchan',
-                channelDescription: 'All notification is here',
-                importance: Importance.max,
-                priority: Priority.high,
-                ticker: 'ticker');
-        const NotificationDetails notificationDetails =
-            NotificationDetails(android: androidNotificationDetails);
-        await flutterLocalNotificationsPlugin.show(
-            0,
-            event.notification?.title ?? 'no-title',
-            event.notification?.body ?? 'no body',
-            notificationDetails,
-            payload: 'item x');
-      },
-    );
+    if (!kIsWeb) {
+      if (Platform.isAndroid) {
+        FirebaseMessaging.instance.getToken().then(
+          (token) async {
+            print("token:$token");
+            var androidId = await const AndroidId().getId();
+            DeviceRepo(firestore: FirebaseFirestore.instance)
+                .updateToken((androidId ?? 'unknownid'), token!);
+          },
+        );
+        FirebaseMessaging.onMessage.listen(
+          (event) async {
+            print(event.notification?.title ?? 'empty');
+            var flutterLocalNotificationsPlugin =
+                FlutterLocalNotificationsPlugin();
+            const AndroidNotificationDetails androidNotificationDetails =
+                AndroidNotificationDetails('notifid', 'notifchan',
+                    channelDescription: 'All notification is here',
+                    importance: Importance.max,
+                    priority: Priority.high,
+                    ticker: 'ticker');
+            const NotificationDetails notificationDetails =
+                NotificationDetails(android: androidNotificationDetails);
+            await flutterLocalNotificationsPlugin.show(
+                0,
+                event.notification?.title ?? 'no-title',
+                event.notification?.body ?? 'no body',
+                notificationDetails,
+                payload: 'item x');
+          },
+        );
+      }
+    }
     theFuture = _getFirstTime();
     super.initState();
   }

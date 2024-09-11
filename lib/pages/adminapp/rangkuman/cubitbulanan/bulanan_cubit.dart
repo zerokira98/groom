@@ -26,6 +26,10 @@ class BulananCubit extends Cubit<BulananState> {
       'tanggalStart': thismonth,
       'tanggalEnd': nextmonth,
     });
+    if (dataPemasukan.isEmpty) {
+      emit(BulananState.empty());
+      return;
+    }
     List<num> incomePerHari = List.generate(
         nextmonth.subtract(Durations.long1).day + 1, (index) => 0);
     List<num> customerPerHari = List.generate(

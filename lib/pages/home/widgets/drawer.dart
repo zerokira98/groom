@@ -214,7 +214,10 @@ class _SideDrawerState extends State<SideDrawer> {
                     Navigator.push(
                         context,
                         CupertinoPageRoute(
-                          builder: (context) => const PengeluaranHome(),
+                          builder: (c) => BlocProvider.value(
+                            value: BlocProvider.of<InputserviceBloc>(context),
+                            child: const PengeluaranHome(),
+                          ),
                         ));
                   } else {
                     // Navigator.pop(context);

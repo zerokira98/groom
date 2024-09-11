@@ -1,11 +1,20 @@
 part of '../admin.dart';
 
 class KaryawanButton extends StatelessWidget {
-  const KaryawanButton({super.key});
+  const KaryawanButton({super.key, this.onTap});
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
+      onPressed: onTap ??
+          () {
+            Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => const KaryawanConfig(),
+                ));
+          },
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -14,13 +23,6 @@ class KaryawanButton extends StatelessWidget {
           Text('Atur Karyawan'),
         ],
       ),
-      onPressed: () {
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => const KaryawanConfig(),
-            ));
-      },
     );
   }
 }

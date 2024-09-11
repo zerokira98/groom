@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/cust_repo.dart';
 import 'package:groom/etc/extension.dart' as x;
 import 'package:groom/model/model.dart';
-import 'package:groom/pages/home/riwayat_pemasukan/print_widget.dart';
+import 'package:groom/pages/home/widgets/blue_print.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart';
@@ -49,14 +49,23 @@ class _TileStrukState extends State<TileStruk> {
                 },
               )),
               onPressed: () {
+                Widget? content = switch (widget.theData.midstatus) {
+                  'pending' => Image.network(
+                      'https://api.sandbox.midtrans.com/v2/qris/${widget.theData.midId}/qr-code'),
+                  'settlement' =>
+                    Container(color: Colors.green, width: 4, height: 4),
+                  'expired' =>
+                    Container(color: Colors.red, width: 4, height: 4),
+                  String() =>
+                    Container(color: Colors.grey, width: 4, height: 4),
+                  null => null,
+                };
                 showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Status : ${widget.theData.midstatus}'),
-                    content: Image.network(
-                        'https://api.sandbox.midtrans.com/v2/qris/${widget.theData.midId}/qr-code'),
-                  ),
-                );
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: Text('Status : ${widget.theData.midstatus}'),
+                          content: content,
+                        ));
               },
               icon: const Icon(Icons.qr_code_2))
           : null,

@@ -34,6 +34,15 @@ final class BulananState extends Equatable {
         pendapatanTertinggi: const {},
         jumlahCustomerTertinggi: const {},
       );
+  static BulananState empty() => BulananState(
+        bulan: DateTime.now(),
+        totalPengeluaran: 0,
+        totalPemasukan: 0,
+        incomePerHari: const [],
+        groupAndSumPengeluaran: const {},
+        pendapatanTertinggi: const {},
+        jumlahCustomerTertinggi: const {},
+      );
 
   @override
   List<Object?> get props => [

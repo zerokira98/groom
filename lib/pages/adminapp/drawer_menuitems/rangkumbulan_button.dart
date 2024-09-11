@@ -1,11 +1,24 @@
 part of '../admin.dart';
 
 class RangkumBulananButton extends StatelessWidget {
-  const RangkumBulananButton({super.key});
+  const RangkumBulananButton({super.key, this.onTap});
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
+      onPressed: onTap ??
+          () {
+            Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: BlocProvider.of<BulananCubit>(context)
+                      ..loadData(DateTime.now()),
+                    child: const RangkumMonth(),
+                  ),
+                ));
+          },
       child: const Row(
         children: [
           Icon(Icons.calendar_view_month),
@@ -13,17 +26,6 @@ class RangkumBulananButton extends StatelessWidget {
           Text('Rangkuman Bulanan'),
         ],
       ),
-      onPressed: () {
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => BlocProvider.value(
-                value: BlocProvider.of<BulananCubit>(context)
-                  ..loadData(DateTime.now()),
-                child: const RangkumMonth(),
-              ),
-            ));
-      },
     );
   }
 }

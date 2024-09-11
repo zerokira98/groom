@@ -8,6 +8,6 @@ double cutPercentage(int type, {num value = 1}) => switch (type) {
       int() => 1.0 * value,
     };
 
-bool debugmode = false;
-bool adminonly = false;
+bool debugmode = true;
+bool adminonly = true;
 String adminpass = '12340';

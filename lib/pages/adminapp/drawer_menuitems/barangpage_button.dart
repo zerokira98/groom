@@ -1,11 +1,20 @@
 part of '../admin.dart';
 
 class BarangPageButton extends StatelessWidget {
-  const BarangPageButton({super.key});
+  const BarangPageButton({super.key, this.onTap});
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
+      onPressed: onTap ??
+          () {
+            Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => const BarangPage(),
+                ));
+          },
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -14,13 +23,6 @@ class BarangPageButton extends StatelessWidget {
           Text('Atur Barang'),
         ],
       ),
-      onPressed: () {
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => const BarangPage(),
-            ));
-      },
     );
   }
 }

@@ -1,11 +1,20 @@
 part of '../admin.dart';
 
 class EkuitasPageButton extends StatelessWidget {
-  const EkuitasPageButton({super.key});
+  const EkuitasPageButton({super.key, this.onTap});
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
+      onPressed: onTap ??
+          () {
+            Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => const EkuitasPage(),
+                ));
+          },
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -14,13 +23,6 @@ class EkuitasPageButton extends StatelessWidget {
           Text('Uang Masuk'),
         ],
       ),
-      onPressed: () {
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => const EkuitasPage(),
-            ));
-      },
     );
   }
 }
