@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/pages/adminapp/equity/uangkeluar.dart';
 import 'package:groom/pages/adminapp/karyawan.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
+import 'package:groom/pages/adminapp/servicemenu/servicemenuedit.dart';
 import 'package:groom/pages/barang/barangpage.dart';
 import 'package:groom/pages/adminapp/bon/bon_page.dart';
 import 'package:groom/pages/adminapp/equity/equitypage.dart';
@@ -24,6 +25,7 @@ part 'drawer_menuitems/uangkeluar_button.dart';
 part 'drawer_menuitems/rangkumanharian_button.dart';
 part 'drawer_menuitems/rangkumbulan_button.dart';
 part 'drawer_menuitems/rangkummingguan_button.dart';
+part 'drawer_menuitems/servicemenuitems_button.dart';
 // part 'drawer_menuitems/';
 // part 'drawer_';
 
@@ -250,7 +252,7 @@ class _AdminPageState extends State<AdminPage> {
                               }
                             : null),
                   ),
-                  // DoNothingButton()
+                  const ServicemenuitemButton()
                 ],
               ),
             ),

@@ -5,7 +5,11 @@ sealed class InputserviceEvent {}
 
 class Initiate extends InputserviceEvent {}
 
-class AddCard extends InputserviceEvent {}
+class AddCard extends InputserviceEvent {
+  final int? type;
+
+  AddCard({this.type});
+}
 
 class RemoveCard extends InputserviceEvent {
   final ItemCardMdl data;

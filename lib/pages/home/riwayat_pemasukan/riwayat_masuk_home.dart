@@ -37,137 +37,142 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
           // 'order': 'reverse'
         }),
         builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            return ListView.builder(
-              // reverse: true,
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                var theData = snapshot.data![index];
-                int total = 0;
-                StringBuffer servicelist =
-                    StringBuffer('${theData.namaKaryawan} : ');
-                for (var e in theData.itemCards) {
-                  servicelist.write(cardType[e.type] + ', ');
-                  total += e.price * (e.pcsBarang);
-                }
-                return Column(
-                  children: [
-                    if (index >= 1 &&
-                            snapshot.data![index].tanggal.day !=
-                                snapshot.data![index - 1].tanggal.day ||
-                        index == 0)
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                margin:
-                                    const EdgeInsets.only(bottom: 8.0, top: 8),
-                                decoration: BoxDecoration(
-                                    gradient: LinearGradient(colors: [
-                                  Theme.of(context).primaryColorDark,
-                                  Theme.of(context).primaryColorDark,
-                                  Theme.of(context)
-                                      .primaryColorDark
-                                      .withOpacity(0.45)
-                                ])),
-                                // color: ,
-                                child: Text(
-                                  theData.tanggal.formatLengkap(),
-                                  style: const TextStyle(color: Colors.white),
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else {
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              return ListView.builder(
+                // reverse: true,
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  var theData = snapshot.data![index];
+                  int total = 0;
+                  StringBuffer servicelist =
+                      StringBuffer('${theData.namaKaryawan} : ');
+                  for (var e in theData.itemCards) {
+                    servicelist.write('${cardType[e.type]}, ');
+                    total += e.price * (e.pcsBarang);
+                  }
+                  return Column(
+                    children: [
+                      if (index >= 1 &&
+                              snapshot.data![index].tanggal.day !=
+                                  snapshot.data![index - 1].tanggal.day ||
+                          index == 0)
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  margin: const EdgeInsets.only(
+                                      bottom: 8.0, top: 8),
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(colors: [
+                                    Theme.of(context).primaryColorDark,
+                                    Theme.of(context).primaryColorDark,
+                                    Theme.of(context)
+                                        .primaryColorDark
+                                        .withOpacity(0.45)
+                                  ])),
+                                  // color: ,
+                                  child: Text(
+                                    theData.tanggal.formatLengkap(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
                                 ),
-                              ),
-                            )
-                          ]),
-                    TileStruk(
-                      theData,
-                      servicelist,
-                      total: total,
-                      deletefun: () async {
-                        var dia = await showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Yakin untuk menghapus?'),
-                              actions: [
-                                ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            WidgetStateProperty.all(
-                                                Colors.green)),
-                                    onPressed: () async {
-                                      var a = await RepositoryProvider.of<
-                                              KaryawanRepository>(context)
-                                          .getAllKaryawan();
-                                      if (context.mounted) {
-                                        var pass = a
-                                            .firstWhere((element) =>
-                                                element.namaKaryawan ==
-                                                theData.namaKaryawan)
-                                            .password;
-                                        showDialog<bool>(
-                                          context: context,
-                                          builder: (context) => KeyLock(
-                                              tendigits: pass ?? '0',
-                                              title: theData.namaKaryawan),
-                                        ).then((value) {
-                                          if (value != null && value) {
-                                            RepositoryProvider.of<
-                                                        PemasukanRepository>(
-                                                    context)
-                                                .deleteStruk(theData);
-                                            Navigator.pop(context, true);
-                                          } else {}
-                                        });
-                                      }
-                                    },
-                                    child: const Text('Hapus')),
-                                ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            WidgetStateProperty.all(
-                                                Colors.red)),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text('Batal')),
-                              ],
-                              content: Row(
-                                children: [
-                                  const Text('Alasan : '),
-                                  Expanded(
-                                      child: DropdownMenu(
-                                    dropdownMenuEntries: const [
-                                      DropdownMenuEntry(
-                                          value: 0, label: 'Salah input data'),
-                                    ],
-                                    initialSelection: 0,
-                                    onSelected: (value) {},
-                                  ))
+                              )
+                            ]),
+                      TileStruk(
+                        theData,
+                        servicelist,
+                        total: total,
+                        deletefun: () async {
+                          var dia = await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Yakin untuk menghapus?'),
+                                actions: [
+                                  ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              WidgetStateProperty.all(
+                                                  Colors.green)),
+                                      onPressed: () async {
+                                        var a = await RepositoryProvider.of<
+                                                KaryawanRepository>(context)
+                                            .getAllKaryawan();
+                                        if (context.mounted) {
+                                          var pass = a
+                                              .firstWhere((element) =>
+                                                  element.namaKaryawan ==
+                                                  theData.namaKaryawan)
+                                              .password;
+                                          showDialog<bool>(
+                                            context: context,
+                                            builder: (context) => KeyLock(
+                                                tendigits: pass ?? '0',
+                                                title: theData.namaKaryawan),
+                                          ).then((value) {
+                                            if (value != null && value) {
+                                              RepositoryProvider.of<
+                                                          PemasukanRepository>(
+                                                      context)
+                                                  .deleteStruk(theData);
+                                              Navigator.pop(context, true);
+                                            } else {}
+                                          });
+                                        }
+                                      },
+                                      child: const Text('Hapus')),
+                                  ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              WidgetStateProperty.all(
+                                                  Colors.red)),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Batal')),
                                 ],
-                              ),
-                            );
-                          },
-                        );
-                        if (dia != null && dia == true) {
-                          setState(() {});
-                        }
-                      },
-                      pdf: generatePDF,
-                    )
-                  ],
-                );
-              },
-            );
-          } else if (snapshot.data == null) {
-            return const Center(
-              child: Text('Empty: null'),
-            );
-          } else if (snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('Empty: no data'),
-            );
+                                content: Row(
+                                  children: [
+                                    const Text('Alasan : '),
+                                    Expanded(
+                                        child: DropdownMenu(
+                                      dropdownMenuEntries: const [
+                                        DropdownMenuEntry(
+                                            value: 0,
+                                            label: 'Salah input data'),
+                                      ],
+                                      initialSelection: 0,
+                                      onSelected: (value) {},
+                                    ))
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                          if (dia != null && dia == true) {
+                            setState(() {});
+                          }
+                        },
+                        pdf: generatePDF,
+                      )
+                    ],
+                  );
+                },
+              );
+            } else if (snapshot.data == null) {
+              return const Center(
+                child: Text('Empty: null'),
+              );
+            } else if (snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text('Empty: no data'),
+              );
+            }
           }
           return const CircularProgressIndicator();
         },
@@ -216,9 +221,7 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
 
       telo.cells[0]
-        ..value = cardType[theData.itemCards[i].type] +
-            " :  " +
-            theData.itemCards[i].namaBarang
+        ..value = "${cardType[theData.itemCards[i].type]} :  ${theData.itemCards[i].namaBarang}"
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
     }
     grid.rows.add().cells[3]

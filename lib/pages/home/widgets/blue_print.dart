@@ -146,6 +146,7 @@ class _PrintWidgetState extends State<PrintWidget> {
     List<DropdownMenuItem<BluetoothDevice>> items = [];
     if (_devices.isEmpty) {
       items.add(const DropdownMenuItem(
+        value: null,
         child: Text('NONE'),
       ));
     } else {
@@ -240,8 +241,10 @@ class _PrintWidgetState extends State<PrintWidget> {
           Expanded(
             child: DropdownButton(
               items: getDeviceItems(),
-              onChanged: (BluetoothDevice? value) =>
-                  setState(() => _device = value),
+              onChanged: (BluetoothDevice? value) {
+                print(_device);
+                setState(() => _device = value);
+              },
               value: _device,
             ),
           ),
@@ -255,22 +258,23 @@ class _PrintWidgetState extends State<PrintWidget> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.brown),
-            onPressed: () {
-              initPlatformState();
-            },
-            child: const Text(
-              'Refresh',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              onPressed: () {
+                initPlatformState();
+              },
+              child: const Icon(
+                Icons.refresh,
+                color: Colors.white,
+              )),
           const SizedBox(
             width: 20,
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 backgroundColor: _connected ? Colors.red : Colors.green),
-            onPressed: () => _connected ? disconnect() : connect(context),
+            onPressed: _device == null
+                ? null
+                : () => (_connected ? disconnect() : connect(context)),
             child: Text(
               _connected ? 'Disconnect' : 'Connect',
               style: const TextStyle(color: Colors.white),
@@ -279,11 +283,25 @@ class _PrintWidgetState extends State<PrintWidget> {
         ],
       ),
       ElevatedButton(
+          style:
+              ElevatedButton.styleFrom(backgroundColor: Colors.green.shade800),
           onPressed: () {
             printThermal(widget.theData);
             // generatePDF(false, theData);
           },
-          child: const Text('Print bluetooth')),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Icon(
+                Icons.print,
+                color: Colors.white,
+              ),
+              Text(
+                'Print Bluetooth',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          )),
     ]);
   }
 }

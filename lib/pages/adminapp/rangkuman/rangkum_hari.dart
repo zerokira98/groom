@@ -143,7 +143,7 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                                         '${theData.namaKaryawan} : ');
                                     for (var e in theData.itemCards) {
                                       servicelist
-                                          .write(cardType[e.type] + ', ');
+                                          .write('${cardType[e.type]}, ');
                                       total += e.price * (e.pcsBarang);
                                     }
                                     return TileStruk(

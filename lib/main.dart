@@ -56,14 +56,10 @@ void main() async {
         const InitializationSettings(
       android: initializationSettingsAndroid,
     );
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (details) {},
-    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onDidReceiveNotificationResponse: (details) {});
   }
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_messageHandler);
 
   await dotenv.load();
@@ -76,7 +72,8 @@ class RootApp extends StatelessWidget {
   final wa = WhatsApp()
     ..setup(
       accessToken:
-          "EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD",
+          '''EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349
+WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD''',
       fromNumberId: 318587001335322,
     );
 
@@ -85,58 +82,50 @@ class RootApp extends StatelessWidget {
     return MultiRepositoryProvider(
         providers: [
           RepositoryProvider(
-            create: (context) {
-              return MidApi(
-                  apiKey: dotenv.env['SERVER_API_KEY'] ?? '',
-                  baseUrl: dotenv.env['SERVER_BASE_URL'] ?? '');
-            },
-            child: Container(),
-          ),
+              create: (context) {
+                return MidApi(
+                    apiKey: dotenv.env['SERVER_API_KEY'] ?? '',
+                    baseUrl: dotenv.env['SERVER_BASE_URL'] ?? '');
+              },
+              child: Container()),
           RepositoryProvider(
-            create: (context) => CustomerRepo(firestore: fInstance),
-          ),
-          RepositoryProvider(
-            create: (context) => wa,
-          ),
+              create: (context) => CustomerRepo(firestore: fInstance)),
+          RepositoryProvider(create: (context) => wa),
           RepositoryProvider(
               create: (context) => PemasukanRepository(db: fInstance)),
           RepositoryProvider(
-              create: (context) => PengeluaranRepository(
-                    firestore: fInstance,
-                  )),
+              create: (context) => PengeluaranRepository(firestore: fInstance)),
           RepositoryProvider(
               create: (context) => KaryawanRepository(firestore: fInstance)),
+          RepositoryProvider(
+              create: (context) => ServiceItemsRepository(fInstance)),
           RepositoryProvider(create: (context) => EkuitasRepository(fInstance)),
           RepositoryProvider(create: (context) => BonRepository(db: fInstance)),
           RepositoryProvider(
               create: (context) => BarangRepository(firestore: fInstance)),
         ],
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider(
+        child: MultiBlocProvider(providers: [
+          BlocProvider(
               create: (context) =>
-                  ThemeCubit(themeDatas: ThemeDatas())..getThemeData(),
-            ),
-            BlocProvider(
-              create: (context) => RangkumanWeekCubit(
-                  RepositoryProvider.of<PemasukanRepository>(context),
-                  RepositoryProvider.of<BonRepository>(context),
-                  RepositoryProvider.of<PengeluaranRepository>(context)),
-            ),
-            BlocProvider(
-              create: (context) => RangkumanDayCubit(
-                  RepositoryProvider.of<PemasukanRepository>(context),
-                  RepositoryProvider.of<PengeluaranRepository>(context),
-                  RepositoryProvider.of<BonRepository>(context)),
-            ),
-            BlocProvider(
-              create: (context) => BulananCubit(
-                  RepositoryProvider.of<PemasukanRepository>(context),
-                  RepositoryProvider.of<PengeluaranRepository>(context)),
-            )
-          ],
-          child: const MyApp(),
-        ));
+                  ThemeCubit(themeDatas: ThemeDatas())..getThemeData()),
+          BlocProvider(
+            create: (context) => RangkumanWeekCubit(
+                RepositoryProvider.of<PemasukanRepository>(context),
+                RepositoryProvider.of<BonRepository>(context),
+                RepositoryProvider.of<PengeluaranRepository>(context)),
+          ),
+          BlocProvider(
+            create: (context) => RangkumanDayCubit(
+                RepositoryProvider.of<PemasukanRepository>(context),
+                RepositoryProvider.of<PengeluaranRepository>(context),
+                RepositoryProvider.of<BonRepository>(context)),
+          ),
+          BlocProvider(
+            create: (context) => BulananCubit(
+                RepositoryProvider.of<PemasukanRepository>(context),
+                RepositoryProvider.of<PengeluaranRepository>(context)),
+          )
+        ], child: const MyApp()));
   }
 }
 

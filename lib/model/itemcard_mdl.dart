@@ -48,9 +48,9 @@ class ItemCardMdl extends Equatable with FormzMixin {
   List<FormzInput> get inputs => [];
 }
 
-List cardType = [
-  'Haircut(rambut)',
-  'Shave(kumis,jenggot)',
+List<String> cardType = [
+  'Haircut (rambut)',
+  'Shave (kumis,jenggot)',
   'Semir',
   'Barang',
   'Lainnya'

@@ -121,17 +121,47 @@ class _TileStrukState extends State<TileStruk> {
                                 .numberFormat(currency: true))
                           ],
                         ),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                                child: Text(
+                              '~~ Print ~~',
+                              textAlign: TextAlign.center,
+                              textScaler: TextScaler.linear(1.25),
+                            ))
+                          ],
+                        ),
+                      ),
                       PrintWidget(
                         theData: widget.theData,
                       ),
-                      // if (pdf != null)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8.0, bottom: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                                child: Text(
+                              '~~ Share ~~',
+                              textAlign: TextAlign.center,
+                              textScaler: TextScaler.linear(1.25),
+                            ))
+                          ],
+                        ),
+                      ),
                       Row(
                         children: [
                           Expanded(
                               child: TextFormField(
+                            decoration: InputDecoration(
+                                hintText: 'No. WA',
+                                border: UnderlineInputBorder(
+                                    borderRadius: BorderRadius.circular(2),
+                                    borderSide: const BorderSide(color: Colors.red))),
                             controller: nomorhp,
-                            decoration: const InputDecoration(
-                                labelText: 'No. WhatsApp'),
                             keyboardType: TextInputType.phone,
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
@@ -152,6 +182,7 @@ class _TileStrukState extends State<TileStruk> {
                               setstate(() {});
                             },
                           )),
+                          const Padding(padding: EdgeInsets.all(2)),
                           ElevatedButton(
                               key: Key(nomorhp.text),
                               onPressed: (nomorhp.text.isEmpty)
@@ -282,9 +313,7 @@ class _TileStrukState extends State<TileStruk> {
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
 
       telo.cells[0]
-        ..value = cardType[theData.itemCards[i].type] +
-            " :  " +
-            theData.itemCards[i].namaBarang
+        ..value = "${cardType[theData.itemCards[i].type]} :  ${theData.itemCards[i].namaBarang}"
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
     }
     var lastrow = grid.rows.add();

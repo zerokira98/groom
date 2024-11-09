@@ -7,3 +7,4 @@ export './pemasukan_repo.dart';
 export './pengeluaran_repo.dart';
 export './uangmasuk_repo.dart';
 export './device_repo.dart';
+export './serviceitems_repo.dart';

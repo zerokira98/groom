@@ -6,17 +6,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:groom/blocs/cubit/theme_cubit.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
-import 'package:groom/db/karyawan_repo.dart';
-import 'package:groom/etc/lockscreen_keylock.dart';
+import 'package:groom/db/db.dart';
+import 'package:groom/pages/adminapp/servicemenu/servicemenuedit.dart';
+import 'package:groom/pages/home/widgets/bottombar.dart';
 import 'package:groom/pages/home/widgets/drawer.dart';
-import 'package:groom/etc/extension.dart';
 import 'package:groom/pages/home/widgets/home_appbar.dart';
 
-import 'package:groom/pages/home/widgets/itemcard.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/home/riwayat_pemasukan/riwayat_masuk_home.dart';
+import 'package:groom/pages/home/widgets/itemcard_box.dart';
+import 'package:groom/pages/home/widgets/listtile.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -39,11 +39,11 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawerEdgeDragWidth: 48,
       drawer: const SideDrawer(),
-      floatingActionButton: BlocBuilder<InputserviceBloc, InputserviceState>(
-        builder: (context, state) {
-          return FloatingButton(formstate: formKey);
-        },
-      ),
+      // floatingActionButton: BlocBuilder<InputserviceBloc, InputserviceState>(
+      //   builder: (context, state) {
+      //     return FloatingButton(formstate: formKey);
+      //   },
+      // ),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -154,109 +154,81 @@ class _HomeState extends State<Home> {
                           return Future.delayed(
                               Durations.extralong4, () => true);
                         },
-                        child: SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: Column(
-                            children: [
-                              HomeAppbar(),
-                              const Padding(padding: EdgeInsets.all(6)),
-                              BlocBuilder<InputserviceBloc, InputserviceState>(
+                        child: Column(
+                          children: [
+                            HomeAppbar(),
+                            const Padding(padding: EdgeInsets.all(6)),
+                            Expanded(
+                              child: BlocBuilder<InputserviceBloc,
+                                  InputserviceState>(
                                 builder: (context, state) {
                                   if (state is InputserviceLoaded) {
-                                    return Form(
-                                      key: formKey,
-                                      child: Column(
-                                        children: [
-                                          for (var a = 0;
-                                              a < state.itemCards.length;
-                                              a++)
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Stack(children: [
-                                                ItemCard(
-                                                    data: state.itemCards[a]),
-                                                Positioned(
-                                                    child: Card(
-                                                        elevation: 2,
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(2.0),
-                                                          child:
-                                                              Text('${a + 1}'),
-                                                        ))),
-                                              ]),
-                                            ),
-                                        ],
-                                      ),
-                                    );
+                                    if (state.itemCards.isNotEmpty) {
+                                      return ListView.builder(
+                                        itemCount: state.itemCards.length,
+                                        itemBuilder: (context, a) {
+                                          return MyListTile(state.itemCards[a]);
+                                        },
+                                      );
+                                    } else {
+                                      return const Text('Empty');
+                                    }
                                   } else {
-                                    return Container();
+                                    return const Text('Hi');
                                   }
                                 },
                               ),
-                              // ItemCard(),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8, horizontal: 16.0),
-                                      child: ElevatedButton(
-                                          onPressed: () {
-                                            FocusManager.instance.primaryFocus
-                                                ?.unfocus();
-                                            BlocProvider.of<InputserviceBloc>(
-                                                    context)
-                                                .add(AddCard());
-                                          },
-                                          child: const Text('+')),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const Padding(padding: EdgeInsets.all(12)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(4)),
-                          color:
-                              Theme.of(context).primaryColor.withOpacity(0.3),
-                        ),
-                        child: Row(
-                          children: [
-                            BlocBuilder<InputserviceBloc, InputserviceState>(
-                              builder: (context, state) {
-                                if (state is InputserviceLoaded) {
-                                  var total = 0;
-                                  for (var element in state.itemCards) {
-                                    total +=
-                                        element.price * (element.pcsBarang);
+                            ),
+                            const BottombarHome(),
+                            FutureBuilder(
+                                future: RepositoryProvider.of<
+                                        ServiceItemsRepository>(context)
+                                    .getItems(),
+                                builder: (context, snapshot) {
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.done:
+                                      if (snapshot.hasData &&
+                                          (snapshot.data as List).isNotEmpty) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 16.0),
+                                          child: Wrap(
+                                            alignment: WrapAlignment.start,
+                                            spacing: 4,
+                                            runSpacing: 4,
+                                            children: [
+                                              for (var a = 0;
+                                                  a < cardType.length;
+                                                  a++)
+                                                ItemCardBox(cardType[a]),
+                                            ],
+                                          ),
+                                        );
+                                      } else {
+                                        return ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const ServicemenueditPage()));
+                                            },
+                                            child: const Text(
+                                                'Empty menu items, click here to add'));
+                                      }
+                                    case ConnectionState.waiting:
+                                      return const CircularProgressIndicator();
+                                    default:
+                                      return Container();
                                   }
-                                  return Text(
-                                    'Total : ${total.toString().numberFormat(currency: true)}',
-                                    textScaler: const TextScaler.linear(1.5),
-                                  );
-                                } else {
-                                  return const SizedBox();
-                                }
-                              },
-                            )
+                                }),
+                            const Padding(padding: EdgeInsets.all(12)),
                           ],
                         ),
                       ),
                     ),
+                    // Positioned(
+                    //     bottom: 0, left: 0, right: 0, child: BottombarHome()),
                   ],
                 ),
               ),
@@ -265,243 +237,5 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
-  }
-}
-
-class FloatingButton extends StatelessWidget {
-  FloatingButton({super.key, required this.formstate});
-  final GlobalKey<FormState> formstate;
-  final TextEditingController uangCustomer = TextEditingController();
-  ontap(BuildContext builcontx) {
-    showCupertinoDialog(
-        barrierDismissible: true,
-        context: builcontx,
-        builder: (_) => BlocProvider.value(
-              value: builcontx.read<InputserviceBloc>(),
-              child: BlocBuilder<InputserviceBloc, InputserviceState>(
-                builder: (context, state) {
-                  if (state is InputserviceLoaded) {
-                    num totalpembayaran = 0;
-                    for (var e in state.itemCards) {
-                      totalpembayaran += e.pcsBarang * e.price;
-                    }
-                    uangCustomer.text = totalpembayaran.toString();
-                    return SafeArea(
-                      child: AlertDialog(
-                        actions: [
-                          ElevatedButton(
-                              onPressed: () {
-                                var karname =
-                                    (BlocProvider.of<InputserviceBloc>(context)
-                                            .state as InputserviceLoaded)
-                                        .karyawanName;
-                                RepositoryProvider.of<KaryawanRepository>(
-                                        context)
-                                    .getAllKaryawan()
-                                    .then((value) => value
-                                        .firstWhere((element) =>
-                                            element.namaKaryawan == karname)
-                                        .password)
-                                    .then((pass) {
-                                  if (pass != null) {
-                                    showDialog<bool>(
-                                      context: context,
-                                      builder: (context) => KeyLock(
-                                        tendigits: pass,
-                                        title: karname,
-                                      ),
-                                    ).then((correct) {
-                                      if (correct != null && correct) {
-                                        Navigator.pop(context);
-                                        BlocProvider.of<InputserviceBloc>(
-                                                context)
-                                            .add(SubmitToDB());
-                                      } else {}
-                                    });
-                                  } else {
-                                    Flushbar(
-                                      message: 'Set user pass',
-                                      duration: const Duration(seconds: 2),
-                                      animationDuration: Durations.long1,
-                                    ).show(context);
-                                  }
-                                });
-                              },
-                              child: const Text('Submit')),
-                          ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Batal'))
-                        ],
-                        title: Text(state.karyawanName),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    Table(
-                                      columnWidths: const {
-                                        1: IntrinsicColumnWidth()
-                                      },
-                                      border: TableBorder.all(
-                                          color: BlocProvider.of<ThemeCubit>(
-                                                          context)
-                                                      .state
-                                                      .mode ==
-                                                  ThemeMode.dark
-                                              ? Colors.white
-                                              : Colors.black),
-                                      children: [
-                                        for (var awo in state.itemCards)
-                                          TableRow(children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: Column(
-                                                children: [
-                                                  Text(cardType[awo.type]),
-                                                  if (awo.type == 3)
-                                                    Text(
-                                                        ' (${awo.namaBarang} (${awo.pcsBarang}x))'),
-                                                  if (awo.type == 4)
-                                                    Text(' (${awo.namaBarang})')
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.all(4),
-                                              child: Text(
-                                                (awo.price * awo.pcsBarang)
-                                                        .toString()
-                                                        .numberFormat(
-                                                            currency: true) ??
-                                                    'err parse',
-                                                textAlign: TextAlign.end,
-                                              ),
-                                            ),
-                                          ]),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const Padding(padding: EdgeInsets.all(4)),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Total :',
-                                  textScaler: TextScaler.linear(1.25),
-                                ),
-                                Text(
-                                  totalpembayaran.numberFormat(currency: true),
-                                  textScaler: const TextScaler.linear(1.25),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    DropdownButton(
-                                      value: state.tipePembayaran,
-                                      items: const [
-                                        DropdownMenuItem(
-                                            value: TipePembayaran.cash,
-                                            child: Text('Cash')),
-                                        DropdownMenuItem(
-                                            value: TipePembayaran.qris,
-                                            child: Text('Qris'))
-                                      ],
-                                      onChanged: (value) {
-                                        BlocProvider.of<InputserviceBloc>(
-                                                context)
-                                            .add(ChangeTipePembayaran(
-                                                type: value ??
-                                                    TipePembayaran.cash));
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                if (state.tipePembayaran.index == 1)
-                                  StatefulBuilder(builder: (context, setstate) {
-                                    var uangcust =
-                                        (int.tryParse(uangCustomer.text) ?? 0);
-                                    var kurangan = totalpembayaran - uangcust;
-                                    var theteks = '0';
-                                    if (uangcust == 0) {
-                                      theteks = '0';
-                                    } else if (kurangan > 0) {
-                                      theteks = 'uang kurang';
-                                    } else if (kurangan < 0) {
-                                      theteks = (kurangan * -1).toString();
-                                    }
-                                    return Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: TextFormField(
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                controller: uangCustomer,
-                                                onTap: () =>
-                                                    uangCustomer.selection =
-                                                        TextSelection(
-                                                            baseOffset: 0,
-                                                            extentOffset:
-                                                                uangCustomer
-                                                                    .value
-                                                                    .text
-                                                                    .length),
-                                                onChanged: (value) {
-                                                  setstate(() {});
-                                                },
-                                                decoration:
-                                                    const InputDecoration(
-                                                        label: Text('Uang')),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        Text('Kembalian : Rp$theteks')
-                                      ],
-                                    );
-                                  }),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  } else {
-                    return const SizedBox();
-                  }
-                },
-              ),
-            ));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-        child: const Icon(Icons.upload),
-        onPressed: () {
-          var clickstate = BlocProvider.of<InputserviceBloc>(context).state
-              as InputserviceLoaded;
-          if (clickstate.itemCards.isNotEmpty) {
-            if ((formstate.currentState?.validate() ?? false) == false) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Ada kesalahan pengisian data.')));
-              return;
-            }
-            ontap(context);
-          }
-        });
   }
 }

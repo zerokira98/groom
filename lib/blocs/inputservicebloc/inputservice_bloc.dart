@@ -147,7 +147,8 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
         var theState = (state as InputserviceLoaded);
         var idx =
             theState.itemCards.isEmpty ? 0 : theState.itemCards.last.index + 1;
-        var newCard = ItemCardMdl(type: 0, index: idx, price: 20000);
+        var newCard =
+            ItemCardMdl(type: event.type ?? 0, index: idx, price: 20000);
         emit((state as InputserviceLoaded)
             .copyWith(itemCards: theState.itemCards + [newCard]));
       }
