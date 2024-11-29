@@ -10,7 +10,7 @@ class ServiceItemsRepository {
                   ServiceitemsMdl.fromJson(snapshot.data()!),
               toFirestore: (value, options) => value.toJson(),
             );
-  Future<List> getItems() async {
+  Future<List<ServiceitemsMdl>> getItems() async {
     var fetch = await ref
         .get()
         .then((value) => value.docs.map((e) => e.data()).toList());
