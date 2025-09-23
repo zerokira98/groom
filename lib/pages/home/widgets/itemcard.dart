@@ -8,7 +8,7 @@ import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 
 class ItemCard extends StatelessWidget {
-  final ItemCardMdl data;
+  final ServiceitemsMdl data;
   const ItemCard({super.key, required this.data});
 
   @override
@@ -21,34 +21,37 @@ class ItemCard extends StatelessWidget {
             Row(
               children: [
                 const Text('Service : '),
-                DropdownMenu(
-                  dropdownMenuEntries: [
-                    for (int i = 0; i < cardType.length; i++)
-                      DropdownMenuEntry(label: cardType[i], value: i)
-                  ],
-                  initialSelection: data.type,
-                  onSelected: (value) {
-                    BlocProvider.of<InputserviceBloc>(context)
-                        .add(ChangeItemType(idx: data.index, type: value!));
-                  },
-                ),
+                // DropdownMenu(
+                //   dropdownMenuEntries: [
+                //     for (int i = 0; i < cardType.length; i++)
+                //       DropdownMenuEntry(label: cardType[i], value: i),
+                //   ],
+                //   initialSelection: data.id,
+                //   onSelected: (value) {
+                //     BlocProvider.of<InputserviceBloc>(
+                //       context,
+                //     ).add(ChangeItemType(idx: data.index, type: value!));
+                //   },
+                // ),
                 const Expanded(child: SizedBox()),
                 IconButton(
-                    onPressed: () {
-                      BlocProvider.of<InputserviceBloc>(context)
-                          .add(RemoveCard(data));
-                    },
-                    icon: const Icon(Icons.delete_rounded))
+                  onPressed: () {
+                    BlocProvider.of<InputserviceBloc>(
+                      context,
+                    ).add(RemoveCard(data));
+                  },
+                  icon: const Icon(Icons.delete_rounded),
+                ),
               ],
             ),
-            switch (data.type) {
-              0 => ItemCardHaircut(data),
-              1 => ItemCardShave(data),
-              2 => ItemCardColoring(data),
-              3 => ItemCardGoods(data),
-              4 => ItemCardOthers(data),
-              int() => const Text('error switch')
-            }
+            // switch (data.id) {
+            //   0 => ItemCardHaircut(data),
+            //   1 => ItemCardShave(data),
+            //   2 => ItemCardColoring(data),
+            //   3 => ItemCardGoods(data),
+            //   4 => ItemCardOthers(data),
+            //   int() => const Text('error switch'),
+            // },
           ],
         ),
       ),
@@ -57,7 +60,7 @@ class ItemCard extends StatelessWidget {
 }
 
 class ItemCardHaircut extends StatefulWidget {
-  final ItemCardMdl data;
+  final ServiceitemsMdl data;
   const ItemCardHaircut(this.data, {super.key});
 
   @override
@@ -86,8 +89,9 @@ class _ItemCardHaircutState extends State<ItemCardHaircut> {
               onChanged: (value) {
                 setState(() {
                   keramas = value!;
-                  BlocProvider.of<InputserviceBloc>(context)
-                      .add(ChangePrice(idx: widget.data.index, price: total()));
+                  BlocProvider.of<InputserviceBloc>(
+                    context,
+                  ).add(ChangePrice(idx: widget.data.index, price: total()));
                 });
               },
             ),
@@ -98,8 +102,10 @@ class _ItemCardHaircutState extends State<ItemCardHaircut> {
             const Text('Biaya : '),
 
             ///make it textfield
-            Text((keramas ? basicHaircut + keramasPrice : basicHaircut)
-                .numberFormat(currency: true))
+            Text(
+              (keramas ? basicHaircut + keramasPrice : basicHaircut)
+                  .numberFormat(currency: true),
+            ),
           ],
         ),
       ],
@@ -108,7 +114,7 @@ class _ItemCardHaircutState extends State<ItemCardHaircut> {
 }
 
 class ItemCardShave extends StatefulWidget {
-  final ItemCardMdl data;
+  final ServiceitemsMdl data;
   const ItemCardShave(this.data, {super.key});
 
   @override
@@ -138,19 +144,15 @@ class _ItemCardShaveState extends State<ItemCardShave> {
               onChanged: (value) {
                 setState(() {
                   extra = value!;
-                  BlocProvider.of<InputserviceBloc>(context)
-                      .add(ChangePrice(idx: widget.data.index, price: total()));
+                  BlocProvider.of<InputserviceBloc>(
+                    context,
+                  ).add(ChangePrice(idx: widget.data.index, price: total()));
                 });
               },
             ),
           ],
         ),
-        Row(
-          children: [
-            const Text('Biaya : '),
-            Text('${total()}'),
-          ],
-        )
+        Row(children: [const Text('Biaya : '), Text('${total()}')]),
       ],
     );
   }
@@ -158,7 +160,7 @@ class _ItemCardShaveState extends State<ItemCardShave> {
 
 class ItemCardColoring extends StatelessWidget {
   const ItemCardColoring(this.data, {super.key});
-  final ItemCardMdl data;
+  final ServiceitemsMdl data;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -178,12 +180,13 @@ class ItemCardColoring extends StatelessWidget {
                 },
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
-                  FilteringTextInputFormatter.deny(RegExp('^0+'))
+                  FilteringTextInputFormatter.deny(RegExp('^0+')),
                 ],
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
-                  BlocProvider.of<InputserviceBloc>(context).add(
-                      ChangePrice(idx: data.index, price: int.parse(value)));
+                  BlocProvider.of<InputserviceBloc>(
+                    context,
+                  ).add(ChangePrice(idx: data.index, price: int.parse(value)));
                 },
               ),
             ),
@@ -197,7 +200,7 @@ class ItemCardColoring extends StatelessWidget {
 
 class ItemCardGoods extends StatefulWidget {
   const ItemCardGoods(this.data, {super.key});
-  final ItemCardMdl data;
+  final ServiceitemsMdl data;
 
   @override
   State<ItemCardGoods> createState() => _ItemCardGoodsState();
@@ -222,45 +225,56 @@ class _ItemCardGoodsState extends State<ItemCardGoods> {
             // Text('Nama Barang : '),
             Expanded(
               child: Autocomplete(
-                fieldViewBuilder: (context, textEditingController, focusNode,
-                        onFieldSubmitted) =>
-                    TextFormField(
-                  controller: textEditingController,
-                  validator: (value) {
-                    if (value == null) return null;
-                    if (value.isEmpty) {
-                      return 'tidak boleh kosong';
-                    } else {
-                      return null;
-                    }
-                  },
-                  onFieldSubmitted: (value) {
-                    onFieldSubmitted();
-                  },
-                  focusNode: focusNode,
-                  onChanged: (value) {
-                    BlocProvider.of<InputserviceBloc>(context).add(
-                        ChangeItemDetails(
+                fieldViewBuilder:
+                    (
+                      context,
+                      textEditingController,
+                      focusNode,
+                      onFieldSubmitted,
+                    ) => TextFormField(
+                      controller: textEditingController,
+                      validator: (value) {
+                        if (value == null) return null;
+                        if (value.isEmpty) {
+                          return 'tidak boleh kosong';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onFieldSubmitted: (value) {
+                        onFieldSubmitted();
+                      },
+                      focusNode: focusNode,
+                      onChanged: (value) {
+                        BlocProvider.of<InputserviceBloc>(context).add(
+                          ChangeItemDetails(
                             idx: widget.data.index,
-                            data: widget.data.copyWith(namaBarang: value)));
-                  },
-                  decoration: const InputDecoration(label: Text('Nama Barang')),
-                ),
+                            data: widget.data.copyWith(title: value),
+                          ),
+                        );
+                      },
+                      decoration: const InputDecoration(
+                        label: Text('Nama Barang'),
+                      ),
+                    ),
                 onSelected: (option) async {
-                  await RepositoryProvider.of<BarangRepository>(context)
-                      .find(option)
-                      .then((value) {
+                  await RepositoryProvider.of<BarangRepository>(
+                    context,
+                  ).find(option).then((value) {
                     if (value.isNotEmpty) {
                       debugPrint(value.first.toString());
                       setState(() {
                         priceController.text = value.first.hargajual.toString();
                       });
                       BlocProvider.of<InputserviceBloc>(context).add(
-                          ChangeItemDetails(
-                              idx: widget.data.index,
-                              data: widget.data.copyWith(
-                                  namaBarang: value.first.namaBarang,
-                                  price: value.first.hargajual.toInt())));
+                        ChangeItemDetails(
+                          idx: widget.data.index,
+                          data: widget.data.copyWith(
+                            title: value.first.namaBarang,
+                            price: value.first.hargajual.toInt(),
+                          ),
+                        ),
+                      );
                     }
                   });
                 },
@@ -269,16 +283,22 @@ class _ItemCardGoodsState extends State<ItemCardGoods> {
                     return const Iterable<String>.empty();
                   }
                   var aa =
-                      await RepositoryProvider.of<BarangRepository>(context)
-                          .getAll()
-                          .then((value) => value
-                              .map((e) => RegExp(textEditingValue.text,
-                                          caseSensitive: false)
-                                      .hasMatch(e.namaBarang)
+                      await RepositoryProvider.of<BarangRepository>(
+                        context,
+                      ).getAll().then(
+                        (value) => value
+                            .map(
+                              (e) =>
+                                  RegExp(
+                                    textEditingValue.text,
+                                    caseSensitive: false,
+                                  ).hasMatch(e.namaBarang)
                                   ? e.namaBarang
-                                  : null)
-                              .nonNulls
-                              .toList());
+                                  : null,
+                            )
+                            .nonNulls
+                            .toList(),
+                      );
 
                   // await RepositoryProvider.of<PengeluaranRepository>(
                   //         context)
@@ -299,17 +319,20 @@ class _ItemCardGoodsState extends State<ItemCardGoods> {
                 menuMaxHeight: 480,
                 isDense: true,
                 items: List.generate(
-                    99,
-                    (index) => DropdownMenuItem(
-                          value: index + 1,
-                          child: Text('${index + 1}'),
-                        )),
-                value: widget.data.pcsBarang,
+                  99,
+                  (index) => DropdownMenuItem(
+                    value: index + 1,
+                    child: Text('${index + 1}'),
+                  ),
+                ),
+                value: widget.data.pcs,
                 onChanged: (value) {
                   BlocProvider.of<InputserviceBloc>(context).add(
-                      ChangeItemDetails(
-                          idx: widget.data.index,
-                          data: widget.data.copyWith(pcsBarang: value ?? 1)));
+                    ChangeItemDetails(
+                      idx: widget.data.index,
+                      data: widget.data.copyWith(pcs: () => value ?? 1),
+                    ),
+                  );
                 },
               ),
             ),
@@ -320,46 +343,50 @@ class _ItemCardGoodsState extends State<ItemCardGoods> {
                 children: [
                   const Text('Harga per pcs : '),
                   Expanded(
-                      child: TextFormField(
-                    controller: priceController,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (value) {
-                      if ((int.tryParse(value ?? '') ?? 0) < 1000) {
-                        return 'kurang dari 1000';
-                      }
-                      return null;
-                    },
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      FilteringTextInputFormatter.deny(RegExp('^0+'))
-                    ],
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      BlocProvider.of<InputserviceBloc>(context).add(
+                    child: TextFormField(
+                      controller: priceController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if ((int.tryParse(value ?? '') ?? 0) < 1000) {
+                          return 'kurang dari 1000';
+                        }
+                        return null;
+                      },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        FilteringTextInputFormatter.deny(RegExp('^0+')),
+                      ],
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        BlocProvider.of<InputserviceBloc>(context).add(
                           ChangeItemDetails(
-                              idx: widget.data.index,
-                              data: widget.data
-                                  .copyWith(price: int.tryParse(value) ?? 0)));
-                    },
-                  )),
+                            idx: widget.data.index,
+                            data: widget.data.copyWith(
+                              price: int.tryParse(value) ?? 0,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
         Row(
           children: [
             const Text('Total Harga : '),
-            Text('${widget.data.price * (widget.data.pcsBarang)}'),
+            Text('${widget.data.price * (widget.data.pcs)}'),
           ],
-        )
+        ),
       ],
     );
   }
 }
 
 class ItemCardOthers extends StatelessWidget {
-  final ItemCardMdl data;
+  final ServiceitemsMdl data;
   const ItemCardOthers(this.data, {super.key});
   @override
   Widget build(BuildContext context) {
@@ -368,57 +395,70 @@ class ItemCardOthers extends StatelessWidget {
         Row(
           children: [
             Expanded(
-                child: Autocomplete(
-              optionsBuilder: (textEditingValue) async {
-                if (textEditingValue.text == '') {
-                  return const Iterable<String>.empty();
-                }
-                return await RepositoryProvider.of<PemasukanRepository>(context)
-                    .getAllLainnya(textEditingValue.text);
-              },
-              fieldViewBuilder: (context, textEditingController, focusNode,
-                      onFieldSubmitted) =>
-                  TextField(
-                focusNode: focusNode,
-                onSubmitted: (value) => onFieldSubmitted,
-                controller: textEditingController,
-                onChanged: (value) {
-                  BlocProvider.of<InputserviceBloc>(context).add(
-                      ChangeItemDetails(
-                          idx: data.index,
-                          data: data.copyWith(namaBarang: value)));
+              child: Autocomplete(
+                optionsBuilder: (textEditingValue) async {
+                  if (textEditingValue.text == '') {
+                    return const Iterable<String>.empty();
+                  }
+                  return await RepositoryProvider.of<PemasukanRepository>(
+                    context,
+                  ).getAllLainnya(textEditingValue.text);
                 },
-                decoration: const InputDecoration(label: Text('Nama service')),
+                fieldViewBuilder:
+                    (
+                      context,
+                      textEditingController,
+                      focusNode,
+                      onFieldSubmitted,
+                    ) => TextField(
+                      focusNode: focusNode,
+                      onSubmitted: (value) => onFieldSubmitted,
+                      controller: textEditingController,
+                      onChanged: (value) {
+                        BlocProvider.of<InputserviceBloc>(context).add(
+                          ChangeItemDetails(
+                            idx: data.index,
+                            data: data.copyWith(title: value),
+                          ),
+                        );
+                      },
+                      decoration: const InputDecoration(
+                        label: Text('Nama service'),
+                      ),
+                    ),
               ),
-            )),
+            ),
           ],
         ),
         Row(
           children: [
             Expanded(
-                child: TextFormField(
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                FilteringTextInputFormatter.deny(RegExp('^0+'))
-              ],
-              validator: (value) {
-                if (value == null) {
-                  return 'null';
-                } else if (int.tryParse(value) == null) {
-                  return 'not a number';
-                }
-                return null;
-              },
-              onChanged: (value) {
-                if (int.tryParse(value) != null) {
-                  BlocProvider.of<InputserviceBloc>(context).add(
+              child: TextFormField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  FilteringTextInputFormatter.deny(RegExp('^0+')),
+                ],
+                validator: (value) {
+                  if (value == null) {
+                    return 'null';
+                  } else if (int.tryParse(value) == null) {
+                    return 'not a number';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  if (int.tryParse(value) != null) {
+                    BlocProvider.of<InputserviceBloc>(context).add(
                       ChangeItemDetails(
-                          idx: data.index,
-                          data: data.copyWith(price: int.tryParse(value))));
-                }
-              },
-              decoration: const InputDecoration(label: Text('Biaya')),
-            )),
+                        idx: data.index,
+                        data: data.copyWith(price: int.tryParse(value)),
+                      ),
+                    );
+                  }
+                },
+                decoration: const InputDecoration(label: Text('Biaya')),
+              ),
+            ),
           ],
         ),
       ],

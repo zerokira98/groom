@@ -1,8 +1,8 @@
 // part of 'db_service.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:groom/model/barang_mdl.dart';
-import 'package:groom/model/itemcard_mdl.dart';
+
+import '../model/model.dart';
 
 class BarangRepository {
   // final StoreRef<int, Map<String, Object?>> _storeRef =
@@ -10,11 +10,12 @@ class BarangRepository {
   late CollectionReference<BarangMdl> ref;
   FirebaseFirestore firestore;
   BarangRepository({required this.firestore}) {
-    ref = firestore.collection('barang').withConverter(
-          fromFirestore: (snapshot, options) =>
-              BarangMdl.fromJson(snapshot.data()!).copyWith(
-            id: () => snapshot.id,
-          ),
+    ref = firestore
+        .collection('barang')
+        .withConverter(
+          fromFirestore: (snapshot, options) => BarangMdl.fromJson(
+            snapshot.data()!,
+          ).copyWith(id: () => snapshot.id),
           toFirestore: (value, options) => value.toJson(),
         );
   }
@@ -65,7 +66,7 @@ class BarangRepository {
     //         .toList());
   }
 
-  Future decrease(ItemCardMdl e) async {
+  Future decrease(ServiceitemsMdl e) async {
     // ref.where(''namaBarrang', isEqualTo: namaBarang')
   }
 }

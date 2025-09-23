@@ -6,21 +6,42 @@ part 'serviceitems_mdl.g.dart';
 
 @JsonSerializable()
 class ServiceitemsMdl extends Equatable {
+  final int index;
   final String title;
-  final int type;
+  final double cutPercentage;
+  final String? id;
   final int price;
+  final int pcs;
   final String? img;
-  const ServiceitemsMdl(
-      {required this.title, required this.type, required this.price, this.img});
+
+  const ServiceitemsMdl({
+    this.pcs = 1,
+    this.index = 0,
+    required this.title,
+    this.id,
+    required this.price,
+    this.img,
+    required this.cutPercentage,
+  });
 
   @override
-  List<Object?> get props => [title, type, price, img];
+  List<Object?> get props => [title, id, price, img, cutPercentage, pcs, index];
 
-  ServiceitemsMdl copyWith(
-      {String? title, int? type, int? price, ValueGetter<String?>? img}) {
+  ServiceitemsMdl copyWith({
+    String? title,
+    ValueGetter<String?>? id,
+    ValueGetter<int>? pcs,
+    ValueGetter<int>? index,
+    int? price,
+    ValueGetter<String?>? img,
+    double? cutPercentage,
+  }) {
     return ServiceitemsMdl(
+      cutPercentage: cutPercentage ?? this.cutPercentage,
       title: title ?? this.title,
-      type: type ?? this.type,
+      id: id != null ? id() : this.id,
+      pcs: pcs != null ? pcs() : this.pcs,
+      index: index != null ? index() : this.index,
       price: price ?? this.price,
       img: img != null ? img() : this.img,
     );

@@ -188,7 +188,7 @@ class _BonAddPageState extends State<BonAddPage> {
 
   var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
-  valid() {
+  bool valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&
         (namaKaryawan != null || namaKaryawan!.isNotEmpty);
   }
@@ -350,7 +350,7 @@ class _BonDecreasePageState extends State<BonDecreasePage> {
 
   var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
-  valid() {
+  bool valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&
         (namaKaryawan != null || namaKaryawan!.isNotEmpty);
   }

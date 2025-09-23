@@ -15,16 +15,19 @@ import 'package:weekly_date_picker/datetime_apis.dart';
 class PrintMingguan extends StatelessWidget {
   final List<List<PerPerson>> perDay;
   final DateTime startDate;
-  const PrintMingguan(
-      {super.key, required this.perDay, required this.startDate});
-  void printIncomeMingguan(
-    BuildContext context,
-  ) async {
-    var karyawanListfr =
-        await RepositoryProvider.of<KaryawanRepository>(context)
-            .getAllKaryawan(true);
-    karyawanListfr =
-        karyawanListfr.map((e) => e.aktif ? e : null).nonNulls.toList();
+  const PrintMingguan({
+    super.key,
+    required this.perDay,
+    required this.startDate,
+  });
+  void printIncomeMingguan(BuildContext context) async {
+    var karyawanListfr = await RepositoryProvider.of<KaryawanRepository>(
+      context,
+    ).getAllKaryawan(true);
+    karyawanListfr = karyawanListfr
+        .map((e) => e.aktif ? e : null)
+        .nonNulls
+        .toList();
     var karyawanList = karyawanListfr.map((e) => e.namaKaryawan).toList();
     // debugPrint(karyawanList);
     // var karyawanList = ['Rudy', 'Alfin', 'Febri', 'Indra', 'Yudha'];
@@ -34,7 +37,7 @@ class PrintMingguan extends StatelessWidget {
       'E2EFDA',
       'FFF2CC',
       'EDEDED',
-      'ACB9CA'
+      'ACB9CA',
     ];
     var karyawanColorList2 = [
       '9BC2E6',
@@ -42,7 +45,7 @@ class PrintMingguan extends StatelessWidget {
       'A9D08E',
       'FFD966',
       'D0CECE',
-      'D6DCE4'
+      'D6DCE4',
     ];
     var colperPerson = ['HC', 'S/H', 'CLR', 'GOODS'];
     // var excel = Excel.createExcel();
@@ -59,36 +62,39 @@ class PrintMingguan extends StatelessWidget {
       sheet.getRangeByIndex(1, (i + 2) + (i * 3), 1, (i + 5) + (i * 3))
         ..merge()
         ..cellStyle.bold = true
-        ..cellStyle.backColorRgb =
-            Color(int.parse("FF${karyawanColorList2[i]}", radix: 16))
+        ..cellStyle.backColorRgb = Color(
+          int.parse("FF${karyawanColorList2[i]}", radix: 16),
+        )
         ..value = karyawanList[i];
       for (var j = 0; j < colperPerson.length; j++) {
         sheet.getRangeByIndex(2, i + 2 + (i * 3) + j)
           ..value = colperPerson[j]
-          ..cellStyle.backColorRgb =
-              Color(int.parse("FF${karyawanColorList2[i]}", radix: 16));
+          ..cellStyle.backColorRgb = Color(
+            int.parse("FF${karyawanColorList2[i]}", radix: 16),
+          );
       }
       sheet
-              .getRangeByIndex(3, (i + 2) + (i * 3), 8, (i + 5) + (i * 3))
-              .cellStyle
-              .backColorRgb =
-          Color(int.parse("FF${karyawanColorList[i]}", radix: 16));
+          .getRangeByIndex(3, (i + 2) + (i * 3), 8, (i + 5) + (i * 3))
+          .cellStyle
+          .backColorRgb = Color(
+        int.parse("FF${karyawanColorList[i]}", radix: 16),
+      );
     } //end loop
-//data inserts
+    //data inserts
     for (var idx = 0; idx < perDay.length; idx++) {
       var element = perDay[idx];
-      List<Object> insertRow =
-          List.filled((karyawanList.length * colperPerson.length) + 1, '');
+      List<Object> insertRow = List.filled(
+        (karyawanList.length * colperPerson.length) + 1,
+        '',
+      );
       insertRow[0] = startDate.addDays(idx);
 
       for (var e in element) {
-        var index = karyawanList.indexWhere(
-          (e1) => e1 == e.namaKaryawan,
-        );
+        var index = karyawanList.indexWhere((e1) => e1 == e.namaKaryawan);
         var startIndex = 1 + (index * 4);
         for (var i = 0; i < colperPerson.length; i++) {
           var getprice =
-              e.perCategory.firstWhere((wew) => wew.type == i).price / 1000;
+              e.perCategory.firstWhere((wew) => wew.id == i).price / 1000;
           insertRow[startIndex + i] = getprice == 0 ? '' : getprice.toInt();
         }
       }
@@ -110,9 +116,9 @@ class PrintMingguan extends StatelessWidget {
       // theFile.writeAsBytesSync(bytes, mode: FileMode.write);
       var filebytes = Uint8List.fromList(bytes);
       var blob = html.Blob([filebytes], 'application/vnd.ms-excel', 'native');
-      var anchorElement = html.AnchorElement(
-        href: html.Url.createObjectUrlFromBlob(blob).toString(),
-      )
+      html.AnchorElement(
+          href: html.Url.createObjectUrlFromBlob(blob).toString(),
+        )
         ..setAttribute("download", "data.xlsx")
         ..click();
     } else if (Platform.isAndroid) {
@@ -135,10 +141,11 @@ class PrintMingguan extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       child: TextButton(
-          onPressed: () {
-            printIncomeMingguan(context);
-          },
-          child: const Text('print!')),
+        onPressed: () {
+          printIncomeMingguan(context);
+        },
+        child: const Text('print!'),
+      ),
     );
   }
 }

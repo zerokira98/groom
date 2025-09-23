@@ -1,6 +1,6 @@
 ///from pub.dev whatsapp with change at api ver
 
-library whatsapp;
+library;
 
 import 'dart:async';
 import 'dart:convert';
@@ -15,7 +15,7 @@ class WhatsApp {
   /// Configure the WhatsApp API with access token and from number id.
   /// [accessToken] is the access token of the WhatsApp API.
   /// [fromNumberId] is the from number id of the WhatsApp API.
-  setup({accessToken, int? fromNumberId}) {
+  void setup({accessToken, int? fromNumberId}) {
     token = accessToken;
     _fromNumberId = fromNumberId;
     _headers = {
@@ -30,7 +30,7 @@ class WhatsApp {
   /// [message] is the message to be sent.
   /// [compress] is the compress of the WhatsApp's link.
 
-  short({int? to, String? message, bool? compress}) {
+  String short({int? to, String? message, bool? compress}) {
     if (compress == true) {
       return 'https://wa.me/$to?text=$message';
     } else {
@@ -379,7 +379,7 @@ class WhatsApp {
   /// [to] is the phone number with country code but without the plus (+) sign.
   /// [bodyText] is the main body text of message
   /// [buttons] is list of action buttons with id and text
-  messagesButton({to, bodyText, buttons}) async {
+  Future messagesButton({to, bodyText, buttons}) async {
     var url = 'https://graph.facebook.com/v19.0/$_fromNumberId/messages';
 
     var buttonsList = [];

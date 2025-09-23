@@ -28,7 +28,7 @@ class _PengeluaranPageState extends State<PengeluaranPage> {
   TextEditingController pcs = TextEditingController(text: '1');
   var uangFormatter = CurrencyTextInputFormatter.currency(
       locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
-  valid() {
+  bool valid() {
     return (uangFormatter.getUnformattedValue() != 0) &&
         (formKey.currentState?.validate() ?? false);
   }

@@ -1,8 +1,8 @@
 // part of 'DBservice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groom/etc/extension.dart';
-import 'package:groom/model/itemcard_mdl.dart';
-import 'package:groom/model/struk_mdl.dart';
+
+import '../model/model.dart';
 
 abstract class _PemasukanRepo {
   FirebaseFirestore db;
@@ -129,11 +129,9 @@ class PemasukanRepository implements _PemasukanRepo {
 
   @override
   Future<DocumentReference> deleteStruk(StrukMdl data) {
-    return db
-        .collection('strukMasuk')
-        .doc(data.id)
-        .delete()
-        .then((value) async {
+    return db.collection('strukMasuk').doc(data.id).delete().then((
+      value,
+    ) async {
       return await db
           .collection('strukMasukDeleted')
           .add(data.toJson()..addAll({'time': DateTime.now().timestampFire}));
@@ -142,18 +140,30 @@ class PemasukanRepository implements _PemasukanRepo {
 
   @override
   Future<List<StrukMdl>> getAllStruk() {
-    return db.collection('strukMasuk').get().then((value) => value.docs
-        .map((e) => StrukMdl.fromJson(e.data()).copyWith(
-              id: () => e.id,
-              fromCache: () => e.metadata.isFromCache,
-            ))
-        .toList());
+    return db
+        .collection('strukMasuk')
+        .get()
+        .then(
+          (value) => value.docs
+              .map(
+                (e) => StrukMdl.fromJson(e.data()).copyWith(
+                  id: () => e.id,
+                  fromCache: () => e.metadata.isFromCache,
+                ),
+              )
+              .toList(),
+        );
   }
 
   Future<List<String>> getAllLainnya(String? query) {
-    return db.collection('strukLainnya').get().then((value) => value.docs
-        .map((e) => ItemCardMdl.fromJson(e.data()).namaBarang)
-        .toList());
+    return db
+        .collection('strukLainnya')
+        .get()
+        .then(
+          (value) => value.docs
+              .map((e) => ServiceitemsMdl.fromJson(e.data()).title)
+              .toList(),
+        );
 
     //     finder: Finder(
     //         filter: Filter.matchesRegExp(
@@ -171,8 +181,9 @@ class PemasukanRepository implements _PemasukanRepo {
     // var fd = DateTime.now();
 
     // var startTimestamp = Timestamp.fromDateTime(aye);
-    var startTimestamp =
-        Timestamp.fromDate(DateTime(ts.year, ts.month, ts.day));
+    var startTimestamp = Timestamp.fromDate(
+      DateTime(ts.year, ts.month, ts.day),
+    );
     var endTimestamp = Timestamp.fromDate(DateTime(te.year, te.month, te.day));
     Query<Map<String, dynamic>> reff = db.collection('strukMasuk');
     for (var e in filter.entries) {
@@ -184,19 +195,25 @@ class PemasukanRepository implements _PemasukanRepo {
           reff = reff.where('tanggal', isGreaterThanOrEqualTo: startTimestamp);
           break;
         case 'tanggalStart' when filter.keys.contains('tanggalEnd'):
-          reff = reff.where(Filter.and(
+          reff = reff.where(
+            Filter.and(
               Filter('tanggal', isGreaterThanOrEqualTo: startTimestamp),
-              Filter('tanggal', isLessThan: endTimestamp)));
+              Filter('tanggal', isLessThan: endTimestamp),
+            ),
+          );
           break;
         default:
       }
     }
-    return reff.get().then((value) => value.docs
-        .map((e) => StrukMdl.fromJson(e.data()).copyWith(
-              id: () => e.id,
-              fromCache: () => e.metadata.isFromCache,
-            ))
-        .toList());
+    return reff.get().then(
+      (value) => value.docs
+          .map(
+            (e) => StrukMdl.fromJson(
+              e.data(),
+            ).copyWith(id: () => e.id, fromCache: () => e.metadata.isFromCache),
+          )
+          .toList(),
+    );
     // var fil = [
     //   Filter.greaterThanOrEquals('tanggal', startTimestamp),
     //   Filter.lessThan('tanggal', endTimestamp),
@@ -246,18 +263,15 @@ class PemasukanRepository implements _PemasukanRepo {
 
   @override
   Future<DocumentReference> insertStruk(StrukMdl data) {
-    for (ItemCardMdl ew in data.itemCards) {
-      if (ew.type == cardType.length - 1) {
-        // await storeLainnya.add(db, ew.toJson());
-        db.collection('strukLainnya').add(ew.toJson());
-      }
-    }
+    // for (ItemCardMdl ew in data.itemCards) {
+    //   if (ew.id == cardType.length - 1) {
+    //     // await storeLainnya.add(db, ew.toJson());
+    //     db.collection('strukLainnya').add(ew.toJson());
+    //   }
+    // }
     var thedata = data.toJson();
     if (data.tipePembayaran == TipePembayaran.qris) {
-      thedata.putIfAbsent(
-        'midstatus',
-        () => 'pending',
-      );
+      thedata.putIfAbsent('midstatus', () => 'pending');
     }
     return db.collection('strukMasuk').add(thedata);
   }

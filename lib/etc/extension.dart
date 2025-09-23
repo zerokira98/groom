@@ -79,15 +79,15 @@ extension Formatnum on num {
     // return this.
   }
 
-  num cutPercentage(int type) => switch (type) {
-        0 when this != 20000 => 0.48 * this,
-        0 when this == 20000 => 0.5 * this,
-        1 => 0.5 * this,
-        2 => 0.4 * this,
-        3 => 0.1 * this,
-        4 => 0.5 * this,
-        int() => 1.0 * this,
-      };
+  // num cutPercentage(int type) => switch (type) {
+  //       0 when this != 20000 => 0.48 * this,
+  //       0 when this == 20000 => 0.5 * this,
+  //       1 => 0.5 * this,
+  //       2 => 0.4 * this,
+  //       3 => 0.1 * this,
+  //       4 => 0.5 * this,
+  //       int() => 1.0 * this,
+  //     };
 }
 
 enum Size {
@@ -117,8 +117,6 @@ extension PrintSize on Size {
         return 3;
       case Size.extraLarge:
         return 4;
-      default:
-        return 0;
     }
   }
 }
@@ -132,8 +130,6 @@ extension PrintAlign on Align {
         return 1;
       case Align.right:
         return 2;
-      default:
-        return 0;
     }
   }
 }

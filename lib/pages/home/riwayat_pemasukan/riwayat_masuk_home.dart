@@ -32,10 +32,10 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         future: RepositoryProvider.of<PemasukanRepository>(context)
             // .getAllStruk(),
             .getStrukFiltered({
-          'tanggalStart': DateTime.now(),
-          'tanggalEnd': DateTime.now().add(const Duration(days: 1)),
-          // 'order': 'reverse'
-        }),
+              'tanggalStart': DateTime.now(),
+              'tanggalEnd': DateTime.now().add(const Duration(days: 1)),
+              // 'order': 'reverse'
+            }),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
@@ -47,11 +47,12 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
                 itemBuilder: (context, index) {
                   var theData = snapshot.data![index];
                   int total = 0;
-                  StringBuffer servicelist =
-                      StringBuffer('${theData.namaKaryawan} : ');
+                  StringBuffer servicelist = StringBuffer(
+                    '${theData.namaKaryawan} : ',
+                  );
                   for (var e in theData.itemCards) {
-                    servicelist.write('${cardType[e.type]}, ');
-                    total += e.price * (e.pcsBarang);
+                    // servicelist.write('${cardType[e.id]}, ');
+                    total += e.price * (e.pcs);
                   }
                   return Column(
                     children: [
@@ -60,29 +61,34 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
                                   snapshot.data![index - 1].tanggal.day ||
                           index == 0)
                         Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  margin: const EdgeInsets.only(
-                                      bottom: 8.0, top: 8),
-                                  decoration: BoxDecoration(
-                                      gradient: LinearGradient(colors: [
-                                    Theme.of(context).primaryColorDark,
-                                    Theme.of(context).primaryColorDark,
-                                    Theme.of(context)
-                                        .primaryColorDark
-                                        .withOpacity(0.45)
-                                  ])),
-                                  // color: ,
-                                  child: Text(
-                                    theData.tanggal.formatLengkap(),
-                                    style: const TextStyle(color: Colors.white),
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                margin: const EdgeInsets.only(
+                                  bottom: 8.0,
+                                  top: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Theme.of(context).primaryColorDark,
+                                      Theme.of(context).primaryColorDark,
+                                      Theme.of(context).primaryColorDark
+                                          .withValues(alpha: 0.45),
+                                    ],
                                   ),
                                 ),
-                              )
-                            ]),
+                                // color: ,
+                                child: Text(
+                                  theData.tanggal.formatLengkap(),
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       TileStruk(
                         theData,
                         servicelist,
@@ -95,60 +101,71 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
                                 title: const Text('Yakin untuk menghapus?'),
                                 actions: [
                                   ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              WidgetStateProperty.all(
-                                                  Colors.green)),
-                                      onPressed: () async {
-                                        var a = await RepositoryProvider.of<
-                                                KaryawanRepository>(context)
-                                            .getAllKaryawan();
-                                        if (context.mounted) {
-                                          var pass = a
-                                              .firstWhere((element) =>
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(
+                                        Colors.green,
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      var a =
+                                          await RepositoryProvider.of<
+                                                KaryawanRepository
+                                              >(context)
+                                              .getAllKaryawan();
+                                      if (context.mounted) {
+                                        var pass = a
+                                            .firstWhere(
+                                              (element) =>
                                                   element.namaKaryawan ==
-                                                  theData.namaKaryawan)
-                                              .password;
-                                          showDialog<bool>(
-                                            context: context,
-                                            builder: (context) => KeyLock(
-                                                tendigits: pass ?? '0',
-                                                title: theData.namaKaryawan),
-                                          ).then((value) {
-                                            if (value != null && value) {
-                                              RepositoryProvider.of<
-                                                          PemasukanRepository>(
-                                                      context)
-                                                  .deleteStruk(theData);
-                                              Navigator.pop(context, true);
-                                            } else {}
-                                          });
-                                        }
-                                      },
-                                      child: const Text('Hapus')),
+                                                  theData.namaKaryawan,
+                                            )
+                                            .password;
+                                        showDialog<bool>(
+                                          context: context,
+                                          builder: (context) => KeyLock(
+                                            tendigits: pass ?? '0',
+                                            title: theData.namaKaryawan,
+                                          ),
+                                        ).then((value) {
+                                          if (value != null && value) {
+                                            RepositoryProvider.of<
+                                                  PemasukanRepository
+                                                >(context)
+                                                .deleteStruk(theData);
+                                            Navigator.pop(context, true);
+                                          } else {}
+                                        });
+                                      }
+                                    },
+                                    child: const Text('Hapus'),
+                                  ),
                                   ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              WidgetStateProperty.all(
-                                                  Colors.red)),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Batal')),
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(
+                                        Colors.red,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Batal'),
+                                  ),
                                 ],
                                 content: Row(
                                   children: [
                                     const Text('Alasan : '),
                                     Expanded(
-                                        child: DropdownMenu(
-                                      dropdownMenuEntries: const [
-                                        DropdownMenuEntry(
+                                      child: DropdownMenu(
+                                        dropdownMenuEntries: const [
+                                          DropdownMenuEntry(
                                             value: 0,
-                                            label: 'Salah input data'),
-                                      ],
-                                      initialSelection: 0,
-                                      onSelected: (value) {},
-                                    ))
+                                            label: 'Salah input data',
+                                          ),
+                                        ],
+                                        initialSelection: 0,
+                                        onSelected: (value) {},
+                                      ),
+                                    ),
                                   ],
                                 ),
                               );
@@ -159,19 +176,15 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
                           }
                         },
                         pdf: generatePDF,
-                      )
+                      ),
                     ],
                   );
                 },
               );
             } else if (snapshot.data == null) {
-              return const Center(
-                child: Text('Empty: null'),
-              );
+              return const Center(child: Text('Empty: null'));
             } else if (snapshot.data!.isEmpty) {
-              return const Center(
-                child: Text('Empty: no data'),
-              );
+              return const Center(child: Text('Empty: no data'));
             }
           }
           return const CircularProgressIndicator();
@@ -206,23 +219,24 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
       ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 2);
     var sumtotal = 0.0;
     for (var i = 0; i < theData.itemCards.length; i++) {
-      sumtotal += theData.itemCards[i].price * theData.itemCards[i].pcsBarang;
+      sumtotal += theData.itemCards[i].price * theData.itemCards[i].pcs;
       var telo = grid.rows.add();
       // telo.cells[0]
       //   ..value = '${i + 1}.'
       //   ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
       telo.cells[1]
-        ..value = theData.itemCards[i].pcsBarang.toString()
+        ..value = theData.itemCards[i].pcs.toString()
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
       telo.cells[2]
-        ..value = (theData.itemCards[i].price * theData.itemCards[i].pcsBarang)
+        ..value = (theData.itemCards[i].price * theData.itemCards[i].pcs)
             .numberFormat(currency: true)
         ..stringFormat = PdfStringFormat(alignment: PdfTextAlignment.right)
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
 
-      telo.cells[0]
-        ..value = "${cardType[theData.itemCards[i].type]} :  ${theData.itemCards[i].namaBarang}"
-        ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
+      // telo.cells[0]
+      //   ..value =
+      //       "${cardType[theData.itemCards[i].id]} :  ${theData.itemCards[i].namaBarang}"
+      //   ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
     }
     grid.rows.add().cells[3]
       ..value = sumtotal.numberFormat(currency: true)
@@ -230,17 +244,21 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
     // grid.columns[0].width = 24;
     grid.columns[1].width = 24;
     grid.columns[2].width = 80;
-// Set header font.
-    headerRow.style.font =
-        PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
+    // Set header font.
+    headerRow.style.font = PdfStandardFont(
+      PdfFontFamily.helvetica,
+      10,
+      style: PdfFontStyle.bold,
+    );
     page.graphics.drawString(
       'Groom Barbershop',
       PdfStandardFont(PdfFontFamily.helvetica, 16),
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 4, pageSize.width, 20),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       'Jl. Gajahmada no xx',
@@ -248,8 +266,9 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 20, pageSize.width, 20),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       'ig: groom_barbershop',
@@ -257,8 +276,9 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 30, pageSize.width, 20),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       'Karyawan: ${theData.namaKaryawan}',
@@ -266,8 +286,9 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 72, pageSize.width, 12),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.right,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.right,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       '${theData.tanggal.formatLengkap()} ${theData.tanggal.clockOnly()}',
@@ -275,13 +296,19 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 60, pageSize.width, 12),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.right,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.right,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     var drawed = grid.draw(
-        page: page,
-        bounds: Rect.fromLTWH(
-            0, 88, page.getClientSize().width, page.getClientSize().height));
+      page: page,
+      bounds: Rect.fromLTWH(
+        0,
+        88,
+        page.getClientSize().width,
+        page.getClientSize().height,
+      ),
+    );
 
     page.graphics.drawString(
       'terimakasih~!',
@@ -289,25 +316,30 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, drawed!.bounds.bottom + 8, pageSize.width, 20),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     var appdoc = await getApplicationDocumentsDirectory();
-// Save the document.
-    var thefile = await File(join(appdoc.path, 'invoice.pdf'))
-        .writeAsBytes(await document.save());
+    // Save the document.
+    var thefile = await File(
+      join(appdoc.path, 'invoice.pdf'),
+    ).writeAsBytes(await document.save());
     if (kIsWeb) {
       var blob = html.Blob(
-          thefile.readAsBytesSync().toList(), 'application/pdf', 'native');
-      var anchorElement = html.AnchorElement(
-        href: html.Url.createObjectUrlFromBlob(blob).toString(),
-      )
+        thefile.readAsBytesSync().toList(),
+        'application/pdf',
+        'native',
+      );
+      html.AnchorElement(
+          href: html.Url.createObjectUrlFromBlob(blob).toString(),
+        )
         ..setAttribute("download", "data.txt")
         ..click();
     } else {
       try {
         if (share) {
-          Share.shareXFiles([XFile(thefile.path)]);
+          SharePlus.instance.share(ShareParams(files: [XFile(thefile.path)]));
         } else {
           await OpenFilex.open(thefile.path).then((value) {
             debugPrint(value.message);
@@ -332,7 +364,7 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
     //     throw Exception(e);
     //   }
     // }
-// Dispose the document.
+    // Dispose the document.
     document.dispose();
   }
 }

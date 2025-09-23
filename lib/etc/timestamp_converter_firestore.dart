@@ -15,3 +15,16 @@ class TimestampConverterFirestore
   @override
   Timestamp toJson(DateTime date) => Timestamp.fromDate(date);
 }
+
+// class DocumentIdConverterFirestore
+//     implements JsonConverter<String?, String?> {
+//   const DocumentIdConverterFirestore();
+
+//   @override
+//   String? fromJson(String? timestamp) {
+//     return timestamp.toDate();
+//   }
+
+//   @override
+//   String? toJson(String? originnull) => Timestamp.fromDate(date);
+// }

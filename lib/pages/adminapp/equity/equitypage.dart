@@ -17,68 +17,72 @@ class _EkuitasPageState extends State<EkuitasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pemasukan Uang'),
-      ),
+      appBar: AppBar(title: const Text('Pemasukan Uang')),
       body: Column(
         children: [
           Expanded(
             child: RefreshIndicator(
               onRefresh: () =>
                   Future.delayed(const Duration(milliseconds: 450), () {
-                setState(() {});
-              }),
-              child: FutureBuilder(
-                  future: RepositoryProvider.of<EkuitasRepository>(context)
-                      .getAll(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (snapshot.data == null) {
-                        return const SizedBox();
-                      } else {
-                        return SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: Column(
-                            children: [
-                              for (var a in snapshot.data!)
-                                ListTile(
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      RepositoryProvider.of<EkuitasRepository>(
-                                              context)
-                                          .delete(a)
-                                          .then((value) => value == 1
-                                              ? setState(() {})
-                                              : null);
-                                    },
-                                  ),
-                                  title: Text(a.deskripsi),
-                                  subtitle: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(a.uang
-                                              .toInt()
-                                              .toString()
-                                              .numberFormat(currency: true) ??
-                                          'parse err'),
-                                      Text(a.tanggal.formatLengkap())
-                                    ],
-                                  ),
-                                )
-                            ],
-                          ),
-                        );
-                      }
-                    } else {
-                      return const SizedBox();
-                    }
+                    setState(() {});
                   }),
+              child: FutureBuilder(
+                future: RepositoryProvider.of<EkuitasRepository>(
+                  context,
+                ).getAll(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data == null) {
+                      return const SizedBox();
+                    } else {
+                      return SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            for (var a in snapshot.data!)
+                              ListTile(
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    RepositoryProvider.of<EkuitasRepository>(
+                                          context,
+                                        )
+                                        .delete(a)
+                                        .then(
+                                          (value) => value == 1
+                                              ? setState(() {})
+                                              : null,
+                                        );
+                                  },
+                                ),
+                                title: Text(a.deskripsi),
+                                subtitle: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      a.uang.toInt().toString().numberFormat(
+                                            currency: true,
+                                          ) ??
+                                          'parse err',
+                                    ),
+                                    Text(a.tanggal.formatLengkap()),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    }
+                  } else {
+                    return const SizedBox();
+                  }
+                },
+              ),
             ),
           ),
           const ReportCard(),
-          InputCard(setstate: setState)
+          InputCard(setstate: setState),
         ],
       ),
     );
@@ -99,10 +103,14 @@ class _InputCardState extends State<InputCard> {
   final TextEditingController uang = TextEditingController();
 
   final TextEditingController tanggal = TextEditingController(
-      text: DateFormat.yMd('id_ID').format(DateTime.now()));
+    text: DateFormat.yMd('id_ID').format(DateTime.now()),
+  );
 
   final uangFormatter = CurrencyTextInputFormatter.currency(
-      locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
+    locale: 'id_ID',
+    symbol: 'Rp',
+    decimalDigits: 0,
+  );
 
   final GlobalKey<FormState> formKey = GlobalKey();
 
@@ -120,116 +128,130 @@ class _InputCardState extends State<InputCard> {
               Row(
                 children: [
                   Expanded(
-                      child: TextFormField(
-                    validator: (value) {
-                      if (value == null) return null;
-                      if (value.isEmpty) return 'cant empty';
-                      return null;
-                    },
-                    controller: deskripsi,
-                    onChanged: (value) {
-                      // BlocProvider.of<InputserviceBloc>(context).add(
-                      //     ChangeItemDetails(
-                      //         idx: data.index,
-                      //         data: data.copyWith(namaBarang: value)));
-                    },
-                    decoration: const InputDecoration(label: Text('Deskripsi')),
-                  )),
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value == null) return null;
+                        if (value.isEmpty) return 'cant empty';
+                        return null;
+                      },
+                      controller: deskripsi,
+                      onChanged: (value) {
+                        // BlocProvider.of<InputserviceBloc>(context).add(
+                        //     ChangeItemDetails(
+                        //         idx: data.index,
+                        //         data: data.copyWith(namaBarang: value)));
+                      },
+                      decoration: const InputDecoration(
+                        label: Text('Deskripsi'),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               Row(
                 children: [
                   Expanded(
-                      child: TextFormField(
-                    controller: uang,
-                    validator: (value) {
-                      if (value == null) {
+                    child: TextFormField(
+                      controller: uang,
+                      validator: (value) {
+                        if (value == null) {
+                          return null;
+                        } else if (uangFormatter
+                                .getUnformattedValue()
+                                .toString()
+                                .length <=
+                            2) {
+                          return 'too small';
+                        }
                         return null;
-                      } else if (uangFormatter
-                              .getUnformattedValue()
-                              .toString()
-                              .length <=
-                          2) {
-                        return 'too small';
-                      }
-                      return null;
-                    },
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [uangFormatter],
-                    onChanged: (value) {
-                      if (int.tryParse(value) != null) {
-                        // BlocProvider.of<InputserviceBloc>(context).add(
-                        //     ChangeItemDetails(
-                        //         idx: data.index,
-                        //         data: data.copyWith(price: int.tryParse(value))));
-                      }
-                    },
-                    decoration: const InputDecoration(label: Text('Uang')),
-                  )),
+                      },
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [uangFormatter],
+                      onChanged: (value) {
+                        if (int.tryParse(value) != null) {
+                          // BlocProvider.of<InputserviceBloc>(context).add(
+                          //     ChangeItemDetails(
+                          //         idx: data.index,
+                          //         data: data.copyWith(price: int.tryParse(value))));
+                        }
+                      },
+                      decoration: const InputDecoration(label: Text('Uang')),
+                    ),
+                  ),
                   const Padding(padding: EdgeInsets.all(4)),
                   Expanded(
-                      child: TextFormField(
-                          controller: tanggal,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (value) {
-                            if (value == null) return null;
-                            try {
-                              DateFormat.yMd('id_ID').parseStrict(value);
-                              return null;
-                            } on FormatException catch (e) {
-                              return e.message.toString();
-                            }
+                    child: TextFormField(
+                      controller: tanggal,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value == null) return null;
+                        try {
+                          DateFormat.yMd('id_ID').parseStrict(value);
+                          return null;
+                        } on FormatException catch (e) {
+                          return e.message.toString();
+                        }
+                      },
+                      onChanged: (value) {
+                        widget.setstate(() {});
+                        debugPrint(
+                          DateFormat.yMd(
+                            'id_ID',
+                          ).tryParseStrict(value).toString(),
+                        );
+                      },
+                      decoration: InputDecoration(
+                        label: const Text('Tanggal'),
+                        errorMaxLines: 2,
+                        suffixIcon: InkWell(
+                          onTap: () {
+                            showDatePicker(
+                              context: context,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now(),
+                            ).then((value) {
+                              if (value != null) {
+                                widget.setstate(() {
+                                  tanggal.text = DateFormat.yMd(
+                                    'id_ID',
+                                  ).format(value);
+                                });
+                              }
+                            });
                           },
-                          onChanged: (value) {
-                            widget.setstate(() {});
-                            debugPrint(DateFormat.yMd('id_ID')
-                                .tryParseStrict(value)
-                                .toString());
-                          },
-                          decoration: InputDecoration(
-                              label: const Text('Tanggal'),
-                              errorMaxLines: 2,
-                              suffixIcon: InkWell(
-                                onTap: () {
-                                  showDatePicker(
-                                          context: context,
-                                          firstDate: DateTime(2020),
-                                          lastDate: DateTime.now())
-                                      .then((value) {
-                                    if (value != null) {
-                                      widget.setstate(() {
-                                        tanggal.text = DateFormat.yMd('id_ID')
-                                            .format(value);
-                                      });
-                                    }
-                                  });
-                                },
-                                child: const Icon(Icons.calendar_today),
-                              ))))
+                          child: const Icon(Icons.calendar_today),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               Row(
                 children: [
                   ElevatedButton(
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          RepositoryProvider.of<EkuitasRepository>(context).add(
-                              EkuitasMdl(
-                                  tanggal: DateFormat.yMd('id_ID')
-                                      .parseStrict(tanggal.text),
-                                  uang: uangFormatter.getUnformattedValue(),
-                                  deskripsi: deskripsi.text));
-                          widget.setstate(() {
-                            deskripsi.clear();
-                            uang.clear();
-                          });
-                          // .then((value) =>
-                          //     value == 1 ? Navigator.pop(context) : null);
-                        }
-                      },
-                      child: const Text('Submit'))
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        RepositoryProvider.of<EkuitasRepository>(context).add(
+                          EkuitasMdl(
+                            tanggal: DateFormat.yMd(
+                              'id_ID',
+                            ).parseStrict(tanggal.text),
+                            uang: uangFormatter.getUnformattedValue(),
+                            deskripsi: deskripsi.text,
+                          ),
+                        );
+                        widget.setstate(() {
+                          deskripsi.clear();
+                          uang.clear();
+                        });
+                        // .then((value) =>
+                        //     value == 1 ? Navigator.pop(context) : null);
+                      }
+                    },
+                    child: const Text('Submit'),
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -267,8 +289,9 @@ class _ReportCardState extends State<ReportCard> {
 
                 ///total ekuitas
                 FutureBuilder(
-                  future: RepositoryProvider.of<EkuitasRepository>(context)
-                      .getAll(),
+                  future: RepositoryProvider.of<EkuitasRepository>(
+                    context,
+                  ).getAll(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       totalekuitas = 0;
@@ -276,7 +299,8 @@ class _ReportCardState extends State<ReportCard> {
                         totalekuitas += e.uang;
                       }
                       return Text(
-                          'Total Uang Masuk: ${totalekuitas.toInt().toString().numberFormat(currency: true)}');
+                        'Total Uang Masuk: ${totalekuitas.toInt().toString().numberFormat(currency: true)}',
+                      );
                     } else {
                       return const SizedBox();
                     }
@@ -285,22 +309,24 @@ class _ReportCardState extends State<ReportCard> {
 
                 ///Struk income
                 FutureBuilder(
-                  future: RepositoryProvider.of<PemasukanRepository>(context)
-                      .getAllStruk(),
+                  future: RepositoryProvider.of<PemasukanRepository>(
+                    context,
+                  ).getAllStruk(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       totalpemasukan = 0;
                       // num totalqris = 0;
                       for (var e in snapshot.data!) {
                         for (var a in e.itemCards) {
-                          totalpemasukan += a.pcsBarang * a.price;
+                          totalpemasukan += a.pcs * a.price;
                           // totalqris += e.tipePembayaran == TipePembayaran.qris
-                          //     ? a.pcsBarang * a.price
+                          //     ? a.pcs * a.price
                           //     : 0;
                         }
                       }
                       return Text(
-                          'Total All Income : ${totalpemasukan.toInt().toString().numberFormat(currency: true)}');
+                        'Total All Income : ${totalpemasukan.toInt().toString().numberFormat(currency: true)}',
+                      );
                     } else {
                       return const SizedBox();
                     }
@@ -317,7 +343,7 @@ class _ReportCardState extends State<ReportCard> {
                 //               Theme.of(context).primaryColorDark,
                 //               Theme.of(context)
                 //                   .primaryColorDark
-                //                   .withOpacity(0.45)
+                //                   .withValues(alpha:0.45)
                 //             ])),
                 //             child: const
                 const Text('Keluar :'),
@@ -327,8 +353,9 @@ class _ReportCardState extends State<ReportCard> {
 
                 ///Pengeluaran
                 FutureBuilder(
-                  future: RepositoryProvider.of<PengeluaranRepository>(context)
-                      .getAll(),
+                  future: RepositoryProvider.of<PengeluaranRepository>(
+                    context,
+                  ).getAll(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       totalPengeluaran = 0;
@@ -336,7 +363,8 @@ class _ReportCardState extends State<ReportCard> {
                         totalPengeluaran += e.pcs * e.biaya;
                       }
                       return Text(
-                          'Pengeluaran All tanpaBon : ${totalPengeluaran.toInt().toString().numberFormat(currency: true)}');
+                        'Pengeluaran All tanpaBon : ${totalPengeluaran.toInt().toString().numberFormat(currency: true)}',
+                      );
                     } else {
                       return const SizedBox();
                     }
@@ -345,18 +373,21 @@ class _ReportCardState extends State<ReportCard> {
 
                 ///Bon
                 FutureBuilder(
-                  future:
-                      RepositoryProvider.of<BonRepository>(context).getAllBon(),
+                  future: RepositoryProvider.of<BonRepository>(
+                    context,
+                  ).getAllBon(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       totalbon = 0;
                       for (var e in snapshot.data!) {
-                        totalbon += e.jumlahBon *
+                        totalbon +=
+                            e.jumlahBon *
                             (e.tipe == BonType.berhutang ? -1 : 1);
                       }
 
                       return Text(
-                          'Pengeluaran Bon : ${totalbon.toInt().toString().numberFormat(currency: true)}');
+                        'Pengeluaran Bon : ${totalbon.toInt().toString().numberFormat(currency: true)}',
+                      );
                     } else {
                       return const SizedBox();
                     }
@@ -364,14 +395,16 @@ class _ReportCardState extends State<ReportCard> {
                 ),
                 const Padding(padding: EdgeInsets.all(4)),
                 Text(
-                    'Total kas sekarang : ${(totalekuitas + totalpemasukan - totalPengeluaran + totalbon).toInt().toString().numberFormat(currency: true)}')
+                  'Total kas sekarang : ${(totalekuitas + totalpemasukan - totalPengeluaran + totalbon).toInt().toString().numberFormat(currency: true)}',
+                ),
               ],
             ),
             IconButton(
-                onPressed: () {
-                  setState(() {});
-                },
-                icon: const Icon(Icons.refresh_sharp)),
+              onPressed: () {
+                setState(() {});
+              },
+              icon: const Icon(Icons.refresh_sharp),
+            ),
           ],
         ),
       ),

@@ -13,7 +13,6 @@ import 'package:groom/blocs/cubit/theme_cubit.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/db.dart';
 import 'package:groom/etc/globalvar.dart';
-import 'package:groom/etc/lib/whatsapp.dart';
 import 'package:groom/model/model.dart';
 import 'package:groom/pages/adminapp/admin.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
@@ -49,7 +48,7 @@ void main() async {
   initializeDateFormatting('id_ID', null);
   if (!kIsWeb) {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('ic_launcher');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     InitializationSettings initializationSettings =
@@ -69,13 +68,13 @@ void main() async {
 class RootApp extends StatelessWidget {
   RootApp({super.key});
   final fInstance = FirebaseFirestore.instance;
-  final wa = WhatsApp()
-    ..setup(
-      accessToken:
-          '''EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349
-WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD''',
-      fromNumberId: 318587001335322,
-    );
+//   final wa = WhatsApp()
+//     ..setup(
+//       accessToken:
+//           '''EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349
+// WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD''',
+//       fromNumberId: 318587001335322,
+//     );
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +89,7 @@ WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC
               child: Container()),
           RepositoryProvider(
               create: (context) => CustomerRepo(firestore: fInstance)),
-          RepositoryProvider(create: (context) => wa),
+          // RepositoryProvider(create: (context) => wa),
           RepositoryProvider(
               create: (context) => PemasukanRepository(db: fInstance)),
           RepositoryProvider(

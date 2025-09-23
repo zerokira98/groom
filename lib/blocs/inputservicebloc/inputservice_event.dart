@@ -6,13 +6,13 @@ sealed class InputserviceEvent {}
 class Initiate extends InputserviceEvent {}
 
 class AddCard extends InputserviceEvent {
-  final int? type;
+  final ServiceitemsMdl data;
 
-  AddCard({this.type});
+  AddCard({required this.data});
 }
 
 class RemoveCard extends InputserviceEvent {
-  final ItemCardMdl data;
+  final ServiceitemsMdl data;
   RemoveCard(this.data);
 }
 
@@ -33,7 +33,7 @@ class ChangeTipePembayaran extends InputserviceEvent {
 
 class ChangeItemDetails extends InputserviceEvent {
   final int idx;
-  final ItemCardMdl data;
+  final ServiceitemsMdl data;
   ChangeItemDetails({required this.idx, required this.data});
 }
 

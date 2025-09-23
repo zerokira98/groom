@@ -12,19 +12,23 @@ class RangkumanDayCubit extends Cubit<RangkumanDayState> {
   PengeluaranRepository repoPengeluaran;
   BonRepository repoBon;
   RangkumanDayCubit(this.repoPemasukan, this.repoPengeluaran, this.repoBon)
-      : super(RangkumanDayInitial());
-  loadData(Map filter) async {
-    var tsStart =
-        Timestamp.fromDate(DateUtils.dateOnly(filter['tanggalStart']));
+    : super(RangkumanDayInitial());
+  Future<void> loadData(Map filter) async {
+    var tsStart = Timestamp.fromDate(
+      DateUtils.dateOnly(filter['tanggalStart']),
+    );
     var tsEnd = Timestamp.fromDate(DateUtils.dateOnly(filter['tanggalEnd']));
     var a = await repoPemasukan.getStrukFiltered(filter);
-    var b =
-        await repoPengeluaran.getOperasionalOnly(tgl: filter['tanggalStart']);
-    List<BonData> c = await repoBon.getBonFiltered(Filter.and(
-      Filter('author', isEqualTo: 'self'),
-      Filter('tanggal', isGreaterThanOrEqualTo: tsStart),
-      Filter('tanggal', isLessThan: tsEnd),
-    ));
+    var b = await repoPengeluaran.getOperasionalOnly(
+      tgl: filter['tanggalStart'],
+    );
+    List<BonData> c = await repoBon.getBonFiltered(
+      Filter.and(
+        Filter('author', isEqualTo: 'self'),
+        Filter('tanggal', isGreaterThanOrEqualTo: tsStart),
+        Filter('tanggal', isLessThan: tsEnd),
+      ),
+    );
     var bontot = 0;
     for (var e in c) {
       bontot += e.tipe == BonType.berhutang ? e.jumlahBon : 0;
@@ -37,34 +41,41 @@ class RangkumanDayCubit extends Cubit<RangkumanDayState> {
     for (var e1 in a) {
       if (e1.tipePembayaran == TipePembayaran.qris) {
         for (var ee in e1.itemCards) {
-          qrisTotal += ee.pcsBarang * ee.price;
+          qrisTotal += ee.pcs * ee.price;
         }
       }
       if (perPerson.any((e2) => e2.namaKaryawan == e1.namaKaryawan)) {
         var total = 0;
         for (var eSum in e1.itemCards) {
-          total += eSum.price * (eSum.pcsBarang);
+          total += eSum.price * (eSum.pcs);
         }
         total += perPerson
             .firstWhere((e3) => e3.namaKaryawan == e1.namaKaryawan)
             .totalPendapatan;
         perPerson = perPerson
-            .map((ea) => ea.namaKaryawan == e1.namaKaryawan
-                ? ea.copyWith(
-                    totalPendapatan: total, datas: () => ea.datas! + [e1])
-                : ea)
+            .map(
+              (ea) => ea.namaKaryawan == e1.namaKaryawan
+                  ? ea.copyWith(
+                      totalPendapatan: total,
+                      datas: () => ea.datas! + [e1],
+                    )
+                  : ea,
+            )
             .toList();
       } else if ((perPerson.any((e2) => e2.namaKaryawan == e1.namaKaryawan)) ==
           false) {
         var total = 0;
         for (var eSum in e1.itemCards) {
-          total += eSum.price * (eSum.pcsBarang);
+          total += eSum.price * (eSum.pcs);
         }
-        perPerson.add(PerPerson(
+        perPerson.add(
+          PerPerson(
             datas: [e1],
             namaKaryawan: e1.namaKaryawan,
             totalPendapatan: total,
-            perCategory: e1.itemCards));
+            perCategory: e1.itemCards,
+          ),
+        );
       }
     }
     for (var e in b) {
@@ -72,13 +83,16 @@ class RangkumanDayCubit extends Cubit<RangkumanDayState> {
         operasionalTotal += e.biaya * e.pcs;
       }
     }
-    emit(RangkumanDayLoaded(
+    emit(
+      RangkumanDayLoaded(
         qristotal: qrisTotal,
         operasional: operasionalTotal,
         pengeluaranList: b,
         bontotal: bontot,
         tanggalStart: DateUtils.dateOnly(filter['tanggalStart']),
         tanggalEnd: DateUtils.dateOnly(filter['tanggalEnd']),
-        incomePerPerson: perPerson));
+        incomePerPerson: perPerson,
+      ),
+    );
   }
 }

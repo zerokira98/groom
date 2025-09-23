@@ -8,13 +8,18 @@ part of 'pengeluaran_mdl.dart';
 
 PengeluaranMdl _$PengeluaranMdlFromJson(Map<String, dynamic> json) =>
     PengeluaranMdl(
-      tanggal: const TimestampConverterFirestore()
-          .fromJson(json['tanggal'] as Timestamp),
+      tanggal: const TimestampConverterFirestore().fromJson(
+        json['tanggal'] as Timestamp,
+      ),
       tanggalPost: _$JsonConverterFromJson<Timestamp, DateTime>(
-          json['tanggalPost'], const TimestampConverterFirestore().fromJson),
+        json['tanggalPost'],
+        const TimestampConverterFirestore().fromJson,
+      ),
       namaPengeluaran: json['namaPengeluaran'] as String,
-      tipePengeluaran:
-          $enumDecode(_$TipePengeluaranEnumMap, json['tipePengeluaran']),
+      tipePengeluaran: $enumDecode(
+        _$TipePengeluaranEnumMap,
+        json['tipePengeluaran'],
+      ),
       pcs: json['pcs'] as num,
       biaya: json['biaya'] as num,
       id: json['id'] as String?,
@@ -26,7 +31,9 @@ Map<String, dynamic> _$PengeluaranMdlToJson(PengeluaranMdl instance) =>
       'id': instance.id,
       'tanggal': const TimestampConverterFirestore().toJson(instance.tanggal),
       'tanggalPost': _$JsonConverterToJson<Timestamp, DateTime>(
-          instance.tanggalPost, const TimestampConverterFirestore().toJson),
+        instance.tanggalPost,
+        const TimestampConverterFirestore().toJson,
+      ),
       'namaPengeluaran': instance.namaPengeluaran,
       'tipePengeluaran': _$TipePengeluaranEnumMap[instance.tipePengeluaran]!,
       'karyawan': instance.karyawan,
@@ -37,8 +44,7 @@ Map<String, dynamic> _$PengeluaranMdlToJson(PengeluaranMdl instance) =>
 Value? _$JsonConverterFromJson<Json, Value>(
   Object? json,
   Value? Function(Json json) fromJson,
-) =>
-    json == null ? null : fromJson(json as Json);
+) => json == null ? null : fromJson(json as Json);
 
 const _$TipePengeluaranEnumMap = {
   TipePengeluaran.gaji: 'gaji',
@@ -50,5 +56,4 @@ const _$TipePengeluaranEnumMap = {
 Json? _$JsonConverterToJson<Json, Value>(
   Value? value,
   Json? Function(Value value) toJson,
-) =>
-    value == null ? null : toJson(value);
+) => value == null ? null : toJson(value);

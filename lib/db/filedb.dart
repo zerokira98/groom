@@ -19,9 +19,9 @@ class FileRepo {
   ///return filepath
   Future<String> uploadFile(File file, String filename) async {
     var dir = await getApplicationDocumentsDirectory();
-    var newfilename = generateRandomString(6) + filename;
+    // var newfilename = generateRandomString(6) + filename;
     // var theFile = File(join(dir.path, newfilename ));
-    return file.copy(join(dir.path, newfilename, extension(file.path))).then(
+    return file.copy(join(dir.path, filename + extension(file.path))).then(
       (value) {
         return value.path;
       },
@@ -29,8 +29,7 @@ class FileRepo {
   }
 }
 
-String generateRandomString(int len) {
+String generateRandomString(int len, {bool number = false}) {
   var r = Random();
-  return String.fromCharCodes(
-      List.generate(len, (index) => r.nextInt(33) + 89));
+  return String.fromCharCodes(List.generate(len, (index) => r.nextInt(24) + 1));
 }

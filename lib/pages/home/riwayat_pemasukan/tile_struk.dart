@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/cust_repo.dart';
 import 'package:groom/etc/extension.dart' as x;
 import 'package:groom/model/model.dart';
-import 'package:groom/pages/home/widgets/blue_print.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart';
@@ -23,15 +22,21 @@ class TileStruk extends StatefulWidget {
   final void Function()? deletefun;
   final StringBuffer serviceList;
   final int total;
-  const TileStruk(this.theData, this.serviceList,
-      {super.key, this.pdf, required this.total, this.deletefun});
+  const TileStruk(
+    this.theData,
+    this.serviceList, {
+    super.key,
+    this.pdf,
+    required this.total,
+    this.deletefun,
+  });
 
   @override
   State<TileStruk> createState() => _TileStrukState();
 }
 
 class _TileStrukState extends State<TileStruk> {
-  thisWidgetSetstate() => setState(() {});
+  void thisWidgetSetstate() => setState(() {});
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -39,40 +44,53 @@ class _TileStrukState extends State<TileStruk> {
       leading: widget.theData.tipePembayaran == TipePembayaran.qris
           ? IconButton(
               style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                switch (widget.theData.midstatus) {
-                  'pending' => Colors.yellow.withOpacity(0.5),
-                  'settlement' => Colors.green.withOpacity(0.5),
-                  'expired' => Colors.red.withOpacity(0.5),
-                  String() => Colors.grey.withOpacity(0.5),
-                  null => null,
-                },
-              )),
+                backgroundColor: WidgetStatePropertyAll(
+                  switch (widget.theData.midstatus) {
+                    'pending' => Colors.yellow.withValues(alpha: 0.5),
+                    'settlement' => Colors.green.withValues(alpha: 0.5),
+                    'expired' => Colors.red.withValues(alpha: 0.5),
+                    String() => Colors.grey.withValues(alpha: 0.5),
+                    null => null,
+                  },
+                ),
+              ),
               onPressed: () {
                 Widget? content = switch (widget.theData.midstatus) {
                   'pending' => Image.network(
-                      'https://api.sandbox.midtrans.com/v2/qris/${widget.theData.midId}/qr-code'),
-                  'settlement' =>
-                    Container(color: Colors.green, width: 4, height: 4),
-                  'expired' =>
-                    Container(color: Colors.red, width: 4, height: 4),
-                  String() =>
-                    Container(color: Colors.grey, width: 4, height: 4),
+                    'https://api.sandbox.midtrans.com/v2/qris/${widget.theData.midId}/qr-code',
+                  ),
+                  'settlement' => Container(
+                    color: Colors.green,
+                    width: 4,
+                    height: 4,
+                  ),
+                  'expired' => Container(
+                    color: Colors.red,
+                    width: 4,
+                    height: 4,
+                  ),
+                  String() => Container(
+                    color: Colors.grey,
+                    width: 4,
+                    height: 4,
+                  ),
                   null => null,
                 };
                 showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: Text('Status : ${widget.theData.midstatus}'),
-                          content: content,
-                        ));
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Status : ${widget.theData.midstatus}'),
+                    content: content,
+                  ),
+                );
               },
-              icon: const Icon(Icons.qr_code_2))
+              icon: const Icon(Icons.qr_code_2),
+            )
           : null,
       tileColor: widget.theData.fromCache != null
           ? widget.theData.fromCache!
-              ? Colors.grey
-              : null
+                ? Colors.grey
+                : null
           : null,
       trailing: widget.deletefun != null
           ? InkWell(onTap: widget.deletefun, child: const Icon(Icons.delete))
@@ -84,7 +102,8 @@ class _TileStrukState extends State<TileStruk> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                  'Total: ${widget.total} (${widget.theData.tipePembayaran.name})'),
+                'Total: ${widget.total} (${widget.theData.tipePembayaran.name})',
+              ),
               Text(DateFormat.Hm('id_ID').format(widget.theData.tanggal)),
             ],
           ),
@@ -95,118 +114,137 @@ class _TileStrukState extends State<TileStruk> {
           context: context,
           builder: (context) {
             TextEditingController nomorhp = TextEditingController();
-            return StatefulBuilder(builder: (context, setstate) {
-              return Dialog(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(widget.theData.namaKaryawan,
-                            textScaler: const TextScaler.linear(1.2)),
-                      ),
-                      for (var e in widget.theData.itemCards)
+            return StatefulBuilder(
+              builder: (context, setstate) {
+                return Dialog(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            widget.theData.namaKaryawan,
+                            textScaler: const TextScaler.linear(1.2),
+                          ),
+                        ),
+                        for (var e in widget.theData.itemCards)
+                          Row(
+                            children: [
+                              Column(
+                                children: [
+                                  // Text('${cardType[e.id]} '),
+                                  if (e.title.isNotEmpty) Text(e.title),
+                                ],
+                              ),
+                              const Text(' : '),
+                              Text(
+                                (e.price * e.pcs).numberFormat(currency: true),
+                              ),
+                            ],
+                          ),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '~~ Print ~~',
+                                  textAlign: TextAlign.center,
+                                  textScaler: TextScaler.linear(1.25),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // PrintWidget(
+                        //   theData: widget.theData,
+                        // ),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 8.0, bottom: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '~~ Share ~~',
+                                  textAlign: TextAlign.center,
+                                  textScaler: TextScaler.linear(1.25),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         Row(
                           children: [
-                            Column(
-                              children: [
-                                Text('${cardType[e.type]} '),
-                                if (e.namaBarang.isNotEmpty) Text(e.namaBarang)
-                              ],
-                            ),
-                            const Text(' : '),
-                            Text((e.price * e.pcsBarang)
-                                .numberFormat(currency: true))
-                          ],
-                        ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
                             Expanded(
-                                child: Text(
-                              '~~ Print ~~',
-                              textAlign: TextAlign.center,
-                              textScaler: TextScaler.linear(1.25),
-                            ))
-                          ],
-                        ),
-                      ),
-                      PrintWidget(
-                        theData: widget.theData,
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0, bottom: 4),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                                child: Text(
-                              '~~ Share ~~',
-                              textAlign: TextAlign.center,
-                              textScaler: TextScaler.linear(1.25),
-                            ))
-                          ],
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
                               child: TextFormField(
-                            decoration: InputDecoration(
-                                hintText: 'No. WA',
-                                border: UnderlineInputBorder(
+                                decoration: InputDecoration(
+                                  hintText: 'No. WA',
+                                  border: UnderlineInputBorder(
                                     borderRadius: BorderRadius.circular(2),
-                                    borderSide: const BorderSide(color: Colors.red))),
-                            controller: nomorhp,
-                            keyboardType: TextInputType.phone,
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            validator: (value) {
-                              if (value == null) return null;
-                              if (value.isNotEmpty) {
-                                bool regex = RegExp(r'^(?:[+0]9)?[0-9]{10,14}$')
-                                    .hasMatch(value);
-                                if (regex == false) {
-                                  return 'format salah/kurang dari 10digit';
-                                }
-                              } else {
-                                return null;
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              setstate(() {});
-                            },
-                          )),
-                          const Padding(padding: EdgeInsets.all(2)),
-                          ElevatedButton(
+                                    borderSide: const BorderSide(
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                                controller: nomorhp,
+                                keyboardType: TextInputType.phone,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (value) {
+                                  if (value == null) return null;
+                                  if (value.isNotEmpty) {
+                                    bool regex = RegExp(
+                                      r'^(?:[+0]9)?[0-9]{10,14}$',
+                                    ).hasMatch(value);
+                                    if (regex == false) {
+                                      return 'format salah/kurang dari 10digit';
+                                    }
+                                  } else {
+                                    return null;
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {
+                                  setstate(() {});
+                                },
+                              ),
+                            ),
+                            const Padding(padding: EdgeInsets.all(2)),
+                            ElevatedButton(
                               key: Key(nomorhp.text),
                               onPressed: (nomorhp.text.isEmpty)
                                   ? null
                                   : () {
                                       var idnPhone = nomorhp.text[0] == '0'
-                                          ? nomorhp.text
-                                              .replaceRange(0, 1, '62')
+                                          ? nomorhp.text.replaceRange(
+                                              0,
+                                              1,
+                                              '62',
+                                            )
                                           : nomorhp.text;
                                       var uri =
-                                          Uri.parse('https://wa.me/$idnPhone')
-                                              .replace(queryParameters: {
-                                        'text':
-                                            'Terimakasih telah menggunakan jasa Groom Barbershop.'
-                                      });
+                                          Uri.parse(
+                                            'https://wa.me/$idnPhone',
+                                          ).replace(
+                                            queryParameters: {
+                                              'text':
+                                                  'Terimakasih telah menggunakan jasa Groom Barbershop.',
+                                            },
+                                          );
                                       // FilePicker.platform.pickFiles().then((value) {
                                       //   if (value == null) return;
                                       //   if (value.isSinglePick) {
                                       RepositoryProvider.of<CustomerRepo>(
-                                              context)
+                                            context,
+                                          )
                                           .addCustDate(idnPhone, DateTime.now())
                                           .then((value) {
-                                        return launchUrl(uri);
-                                      });
+                                            return launchUrl(uri);
+                                          });
                                       // RepositoryProvider.of<WhatsApp>(context)
                                       //     .messagesTemplate(to: 6289509855934
                                       //         // mediaFilepath: value.paths[0],
@@ -240,32 +278,36 @@ class _TileStrukState extends State<TileStruk> {
                                       //   }
                                       // });
                                     },
-                              child: const Text('OpenWa'))
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Wrap(
-                          // mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ElevatedButton(
+                              child: const Text('OpenWa'),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Wrap(
+                            // mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
                                 onPressed: () {
                                   generatePDF(true, widget.theData);
                                 },
-                                child: const Text('Share PDF')),
-                            ElevatedButton(
+                                child: const Text('Share PDF'),
+                              ),
+                              ElevatedButton(
                                 onPressed: () {
                                   generatePDF(false, widget.theData);
                                 },
-                                child: const Text('Open PDF')),
-                          ],
+                                child: const Text('Open PDF'),
+                              ),
+                            ],
+                          ),
                         ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            });
+                );
+              },
+            );
           },
         );
       },
@@ -298,23 +340,24 @@ class _TileStrukState extends State<TileStruk> {
       ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 2);
     var sumtotal = 0.0;
     for (var i = 0; i < theData.itemCards.length; i++) {
-      sumtotal += theData.itemCards[i].price * theData.itemCards[i].pcsBarang;
+      sumtotal += theData.itemCards[i].price * theData.itemCards[i].pcs;
       var telo = grid.rows.add();
       // telo.cells[0]
       //   ..value = '${i + 1}.'
       //   ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
       telo.cells[1]
-        ..value = theData.itemCards[i].pcsBarang.toString()
+        ..value = theData.itemCards[i].pcs.toString()
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
       telo.cells[2]
-        ..value = (theData.itemCards[i].price * theData.itemCards[i].pcsBarang)
+        ..value = (theData.itemCards[i].price * theData.itemCards[i].pcs)
             .numberFormat(currency: true)
         ..stringFormat = PdfStringFormat(alignment: PdfTextAlignment.right)
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
 
-      telo.cells[0]
-        ..value = "${cardType[theData.itemCards[i].type]} :  ${theData.itemCards[i].namaBarang}"
-        ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
+      // telo.cells[0]
+      //   ..value =
+      //       "${cardType[theData.itemCards[i].id]} :  ${theData.itemCards[i].namaBarang}"
+      //   ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
     }
     var lastrow = grid.rows.add();
     lastrow.cells[2]
@@ -326,17 +369,21 @@ class _TileStrukState extends State<TileStruk> {
     // grid.columns[0].width = 24;
     grid.columns[1].width = 24;
     grid.columns[2].width = 40;
-// Set header font.
-    headerRow.style.font =
-        PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
+    // Set header font.
+    headerRow.style.font = PdfStandardFont(
+      PdfFontFamily.helvetica,
+      10,
+      style: PdfFontStyle.bold,
+    );
     page.graphics.drawString(
       'Groom Barbershop',
       PdfStandardFont(PdfFontFamily.helvetica, 14),
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 4, pageSize.width, 20),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       'Jl. Gajahmada no xx',
@@ -344,8 +391,9 @@ class _TileStrukState extends State<TileStruk> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 20, pageSize.width, 20),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       'ig: groom_barbershop',
@@ -353,8 +401,9 @@ class _TileStrukState extends State<TileStruk> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 30, pageSize.width, 20),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       theData.id ?? 'null',
@@ -362,8 +411,9 @@ class _TileStrukState extends State<TileStruk> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 60, pageSize.width, 10),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.right,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.right,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       '${theData.tanggal.formatLengkap()} ${theData.tanggal.clockOnly()}',
@@ -371,8 +421,9 @@ class _TileStrukState extends State<TileStruk> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 68, pageSize.width, 12),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.right,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.right,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     page.graphics.drawString(
       'Karyawan: ${theData.namaKaryawan}',
@@ -380,13 +431,19 @@ class _TileStrukState extends State<TileStruk> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, 80, pageSize.width, 12),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.right,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.right,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     var drawed = grid.draw(
-        page: page,
-        bounds: Rect.fromLTWH(
-            0, 104, page.getClientSize().width, page.getClientSize().height));
+      page: page,
+      bounds: Rect.fromLTWH(
+        0,
+        104,
+        page.getClientSize().width,
+        page.getClientSize().height,
+      ),
+    );
 
     page.graphics.drawString(
       'terimakasih~!',
@@ -394,27 +451,29 @@ class _TileStrukState extends State<TileStruk> {
       brush: PdfSolidBrush(PdfColor(0, 0, 0)),
       bounds: Rect.fromLTWH(0, drawed!.bounds.bottom + 8, pageSize.width, 20),
       format: PdfStringFormat(
-          alignment: PdfTextAlignment.center,
-          lineAlignment: PdfVerticalAlignment.middle),
+        alignment: PdfTextAlignment.center,
+        lineAlignment: PdfVerticalAlignment.middle,
+      ),
     );
     if (kIsWeb) {
       /// Save the document.
       var pdfinbytes = Uint8List.fromList(await document.save());
       var blob = html.Blob([pdfinbytes], 'application/pdf', 'native');
-      var anchorElement = html.AnchorElement(
-        href: html.Url.createObjectUrlFromBlob(blob).toString(),
-      )
+      html.AnchorElement(
+          href: html.Url.createObjectUrlFromBlob(blob).toString(),
+        )
         ..setAttribute("download", "data.pdf")
         ..click();
     } else {
       var appdoc = await getApplicationDocumentsDirectory();
 
       /// Save the document.
-      var thefile = await File(join(appdoc.path, 'invoice.pdf'))
-          .writeAsBytes(await document.save());
+      var thefile = await File(
+        join(appdoc.path, 'invoice.pdf'),
+      ).writeAsBytes(await document.save());
       try {
         if (share) {
-          Share.shareXFiles([XFile(thefile.path)]);
+          SharePlus.instance.share(ShareParams(files: [XFile(thefile.path)]));
         } else {
           await OpenFilex.open(thefile.path).then((value) {
             debugPrint(value.message);
@@ -425,7 +484,7 @@ class _TileStrukState extends State<TileStruk> {
         debugPrint(e.toString());
       }
     }
-// Dispose the document.
+    // Dispose the document.
     document.dispose();
   }
 }

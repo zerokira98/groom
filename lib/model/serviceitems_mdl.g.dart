@@ -8,16 +8,22 @@ part of 'serviceitems_mdl.dart';
 
 ServiceitemsMdl _$ServiceitemsMdlFromJson(Map<String, dynamic> json) =>
     ServiceitemsMdl(
+      pcs: (json['pcs'] as num?)?.toInt() ?? 1,
+      index: (json['index'] as num?)?.toInt() ?? 0,
       title: json['title'] as String,
-      type: (json['type'] as num).toInt(),
+      id: json['id'] as String?,
       price: (json['price'] as num).toInt(),
       img: json['img'] as String?,
+      cutPercentage: (json['cutPercentage'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$ServiceitemsMdlToJson(ServiceitemsMdl instance) =>
     <String, dynamic>{
+      'index': instance.index,
       'title': instance.title,
-      'type': instance.type,
+      'cutPercentage': instance.cutPercentage,
+      'id': instance.id,
       'price': instance.price,
+      'pcs': instance.pcs,
       'img': instance.img,
     };

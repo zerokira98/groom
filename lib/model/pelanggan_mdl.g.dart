@@ -7,11 +7,12 @@ part of 'pelanggan_mdl.dart';
 // **************************************************************************
 
 PelangganMdl _$PelangganMdlFromJson(Map<String, dynamic> json) => PelangganMdl(
-      nama: json['nama'] as String,
-      kontak: json['kontak'] as String,
-      dibuat: const TimestampConverterFirestore()
-          .fromJson(json['dibuat'] as Timestamp),
-    );
+  nama: json['nama'] as String,
+  kontak: json['kontak'] as String,
+  dibuat: const TimestampConverterFirestore().fromJson(
+    json['dibuat'] as Timestamp,
+  ),
+);
 
 Map<String, dynamic> _$PelangganMdlToJson(PelangganMdl instance) =>
     <String, dynamic>{

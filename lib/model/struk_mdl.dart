@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:groom/etc/timestamp_converter_firestore.dart';
-import 'package:groom/model/pelanggan_mdl.dart';
+import 'package:groom/model/model.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
-import 'package:groom/model/itemcard_mdl.dart';
 
 ///  int? id;
 ///    String namaKaryawan;
 ///    DateTime tanggal;
-///    List<ItemCardMdl> itemCards;
+///    List&ltItemCardMdl&gt itemCards;
 part 'struk_mdl.g.dart';
 
 @JsonSerializable(explicitToJson: true)
@@ -24,43 +23,52 @@ class StrukMdl extends Equatable {
   final DateTime tanggal;
   final PelangganMdl? pelanggan;
   final TipePembayaran tipePembayaran;
-  final List<ItemCardMdl> itemCards;
+  final List<ServiceitemsMdl> itemCards;
 
-  const StrukMdl(
-      {required this.namaKaryawan,
-      required this.tanggal,
-      required this.tipePembayaran,
-      required this.itemCards,
-      this.id,
-      this.fromCache,
-      this.midstatus,
-      this.midId,
-      this.pelanggan});
+  const StrukMdl({
+    required this.namaKaryawan,
+    required this.tanggal,
+    required this.tipePembayaran,
+    required this.itemCards,
+    this.id,
+    this.fromCache,
+    this.midstatus,
+    this.midId,
+    this.pelanggan,
+  });
 
   @override
-  List<Object?> get props =>
-      [id, namaKaryawan, tanggal, pelanggan, tipePembayaran, itemCards];
+  List<Object?> get props => [
+    id,
+    namaKaryawan,
+    tanggal,
+    pelanggan,
+    tipePembayaran,
+    itemCards,
+  ];
 
-  StrukMdl copyWith(
-      {ValueGetter<String?>? id,
-      ValueGetter<bool?>? fromCache,
-      String? namaKaryawan,
-      ValueGetter<String?>? midstatus,
-      ValueGetter<String?>? midId,
-      DateTime? tanggal,
-      ValueGetter<PelangganMdl?>? pelanggan,
-      TipePembayaran? tipePembayaran,
-      List<ItemCardMdl>? itemCards}) {
+  StrukMdl copyWith({
+    ValueGetter<String?>? id,
+    ValueGetter<bool?>? fromCache,
+    String? namaKaryawan,
+    ValueGetter<String?>? midstatus,
+    ValueGetter<String?>? midId,
+    DateTime? tanggal,
+    ValueGetter<PelangganMdl?>? pelanggan,
+    TipePembayaran? tipePembayaran,
+    List<ServiceitemsMdl>? itemCards,
+  }) {
     return StrukMdl(
-        id: id != null ? id() : this.id,
-        fromCache: fromCache != null ? fromCache() : this.fromCache,
-        namaKaryawan: namaKaryawan ?? this.namaKaryawan,
-        midstatus: midstatus != null ? midstatus() : this.midstatus,
-        midId: midId != null ? midId() : this.midId,
-        tanggal: tanggal ?? this.tanggal,
-        pelanggan: pelanggan != null ? pelanggan() : this.pelanggan,
-        tipePembayaran: tipePembayaran ?? this.tipePembayaran,
-        itemCards: itemCards ?? this.itemCards);
+      id: id != null ? id() : this.id,
+      fromCache: fromCache != null ? fromCache() : this.fromCache,
+      namaKaryawan: namaKaryawan ?? this.namaKaryawan,
+      midstatus: midstatus != null ? midstatus() : this.midstatus,
+      midId: midId != null ? midId() : this.midId,
+      tanggal: tanggal ?? this.tanggal,
+      pelanggan: pelanggan != null ? pelanggan() : this.pelanggan,
+      tipePembayaran: tipePembayaran ?? this.tipePembayaran,
+      itemCards: itemCards ?? this.itemCards,
+    );
   }
 
   Map<String, dynamic> toJson() => _$StrukMdlToJson(this);

@@ -7,21 +7,21 @@ part of 'barang_mdl.dart';
 // **************************************************************************
 
 BarangMdl _$BarangMdlFromJson(Map<String, dynamic> json) => BarangMdl(
-      namaBarang: json['namaBarang'] as String,
-      pcs: json['pcs'] as num,
-      hargabeli: json['hargabeli'] as num,
-      hargajual: json['hargajual'] as num,
-      id: json['id'] as String?,
-      tglUpdate: json['tglUpdate'] == null
-          ? null
-          : DateTime.parse(json['tglUpdate'] as String),
-    );
+  namaBarang: json['namaBarang'] as String,
+  pcs: json['pcs'] as num,
+  hargabeli: json['hargabeli'] as num,
+  hargajual: json['hargajual'] as num,
+  id: json['id'] as String?,
+  tglUpdate: json['tglUpdate'] == null
+      ? null
+      : DateTime.parse(json['tglUpdate'] as String),
+);
 
 Map<String, dynamic> _$BarangMdlToJson(BarangMdl instance) => <String, dynamic>{
-      'id': instance.id,
-      'tglUpdate': instance.tglUpdate?.toIso8601String(),
-      'namaBarang': instance.namaBarang,
-      'pcs': instance.pcs,
-      'hargabeli': instance.hargabeli,
-      'hargajual': instance.hargajual,
-    };
+  'id': instance.id,
+  'tglUpdate': instance.tglUpdate?.toIso8601String(),
+  'namaBarang': instance.namaBarang,
+  'pcs': instance.pcs,
+  'hargabeli': instance.hargabeli,
+  'hargajual': instance.hargajual,
+};

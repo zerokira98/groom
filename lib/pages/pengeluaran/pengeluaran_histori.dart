@@ -196,7 +196,7 @@ class _HistoriPengeluaranState extends State<HistoriPengeluaran> {
                                 Theme.of(context).primaryColorDark,
                                 Theme.of(context)
                                     .primaryColorDark
-                                    .withOpacity(0.45)
+                                    .withValues(alpha: 0.45)
                               ])),
                               child: Text(
                                   '${e.tanggal.subtract(Duration(days: e.tanggal.weekday)).formatLengkap()} - ${e.tanggal.subtract(Durations.extralong1).formatLengkap()}'),

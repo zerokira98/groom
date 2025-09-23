@@ -57,7 +57,7 @@ class _HomeState extends State<Home> {
           //       icon: const Icon(Icons.view_list_sharp),
           //     );
           //   }),
-          if (kIsWeb &&
+          if (kIsWeb ||
               MediaQuery.of(context).orientation == Orientation.landscape)
             const SideDrawer(),
           Expanded(
@@ -72,17 +72,20 @@ class _HomeState extends State<Home> {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: Text(
-                              'QRCODE VIEW ${jsonDecode(state.success!)['qrcode_url']}'),
+                            'QRCODE VIEW ${jsonDecode(state.success!)['qrcode_url']}',
+                          ),
                           content: Image.network(
-                              jsonDecode(state.success!)['qrcode_url']),
+                            jsonDecode(state.success!)['qrcode_url'],
+                          ),
                         ),
                       );
                     } else {
                       Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => const RiwayatPemasukan(),
-                          ));
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => const RiwayatPemasukan(),
+                        ),
+                      );
                     }
                     BlocProvider.of<InputserviceBloc>(context).add(Initiate());
                   } else if (state.err != null) {
@@ -90,22 +93,22 @@ class _HomeState extends State<Home> {
                       message: state.err,
                       duration: const Duration(seconds: 2),
                       animationDuration: Durations.long1,
-                    ).show(context).then(
-                      (value) {
-                        //     BlocProvider.of<InputserviceBloc>(context)
-                        //        .add(Initiate());
-                      },
-                    );
+                    ).show(context).then((value) {
+                      //     BlocProvider.of<InputserviceBloc>(context)
+                      //        .add(Initiate());
+                    });
                   }
                 }
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: (kIsWeb &&
-                            MediaQuery.of(context).orientation ==
-                                Orientation.landscape)
-                        ? 4
-                        : 0),
+                  horizontal:
+                      (kIsWeb &&
+                          MediaQuery.of(context).orientation ==
+                              Orientation.landscape)
+                      ? 4
+                      : 0,
+                ),
                 child: Stack(
                   children: [
                     OfflineBuilder(
@@ -116,8 +119,11 @@ class _HomeState extends State<Home> {
                         children: [
                           AnimatedPositioned(
                             duration: Durations.extralong4,
-                            curve: const Interval(0.5, 1.0,
-                                curve: Curves.easeInOut),
+                            curve: const Interval(
+                              0.5,
+                              1.0,
+                              curve: Curves.easeInOut,
+                            ),
                             height: !value.contains(ConnectivityResult.none)
                                 ? 0
                                 : 24,
@@ -129,99 +135,123 @@ class _HomeState extends State<Home> {
                                   : const Color(0xFFEE4400),
                               child: Center(
                                 child: Text(
-                                    !value.contains(ConnectivityResult.none)
-                                        ? 'ONLINE'
-                                        : 'OFFLINE MODE'),
+                                  !value.contains(ConnectivityResult.none)
+                                      ? 'ONLINE'
+                                      : 'OFFLINE MODE',
+                                ),
                               ),
                             ),
                           ),
                           AnimatedContainer(
                             duration: Durations.extralong4,
-                            curve: const Interval(0.5, 1.0,
-                                curve: Curves.easeInOut),
+                            curve: const Interval(
+                              0.5,
+                              1.0,
+                              curve: Curves.easeInOut,
+                            ),
                             padding: EdgeInsets.only(
-                                top: !value.contains(ConnectivityResult.none)
-                                    ? 0.0
-                                    : 26.0),
+                              top: !value.contains(ConnectivityResult.none)
+                                  ? 0.0
+                                  : 26.0,
+                            ),
                             child: child,
-                          )
+                          ),
                         ],
                       ),
                       child: RefreshIndicator(
                         onRefresh: () async {
-                          BlocProvider.of<InputserviceBloc>(context)
-                              .add(Initiate());
+                          BlocProvider.of<InputserviceBloc>(
+                            context,
+                          ).add(Initiate());
                           return Future.delayed(
-                              Durations.extralong4, () => true);
+                            Durations.extralong4,
+                            () => true,
+                          );
                         },
                         child: Column(
                           children: [
                             HomeAppbar(),
                             const Padding(padding: EdgeInsets.all(6)),
                             Expanded(
-                              child: BlocBuilder<InputserviceBloc,
-                                  InputserviceState>(
-                                builder: (context, state) {
-                                  if (state is InputserviceLoaded) {
-                                    if (state.itemCards.isNotEmpty) {
-                                      return ListView.builder(
-                                        itemCount: state.itemCards.length,
-                                        itemBuilder: (context, a) {
-                                          return MyListTile(state.itemCards[a]);
-                                        },
-                                      );
-                                    } else {
-                                      return const Text('Empty');
-                                    }
-                                  } else {
-                                    return const Text('Hi');
-                                  }
-                                },
-                              ),
+                              child:
+                                  BlocBuilder<
+                                    InputserviceBloc,
+                                    InputserviceState
+                                  >(
+                                    builder: (context, state) {
+                                      if (state is InputserviceLoaded) {
+                                        if (state.itemCards.isNotEmpty) {
+                                          return ListView.builder(
+                                            itemCount: state.itemCards.length,
+                                            itemBuilder: (context, a) {
+                                              return MyListTile(
+                                                state.itemCards[a],
+                                                a,
+                                              );
+                                            },
+                                          );
+                                        } else {
+                                          return const Text('Empty');
+                                        }
+                                      } else {
+                                        return const Text('Hi');
+                                      }
+                                    },
+                                  ),
                             ),
                             const BottombarHome(),
                             FutureBuilder(
-                                future: RepositoryProvider.of<
-                                        ServiceItemsRepository>(context)
-                                    .getItems(),
-                                builder: (context, snapshot) {
-                                  switch (snapshot.connectionState) {
-                                    case ConnectionState.done:
-                                      if (snapshot.hasData &&
-                                          (snapshot.data as List).isNotEmpty) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 16.0),
-                                          child: Wrap(
-                                            alignment: WrapAlignment.start,
-                                            spacing: 4,
-                                            runSpacing: 4,
-                                            children: [
-                                              for (var a = 0;
-                                                  a < cardType.length;
-                                                  a++)
-                                                ItemCardBox(cardType[a]),
-                                            ],
-                                          ),
-                                        );
-                                      } else {
-                                        return ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const ServicemenueditPage()));
-                                            },
-                                            child: const Text(
-                                                'Empty menu items, click here to add'));
-                                      }
-                                    case ConnectionState.waiting:
-                                      return const CircularProgressIndicator();
-                                    default:
-                                      return Container();
-                                  }
-                                }),
+                              future:
+                                  RepositoryProvider.of<ServiceItemsRepository>(
+                                    context,
+                                  ).getItems(),
+                              builder: (context, snapshot) {
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.done:
+                                    print(snapshot.data);
+                                    if (snapshot.hasData &&
+                                        (snapshot.data as List).isNotEmpty) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16.0,
+                                        ),
+                                        child: Wrap(
+                                          alignment: WrapAlignment.start,
+                                          spacing: 4,
+                                          runSpacing: 4,
+                                          children: [
+                                            for (
+                                              var a = 0;
+                                              a < snapshot.data!.length;
+                                              a++
+                                            )
+                                              ItemCardBox(snapshot.data![a]),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const ServicemenueditPage(),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text(
+                                          'Empty menu items, click here to add',
+                                        ),
+                                      );
+                                    }
+                                  case ConnectionState.waiting:
+                                    return const CircularProgressIndicator();
+                                  default:
+                                    return Container();
+                                }
+                              },
+                            ),
                             const Padding(padding: EdgeInsets.all(12)),
                           ],
                         ),

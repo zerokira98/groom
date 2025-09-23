@@ -13,7 +13,7 @@ class CustomerRepo {
           {'phoneNumber': phoneNumber, 'latestDate': Timestamp.fromDate(time)});
   }
 
-  getCust([String? phoneNumber]) {
+  Future<Object> getCust([String? phoneNumber]) {
     if (phoneNumber == null) {
       return ref.get();
     } else {
@@ -21,11 +21,11 @@ class CustomerRepo {
     }
   }
 
-  changeCustName(String phoneNumber, String name) async {
+  Future<void> changeCustName(String phoneNumber, String name) async {
     return ref.doc(phoneNumber).set({'name': name});
   }
 
-  changeCustAddress(String phoneNumber, String address) async {
+  Future<void> changeCustAddress(String phoneNumber, String address) async {
     return ref.doc(phoneNumber).set({'address': address});
   }
 }

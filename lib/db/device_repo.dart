@@ -5,7 +5,7 @@ class DeviceRepo {
   CollectionReference ref;
   DeviceRepo({required this.firestore}) : ref = firestore.collection('devices');
   FirebaseFirestore firestore;
-  updateToken(String deviceId, String token) {
+  void updateToken(String deviceId, String token) {
     var datenow = Timestamp.fromDate(DateTime.now());
     ref
         .doc(deviceId)

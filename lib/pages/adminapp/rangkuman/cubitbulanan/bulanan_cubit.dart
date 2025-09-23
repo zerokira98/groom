@@ -13,8 +13,8 @@ class BulananCubit extends Cubit<BulananState> {
   PengeluaranRepository repoPengeluaran;
 
   BulananCubit(this.repoPemasukan, this.repoPengeluaran)
-      : super(BulananState.initial());
-  loadData(DateTime dateTime) async {
+    : super(BulananState.initial());
+  Future<void> loadData(DateTime dateTime) async {
     DateTime thismonth = DateTime(dateTime.year, dateTime.month);
     DateTime nextmonth = DateTime(dateTime.year, dateTime.month + 1);
     num totalPengeluaran = 0;
@@ -31,9 +31,13 @@ class BulananCubit extends Cubit<BulananState> {
       return;
     }
     List<num> incomePerHari = List.generate(
-        nextmonth.subtract(Durations.long1).day + 1, (index) => 0);
+      nextmonth.subtract(Durations.long1).day + 1,
+      (index) => 0,
+    );
     List<num> customerPerHari = List.generate(
-        nextmonth.subtract(Durations.long1).day + 1, (index) => 0);
+      nextmonth.subtract(Durations.long1).day + 1,
+      (index) => 0,
+    );
 
     Map<String, num> pendapatanTertinggi = {'day': 0.0, 'sum': 0.0, 'count': 0};
     Map<String, num> jumlahCustomerTertinggi = {
@@ -41,12 +45,12 @@ class BulananCubit extends Cubit<BulananState> {
       'sum': 0.0,
       'count': 0,
       'avg': 0,
-      'emptyDays': 0
+      'emptyDays': 0,
     };
     for (var e in dataPemasukan) {
       num totalPerStruk = 0;
       for (var card in e.itemCards) {
-        totalPerStruk += card.pcsBarang * card.price;
+        totalPerStruk += card.pcs * card.price;
       }
       totalPemasukan += totalPerStruk;
       // totalPemasukanqris +=
@@ -67,10 +71,12 @@ class BulananCubit extends Cubit<BulananState> {
         jumlahCustomerTertinggi['sum'] = e;
       }
     }
-    jumlahCustomerTertinggi['avg'] =
-        customerPerHari.where((element) => element != 0).average;
-    jumlahCustomerTertinggi['emptyDays'] =
-        customerPerHari.where((element) => element == 0).length;
+    jumlahCustomerTertinggi['avg'] = customerPerHari
+        .where((element) => element != 0)
+        .average;
+    jumlahCustomerTertinggi['emptyDays'] = customerPerHari
+        .where((element) => element == 0)
+        .length;
     pendapatanTertinggi['count'] = dataPemasukan
         .where((element) => element.tanggal.day == pendapatanTertinggi['day'])
         .toList()
@@ -93,7 +99,9 @@ class BulananCubit extends Cubit<BulananState> {
       groupAndSum[key] = {
         'list': v,
         'sum': v.fold(
-            0.0, (prev, element) => prev + (element.biaya * element.pcs)),
+          0.0,
+          (prev, element) => prev + (element.biaya * element.pcs),
+        ),
       };
       // if (pendapatanTertinggi['sum']! < groupAndSum[key]['sum']) {
       //   pendapatanTertinggi['day'] = key;
@@ -103,13 +111,16 @@ class BulananCubit extends Cubit<BulananState> {
     for (var e in dataPengeluaran) {
       totalPengeluaran += e.biaya * e.pcs;
     }
-    emit(BulananState(
+    emit(
+      BulananState(
         bulan: thismonth,
         pendapatanTertinggi: pendapatanTertinggi,
         jumlahCustomerTertinggi: jumlahCustomerTertinggi,
         groupAndSumPengeluaran: groupAndSum,
         totalPengeluaran: totalPengeluaran,
         totalPemasukan: totalPemasukan,
-        incomePerHari: incomePerHari));
+        incomePerHari: incomePerHari,
+      ),
+    );
   }
 }

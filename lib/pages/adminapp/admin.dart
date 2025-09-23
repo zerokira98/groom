@@ -40,7 +40,7 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   Widget thePage = const SizedBox();
   var pc = PageController();
-  List thePages(context) {
+  List thePages(BuildContext context) {
     var curdate = DateTime.now();
     return [
       BlocProvider.value(
@@ -298,7 +298,7 @@ class MenuDivider extends StatelessWidget {
                       gradient: LinearGradient(colors: [
                     Theme.of(context).primaryColorDark,
                     Theme.of(context).primaryColorDark,
-                    Theme.of(context).primaryColorDark.withOpacity(0.45)
+                    Theme.of(context).primaryColorDark.withValues(alpha: 0.45)
                   ])),
                   child: Text(
                     title,

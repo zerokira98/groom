@@ -60,10 +60,10 @@ class _SideDrawerState extends State<SideDrawer> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                       colors: [
-                        Colors.white.withOpacity(0.01),
+                        Colors.white.withValues(alpha: 0.01),
                         Colors.white,
                         Colors.white,
-                        Colors.white.withOpacity(0.01),
+                        Colors.white.withValues(alpha: 0.01),
                       ],
                       begin: const Alignment(0, -1),
                       end: const Alignment(0, 1),

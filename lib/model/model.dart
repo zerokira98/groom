@@ -8,3 +8,4 @@ export 'pengeluaran_mdl.dart';
 export 'struk_mdl.dart';
 export 'perperson.dart';
 export './themedatas.dart';
+export 'serviceitems_mdl.dart';
