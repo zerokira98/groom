@@ -273,6 +273,6 @@ class PemasukanRepository implements _PemasukanRepo {
     if (data.tipePembayaran == TipePembayaran.qris) {
       thedata.putIfAbsent('midstatus', () => 'pending');
     }
-    return db.collection('strukMasuk').add(thedata);
+    return db.collection('strukMasuk').add(thedata).then((value) => value);
   }
 }

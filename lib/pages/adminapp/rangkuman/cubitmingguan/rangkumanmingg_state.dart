@@ -10,8 +10,7 @@ sealed class RangkumanWeekState extends Equatable {
 final class RangkumanWeekInitial extends RangkumanWeekState {}
 
 final class RangkumanWeekLoaded extends RangkumanWeekState {
-  final DateTime tanggalStart;
-  final DateTime tanggalEnd;
+  final Datafilter filter;
   final GroupBy groupBy;
   final List<StrukMdl> dataPerPerson;
   // final RangkumFilter filter;
@@ -21,65 +20,59 @@ final class RangkumanWeekLoaded extends RangkumanWeekState {
   final int totalBagiHasil;
   final num pengeluaran;
   final num bon;
-  final List<StrukMdl> dataPerPersoncut;
   final List<List<PerPerson>> dailycut;
 
-  const RangkumanWeekLoaded(
-      {required this.tanggalStart,
-      required this.tanggalEnd,
-      required this.groupBy,
-      required this.dataPerPerson,
-      required this.daily,
-      required this.pengeluaranlist,
-      required this.totalKotor,
-      required this.totalBagiHasil,
-      required this.pengeluaran,
-      required this.bon,
-      required this.dataPerPersoncut,
-      required this.dailycut});
+  const RangkumanWeekLoaded({
+    required this.filter,
+    required this.groupBy,
+    required this.dataPerPerson,
+    required this.daily,
+    required this.pengeluaranlist,
+    required this.totalKotor,
+    required this.totalBagiHasil,
+    required this.pengeluaran,
+    required this.bon,
+    required this.dailycut,
+  });
 
   @override
   List<Object?> get props => [
-        tanggalStart,
-        tanggalEnd,
-        groupBy,
-        dataPerPerson,
-        daily,
-        pengeluaranlist,
-        totalKotor,
-        totalBagiHasil,
-        pengeluaran,
-        bon,
-        dataPerPersoncut,
-        dailycut
-      ];
+    filter,
+    groupBy,
+    dataPerPerson,
+    daily,
+    pengeluaranlist,
+    totalKotor,
+    totalBagiHasil,
+    pengeluaran,
+    bon,
+    dailycut,
+  ];
 
-  RangkumanWeekLoaded copyWith(
-      {DateTime? tanggalStart,
-      DateTime? tanggalEnd,
-      GroupBy? groupBy,
-      List<StrukMdl>? dataPerPerson,
-      List<List<PerPerson>>? daily,
-      Map? pengeluaranlist,
-      int? totalKotor,
-      int? totalBagiHasil,
-      num? pengeluaran,
-      num? bon,
-      List<StrukMdl>? dataPerPersoncut,
-      List<List<PerPerson>>? dailycut}) {
+  RangkumanWeekLoaded copyWith({
+    Datafilter? filter,
+    GroupBy? groupBy,
+    List<StrukMdl>? dataPerPerson,
+    List<List<PerPerson>>? daily,
+    Map? pengeluaranlist,
+    int? totalKotor,
+    int? totalBagiHasil,
+    num? pengeluaran,
+    num? bon,
+    List<List<PerPerson>>? dailycut,
+  }) {
     return RangkumanWeekLoaded(
-        tanggalStart: tanggalStart ?? this.tanggalStart,
-        tanggalEnd: tanggalEnd ?? this.tanggalEnd,
-        groupBy: groupBy ?? this.groupBy,
-        dataPerPerson: dataPerPerson ?? this.dataPerPerson,
-        daily: daily ?? this.daily,
-        pengeluaranlist: pengeluaranlist ?? this.pengeluaranlist,
-        totalKotor: totalKotor ?? this.totalKotor,
-        totalBagiHasil: totalBagiHasil ?? this.totalBagiHasil,
-        pengeluaran: pengeluaran ?? this.pengeluaran,
-        bon: bon ?? this.bon,
-        dataPerPersoncut: dataPerPersoncut ?? this.dataPerPersoncut,
-        dailycut: dailycut ?? this.dailycut);
+      filter: filter ?? this.filter,
+      groupBy: groupBy ?? this.groupBy,
+      dataPerPerson: dataPerPerson ?? this.dataPerPerson,
+      daily: daily ?? this.daily,
+      pengeluaranlist: pengeluaranlist ?? this.pengeluaranlist,
+      totalKotor: totalKotor ?? this.totalKotor,
+      totalBagiHasil: totalBagiHasil ?? this.totalBagiHasil,
+      pengeluaran: pengeluaran ?? this.pengeluaran,
+      bon: bon ?? this.bon,
+      dailycut: dailycut ?? this.dailycut,
+    );
   }
 }
 

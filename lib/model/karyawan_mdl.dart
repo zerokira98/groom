@@ -6,31 +6,38 @@ part 'karyawan_mdl.g.dart';
 
 @JsonSerializable()
 class KaryawanData extends Equatable {
-  const KaryawanData(
-      {required this.namaKaryawan,
-      required this.aktif,
-      this.id,
-      this.password});
+  const KaryawanData({
+    required this.namaKaryawan,
+    required this.aktif,
+    this.id,
+    this.warnahex,
+    this.password,
+  });
 
   ///might not real id in db
   final String? id;
   final String namaKaryawan;
   final String? password;
+  final String? warnahex;
   final bool aktif;
-  KaryawanData copyWith(
-      {ValueGetter<String?>? id,
-      String? namaKaryawan,
-      ValueGetter<String?>? password,
-      bool? aktif}) {
+  KaryawanData copyWith({
+    ValueGetter<String?>? id,
+    String? namaKaryawan,
+    ValueGetter<String?>? password,
+    ValueGetter<String?>? warnahex,
+    bool? aktif,
+  }) {
     return KaryawanData(
-        id: id != null ? id() : this.id,
-        namaKaryawan: namaKaryawan ?? this.namaKaryawan,
-        password: password != null ? password() : this.password,
-        aktif: aktif ?? this.aktif);
+      id: id != null ? id() : this.id,
+      namaKaryawan: namaKaryawan ?? this.namaKaryawan,
+      password: password != null ? password() : this.password,
+      warnahex: warnahex != null ? warnahex() : this.warnahex,
+      aktif: aktif ?? this.aktif,
+    );
   }
 
   @override
-  List<Object?> get props => [id, namaKaryawan, password, aktif];
+  List<Object?> get props => [id, namaKaryawan, password, aktif, warnahex];
 
   Map<String, dynamic> toJson() => _$KaryawanDataToJson(this);
 

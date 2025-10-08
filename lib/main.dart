@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:groom/blocs/cubit/serviceitems_cubit.dart';
 import 'package:groom/blocs/cubit/theme_cubit.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
 import 'package:groom/db/db.dart';
@@ -28,19 +29,24 @@ Future<void> _messageHandler(RemoteMessage message) async {
   print('message:$message');
   var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   const AndroidNotificationDetails androidNotificationDetails =
-      AndroidNotificationDetails('your channel id', 'your channel name',
-          channelDescription: 'your channel description',
-          importance: Importance.max,
-          priority: Priority.high,
-          ticker: 'ticker');
-  const NotificationDetails notificationDetails =
-      NotificationDetails(android: androidNotificationDetails);
+      AndroidNotificationDetails(
+        'your channel id',
+        'your channel name',
+        channelDescription: 'your channel description',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+      );
+  const NotificationDetails notificationDetails = NotificationDetails(
+    android: androidNotificationDetails,
+  );
   await flutterLocalNotificationsPlugin.show(
-      0,
-      message.notification?.title ?? 'no-title',
-      message.notification?.body ?? 'no body',
-      notificationDetails,
-      payload: 'item x');
+    0,
+    message.notification?.title ?? 'no-title',
+    message.notification?.body ?? 'no body',
+    notificationDetails,
+    payload: 'item x',
+  );
 }
 
 void main() async {
@@ -52,11 +58,11 @@ void main() async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     InitializationSettings initializationSettings =
-        const InitializationSettings(
-      android: initializationSettingsAndroid,
+        const InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (details) {},
     );
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: (details) {});
   }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_messageHandler);
@@ -68,63 +74,85 @@ void main() async {
 class RootApp extends StatelessWidget {
   RootApp({super.key});
   final fInstance = FirebaseFirestore.instance;
-//   final wa = WhatsApp()
-//     ..setup(
-//       accessToken:
-//           '''EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349
-// WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD''',
-//       fromNumberId: 318587001335322,
-//     );
+  //   final wa = WhatsApp()
+  //     ..setup(
+  //       accessToken:
+  //           '''EAAE9lyZAyIbIBOx0yT1Tvmfzvyxo4yDMa23ERHO7Jx1ZCzrYwjZCVtw5vBiQTQ6Cl5HehdEpqFmHgw30yYJ3vnjQW5ZBj0TWh66349
+  // WPOseJ0YEKZAFn9IS9IcbjDmRQQvGHiLZAObCRrlbRbliYxSoVogtzUDQGJOrPOGf4nWzcxsjgrYsriC0aql4LMvQ1XRukTVu5bnXSTGFNfX1bcZD''',
+  //       fromNumberId: 318587001335322,
+  //     );
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) {
+            return MidApi(
+              apiKey: dotenv.env['SERVER_API_KEY'] ?? '',
+              baseUrl: dotenv.env['SERVER_BASE_URL'] ?? '',
+            );
+          },
+          child: Container(),
+        ),
+        RepositoryProvider(
+          create: (context) => CustomerRepo(firestore: fInstance),
+        ),
+        // RepositoryProvider(create: (context) => wa),
+        RepositoryProvider(
+          create: (context) => PemasukanRepository(db: fInstance),
+        ),
+        RepositoryProvider(
+          create: (context) => PengeluaranRepository(firestore: fInstance),
+        ),
+        RepositoryProvider(
+          create: (context) => KaryawanRepository(firestore: fInstance),
+        ),
+        RepositoryProvider(
+          create: (context) => ServiceItemsRepository(fInstance),
+        ),
+        RepositoryProvider(create: (context) => EkuitasRepository(fInstance)),
+        RepositoryProvider(create: (context) => BonRepository(db: fInstance)),
+        RepositoryProvider(
+          create: (context) => BarangRepository(firestore: fInstance),
+        ),
+      ],
+      child: MultiBlocProvider(
         providers: [
-          RepositoryProvider(
-              create: (context) {
-                return MidApi(
-                    apiKey: dotenv.env['SERVER_API_KEY'] ?? '',
-                    baseUrl: dotenv.env['SERVER_BASE_URL'] ?? '');
-              },
-              child: Container()),
-          RepositoryProvider(
-              create: (context) => CustomerRepo(firestore: fInstance)),
-          // RepositoryProvider(create: (context) => wa),
-          RepositoryProvider(
-              create: (context) => PemasukanRepository(db: fInstance)),
-          RepositoryProvider(
-              create: (context) => PengeluaranRepository(firestore: fInstance)),
-          RepositoryProvider(
-              create: (context) => KaryawanRepository(firestore: fInstance)),
-          RepositoryProvider(
-              create: (context) => ServiceItemsRepository(fInstance)),
-          RepositoryProvider(create: (context) => EkuitasRepository(fInstance)),
-          RepositoryProvider(create: (context) => BonRepository(db: fInstance)),
-          RepositoryProvider(
-              create: (context) => BarangRepository(firestore: fInstance)),
-        ],
-        child: MultiBlocProvider(providers: [
           BlocProvider(
-              create: (context) =>
-                  ThemeCubit(themeDatas: ThemeDatas())..getThemeData()),
+            create: (context) => ServiceitemsCubit(
+              RepositoryProvider.of<ServiceItemsRepository>(context),
+            )..initiate(),
+            child: Container(),
+          ),
+          BlocProvider(
+            create: (context) =>
+                ThemeCubit(themeDatas: ThemeDatas())..getThemeData(),
+          ),
           BlocProvider(
             create: (context) => RangkumanWeekCubit(
-                RepositoryProvider.of<PemasukanRepository>(context),
-                RepositoryProvider.of<BonRepository>(context),
-                RepositoryProvider.of<PengeluaranRepository>(context)),
+              RepositoryProvider.of<PemasukanRepository>(context),
+              RepositoryProvider.of<BonRepository>(context),
+              RepositoryProvider.of<PengeluaranRepository>(context),
+            ),
           ),
           BlocProvider(
             create: (context) => RangkumanDayCubit(
-                RepositoryProvider.of<PemasukanRepository>(context),
-                RepositoryProvider.of<PengeluaranRepository>(context),
-                RepositoryProvider.of<BonRepository>(context)),
+              RepositoryProvider.of<PemasukanRepository>(context),
+              RepositoryProvider.of<PengeluaranRepository>(context),
+              RepositoryProvider.of<BonRepository>(context),
+            ),
           ),
           BlocProvider(
             create: (context) => BulananCubit(
-                RepositoryProvider.of<PemasukanRepository>(context),
-                RepositoryProvider.of<PengeluaranRepository>(context)),
-          )
-        ], child: const MyApp()));
+              RepositoryProvider.of<PemasukanRepository>(context),
+              RepositoryProvider.of<PengeluaranRepository>(context),
+            ),
+          ),
+        ],
+        child: const MyApp(),
+      ),
+    );
   }
 }
 
@@ -151,35 +179,37 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     if (!kIsWeb) {
       if (Platform.isAndroid) {
-        FirebaseMessaging.instance.getToken().then(
-          (token) async {
-            print("token:$token");
-            var androidId = await const AndroidId().getId();
-            DeviceRepo(firestore: FirebaseFirestore.instance)
-                .updateToken((androidId ?? 'unknownid'), token!);
-          },
-        );
-        FirebaseMessaging.onMessage.listen(
-          (event) async {
-            print(event.notification?.title ?? 'empty');
-            var flutterLocalNotificationsPlugin =
-                FlutterLocalNotificationsPlugin();
-            const AndroidNotificationDetails androidNotificationDetails =
-                AndroidNotificationDetails('notifid', 'notifchan',
-                    channelDescription: 'All notification is here',
-                    importance: Importance.max,
-                    priority: Priority.high,
-                    ticker: 'ticker');
-            const NotificationDetails notificationDetails =
-                NotificationDetails(android: androidNotificationDetails);
-            await flutterLocalNotificationsPlugin.show(
-                0,
-                event.notification?.title ?? 'no-title',
-                event.notification?.body ?? 'no body',
-                notificationDetails,
-                payload: 'item x');
-          },
-        );
+        FirebaseMessaging.instance.getToken().then((token) async {
+          print("token:$token");
+          var androidId = await const AndroidId().getId();
+          DeviceRepo(
+            firestore: FirebaseFirestore.instance,
+          ).updateToken((androidId ?? 'unknownid'), token!);
+        });
+        FirebaseMessaging.onMessage.listen((event) async {
+          print(event.notification?.title ?? 'empty');
+          var flutterLocalNotificationsPlugin =
+              FlutterLocalNotificationsPlugin();
+          const AndroidNotificationDetails androidNotificationDetails =
+              AndroidNotificationDetails(
+                'notifid',
+                'notifchan',
+                channelDescription: 'All notification is here',
+                importance: Importance.max,
+                priority: Priority.high,
+                ticker: 'ticker',
+              );
+          const NotificationDetails notificationDetails = NotificationDetails(
+            android: androidNotificationDetails,
+          );
+          await flutterLocalNotificationsPlugin.show(
+            0,
+            event.notification?.title ?? 'no-title',
+            event.notification?.body ?? 'no body',
+            notificationDetails,
+            payload: 'item x',
+          );
+        });
       }
     }
     theFuture = _getFirstTime();
@@ -191,29 +221,30 @@ class _MyAppState extends State<MyApp> {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {
         return MaterialApp(
-            title: 'Groom Barbershop',
-            theme: state.themeData,
-            home: BlocProvider(
-                create: (context) => InputserviceBloc(
-                    strukrepo:
-                        RepositoryProvider.of<PemasukanRepository>(context),
-                    midApi: RepositoryProvider.of<MidApi>(context),
-                    karyawanrepo:
-                        RepositoryProvider.of<KaryawanRepository>(context),
-                    barangrepo:
-                        RepositoryProvider.of<BarangRepository>(context)),
-                child: FutureBuilder(
-                    future: theFuture,
-                    builder: (context, snap) {
-                      if (snap.hasData) {
-                        if (snap.data) {
-                          return const FirstRun();
-                        } else {
-                          return adminonly ? const AdminPage() : const Home();
-                        }
-                      }
-                      return const CircularProgressIndicator.adaptive();
-                    })));
+          title: 'Groom Barbershop',
+          theme: state.themeData,
+          home: BlocProvider(
+            create: (context) => InputserviceBloc(
+              strukrepo: RepositoryProvider.of<PemasukanRepository>(context),
+              midApi: RepositoryProvider.of<MidApi>(context),
+              karyawanrepo: RepositoryProvider.of<KaryawanRepository>(context),
+              barangrepo: RepositoryProvider.of<BarangRepository>(context),
+            ),
+            child: FutureBuilder(
+              future: theFuture,
+              builder: (context, snap) {
+                if (snap.hasData) {
+                  if (snap.data) {
+                    return const FirstRun();
+                  } else {
+                    return adminonly ? const AdminPage() : const Home();
+                  }
+                }
+                return const CircularProgressIndicator.adaptive();
+              },
+            ),
+          ),
+        );
       },
     );
   }

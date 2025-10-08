@@ -21,13 +21,13 @@ class TileStruk extends StatefulWidget {
   final StrukMdl theData;
   final void Function()? deletefun;
   final StringBuffer serviceList;
-  final int total;
+  // final int total;
   const TileStruk(
     this.theData,
     this.serviceList, {
     super.key,
     this.pdf,
-    required this.total,
+    // required this.total,
     this.deletefun,
   });
 
@@ -36,9 +36,18 @@ class TileStruk extends StatefulWidget {
 }
 
 class _TileStrukState extends State<TileStruk> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void thisWidgetSetstate() => setState(() {});
   @override
   Widget build(BuildContext context) {
+    int total = widget.theData.itemCards.fold(
+      0,
+      (previousValue, element) => previousValue + (element.pcs * element.price),
+    );
     return ListTile(
       isThreeLine: false,
       leading: widget.theData.tipePembayaran == TipePembayaran.qris
@@ -101,9 +110,7 @@ class _TileStrukState extends State<TileStruk> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Total: ${widget.total} (${widget.theData.tipePembayaran.name})',
-              ),
+              Text('Total: $total (${widget.theData.tipePembayaran.name})'),
               Text(DateFormat.Hm('id_ID').format(widget.theData.tanggal)),
             ],
           ),

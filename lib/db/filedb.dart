@@ -16,16 +16,16 @@ class FileRepo {
     }
   }
 
-  ///return filepath
+  ///return filepath, might still locally saved
   Future<String> uploadFile(File file, String filename) async {
     var dir = await getApplicationDocumentsDirectory();
     // var newfilename = generateRandomString(6) + filename;
     // var theFile = File(join(dir.path, newfilename ));
-    return file.copy(join(dir.path, filename + extension(file.path))).then(
-      (value) {
-        return value.path;
-      },
-    );
+    return file.copy(join(dir.path, filename + extension(file.path))).then((
+      value,
+    ) {
+      return value.path;
+    });
   }
 }
 

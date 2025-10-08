@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
+import 'package:groom/etc/extension.dart';
 import 'package:groom/model/model.dart';
 
 class MyListTile extends StatelessWidget {
@@ -54,8 +55,8 @@ class MyListTile extends StatelessWidget {
           ],
         ),
       ),
-      title: Text(data.title),
-      // subtitle: Text(data.title),
+      title: Text(data.title.firstUpcase()),
+      subtitle: Text((data.price * data.pcs).numberFormat(currency: true)),
     );
   }
 }

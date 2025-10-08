@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/etc/extension.dart';
+import 'package:groom/pages/home/riwayat_pemasukan/tile_struk.dart';
 import 'cubitharian/rangkumanharian_cubit.dart';
 import 'package:intl/intl.dart';
 import 'package:weekly_date_picker/datetime_apis.dart';
@@ -27,7 +28,11 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
             fullTotal += element.totalPendapatan;
           }
           return Scaffold(
-            appBar: AppBar(title: const Text('Harian')),
+            appBar: AppBar(
+              title: const Text('Harian'),
+              automaticallyImplyLeading:
+                  MediaQuery.orientationOf(context).index == 0,
+            ),
             bottomNavigationBar: BottomAppBar(
               child: SingleChildScrollView(
                 child: Column(
@@ -126,6 +131,7 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                           children: [
                             Expanded(
                               child: Container(
+                                padding: EdgeInsets.all(4),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
@@ -142,37 +148,32 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                           ],
                         ),
                         // perPerson.entries
-                        // for (var e in state.incomePerPerson)
-                        //   ListTile(
-                        //     onTap: () => showDialog(
-                        //       context: context,
-                        //       builder: (context) => Dialog(
-                        //         child: ListView.builder(
-                        //           itemCount: e.datas?.length ?? 0,
-                        //           itemBuilder: (context, index) {
-                        //             var theData = e.datas![index];
-                        //             int total = 0;
-                        //             StringBuffer servicelist = StringBuffer(
-                        //               '${theData.namaKaryawan} : ',
-                        //             );
-                        //             for (var e in theData.itemCards) {
-                        //               servicelist.write('${cardType[e.id]}, ');
-                        //               total += e.price * (e.pcs);
-                        //             }
-                        //             return TileStruk(
-                        //               e.datas![index],
-                        //               servicelist,
-                        //               total: total,
-                        //             );
-                        //           },
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     title: Text(e.namaKaryawan),
-                        //     subtitle: Text(
-                        //       e.totalPendapatan.numberFormat(currency: true),
-                        //     ),
-                        //   ),
+                        for (var e in state.incomePerPerson)
+                          ListTile(
+                            onTap: () => showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                child: ListView.builder(
+                                  itemCount: e.datas?.length ?? 0,
+                                  itemBuilder: (context, index) {
+                                    var theData = e.datas![index];
+                                    StringBuffer servicelist = StringBuffer(
+                                      '${theData.namaKaryawan} : ',
+                                    );
+
+                                    return TileStruk(
+                                      e.datas![index],
+                                      servicelist,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            title: Text(e.namaKaryawan),
+                            subtitle: Text(
+                              e.totalPendapatan.numberFormat(currency: true),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -186,6 +187,7 @@ class _RangkumanHarianState extends State<RangkumanHarian> {
                           children: [
                             Expanded(
                               child: Container(
+                                padding: EdgeInsets.all(4),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [

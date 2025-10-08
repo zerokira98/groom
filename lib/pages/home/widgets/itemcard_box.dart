@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
@@ -31,7 +33,28 @@ class ItemCardBox extends StatelessWidget {
             child: Column(
               children: [
                 Text(data.title.firstUpcase(), maxLines: 1),
-                const Expanded(child: Center(child: Icon(Icons.abc))),
+                (data.img != null)
+                    ? Expanded(
+                        child: Image(
+                          image: FileImage(File(data.img!)),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Image.asset('img/logo.jpg'),
+                          // loadingBuilder: (context, child, loadingProgress) =>
+                          //     Center(
+                          //       child: LinearProgressIndicator(
+                          //         value:
+                          //             ((loadingProgress
+                          //                             ?.cumulativeBytesLoaded ??
+                          //                         1) /
+                          //                     (loadingProgress
+                          //                             ?.expectedTotalBytes ??
+                          //                         1))
+                          //                 .toDouble(),
+                          //       ),
+                          //     ),
+                        ),
+                      )
+                    : Expanded(child: Center(child: Icon(Icons.abc))),
                 Padding(
                   padding: EdgeInsets.all(4.0),
                   child: Text(data.price.numberFormat(currency: true)),

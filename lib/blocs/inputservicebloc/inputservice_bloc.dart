@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:groom/db/db.dart';
 import 'package:groom/model/model.dart';
+import 'package:http/http.dart';
 
 part 'inputservice_event.dart';
 part 'inputservice_state.dart';
@@ -54,24 +55,29 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
             : theState.tanggal,
         itemCards: theState.itemCards,
       );
+
+      ///why?
       Timestamp tanggal = a.toJson().remove('tanggal');
       var jsonA = a.toJson()..remove('tanggal');
       jsonA.addAll({'tanggal': tanggal.toDate().toIso8601String()});
       try {
-        for (var e in a.itemCards) {
-          ///condition when item is barang
-          if (e.id == 3) {
-            barangrepo.find(e.title).then((v) {
-              if (v.isNotEmpty) {
-                var single = v.first;
-                barangrepo.edit(single.copyWith(pcs: single.pcs - e.pcs));
-              }
-            });
-          }
-        }
+        // for (var e in a.itemCards) {
+        //   ///TODO //condition when item is barang
+        //   if (e.id == 3) {
+        //     barangrepo.find(e.title).then((v) {
+        //       if (v.isNotEmpty) {
+        //         var single = v.first;
+        //         barangrepo.edit(single.copyWith(pcs: single.pcs - e.pcs));
+        //       }
+        //     });
+        //   }
+        // }
         emit(InputserviceLoading());
+
+        /// TODO //iwas using midtrans??
         if (a.tipePembayaran == TipePembayaran.qris) {
-          await strukrepo.insertStruk(a).then((value) async {
+          // if (false) {
+          Response res = await strukrepo.insertStruk(a).then((value) async {
             var res = await midApi
                 .getFlutterTest(
                   jsonEncode(jsonA..update('id', (v) => value.id)),
@@ -96,29 +102,30 @@ class InputserviceBloc extends Bloc<InputserviceEvent, InputserviceState> {
                   },
                 );
             print(jsonDecode(res.body));
-            emit(
-              InputserviceLoaded(
-                tipePembayaran: a.tipePembayaran,
-                tanggal: DateTime.now(),
-                karyawanName: theState.karyawanName,
-                itemCards: const [],
-                success:
-                    '{"qrcode_url":"${jsonDecode(res.body)['qrcode_url']}"}',
-              ),
-            );
-            return value;
+            return res;
           });
-        } else {
-          await strukrepo.insertStruk(a);
           emit(
             InputserviceLoaded(
               tipePembayaran: a.tipePembayaran,
               tanggal: DateTime.now(),
               karyawanName: theState.karyawanName,
               itemCards: const [],
-              success: 'sukses !',
+              success: '{"qrcode_url":"${jsonDecode(res.body)['qrcode_url']}"}',
             ),
           );
+        } else {
+          await strukrepo.insertStruk(a).then((value) {
+            print('herey');
+            emit(
+              InputserviceLoaded(
+                tipePembayaran: a.tipePembayaran,
+                tanggal: DateTime.now(),
+                karyawanName: theState.karyawanName,
+                itemCards: const [],
+                success: '{"success":"sukses !"}',
+              ),
+            );
+          });
         }
       } catch (e) {
         debugPrint('catched err$e');

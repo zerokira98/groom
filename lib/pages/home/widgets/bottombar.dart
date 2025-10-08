@@ -74,6 +74,7 @@ class FloatingButton extends StatelessWidget {
               uangCustomer.text = totalpembayaran.toString();
               return SafeArea(
                 child: AlertDialog(
+                  insetPadding: EdgeInsets.symmetric(vertical: 8),
                   actions: [
                     ElevatedButton(
                       style: ButtonStyle(
@@ -104,10 +105,11 @@ class FloatingButton extends StatelessWidget {
                                       KeyLock(tendigits: pass, title: karname),
                                 ).then((correct) {
                                   if (correct != null && correct) {
-                                    Navigator.pop(context);
+                                    ///TODO create listener
                                     BlocProvider.of<InputserviceBloc>(
                                       context,
                                     ).add(SubmitToDB());
+                                    Navigator.pop(context);
                                   } else {}
                                 });
                               } else {
@@ -167,9 +169,7 @@ class FloatingButton extends StatelessWidget {
                                             children: [
                                               Text(awo.title),
                                               // if (awo.id == 3)
-                                              //   Text(
-                                              //     ' (${awo.namaBarang} (${awo.pcs}x))',
-                                              //   ),
+                                              Text('${awo.pcs}x'),
                                               // if (awo.id == 4)
                                               //   Text(' (${awo.namaBarang})'),
                                             ],
@@ -199,6 +199,26 @@ class FloatingButton extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          DropdownButton(
+                            value: state.tipePembayaran,
+                            items: const [
+                              DropdownMenuItem(
+                                value: TipePembayaran.cash,
+                                child: Text('Cash'),
+                              ),
+                              DropdownMenuItem(
+                                value: TipePembayaran.qris,
+                                child: Text('Qris'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              BlocProvider.of<InputserviceBloc>(context).add(
+                                ChangeTipePembayaran(
+                                  type: value ?? TipePembayaran.cash,
+                                ),
+                              );
+                            },
+                          ),
                           const Text(
                             'Total :',
                             textScaler: TextScaler.linear(1.25),
@@ -211,30 +231,8 @@ class FloatingButton extends StatelessWidget {
                       ),
                       Column(
                         children: [
-                          Row(
-                            children: [
-                              DropdownButton(
-                                value: state.tipePembayaran,
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: TipePembayaran.cash,
-                                    child: Text('Cash'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: TipePembayaran.qris,
-                                    child: Text('Qris'),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  BlocProvider.of<InputserviceBloc>(
-                                    context,
-                                  ).add(
-                                    ChangeTipePembayaran(
-                                      type: value ?? TipePembayaran.cash,
-                                    ),
-                                  );
-                                },
-                              ),
+                          Row(children: [
+                              
                             ],
                           ),
                           if (state.tipePembayaran.index == 1)

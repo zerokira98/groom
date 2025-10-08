@@ -8,7 +8,7 @@ part 'serviceitems_mdl.g.dart';
 class ServiceitemsMdl extends Equatable {
   final int index;
   final String title;
-  final double cutPercentage;
+  final int employeeCut;
   final String? id;
   final int price;
   final int pcs;
@@ -21,11 +21,11 @@ class ServiceitemsMdl extends Equatable {
     this.id,
     required this.price,
     this.img,
-    required this.cutPercentage,
+    required this.employeeCut,
   });
 
   @override
-  List<Object?> get props => [title, id, price, img, cutPercentage, pcs, index];
+  List<Object?> get props => [title, id, price, img, employeeCut, pcs, index];
 
   ServiceitemsMdl copyWith({
     String? title,
@@ -34,10 +34,10 @@ class ServiceitemsMdl extends Equatable {
     ValueGetter<int>? index,
     int? price,
     ValueGetter<String?>? img,
-    double? cutPercentage,
+    ValueGetter<int>? employeeCut,
   }) {
     return ServiceitemsMdl(
-      cutPercentage: cutPercentage ?? this.cutPercentage,
+      employeeCut: employeeCut != null ? employeeCut() : this.employeeCut,
       title: title ?? this.title,
       id: id != null ? id() : this.id,
       pcs: pcs != null ? pcs() : this.pcs,

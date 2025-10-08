@@ -5,15 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/bon_repo.dart';
 import 'package:groom/db/pengeluaran_repo.dart';
 import 'package:groom/etc/extension.dart';
+import 'package:groom/model/datafilter.dart';
 import 'package:groom/model/model.dart';
-import 'package:groom/pages/adminapp/rangkuman/cubitharian/rangkumanharian_cubit.dart';
+// import 'package:groom/pages/adminapp/rangkuman/cubitharian/rangkumanharian_cubit.dart';
 import 'package:groom/pages/pengeluaran/pengeluaran_histori.dart';
 import 'package:groom/pages/print/print_to_excel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as fc;
 import 'package:intl/intl.dart';
-import 'package:weekly_date_picker/datetime_apis.dart';
+// import 'package:weekly_date_picker/datetime_apis.dart';
 import 'cubitmingguan/rangkumanmingg_cubit.dart';
-import 'rangkum_hari.dart';
+// import 'rangkum_hari.dart';
 
 class RangkumanMingguan extends StatelessWidget {
   const RangkumanMingguan({super.key});
@@ -23,7 +24,7 @@ class RangkumanMingguan extends StatelessWidget {
     var now = DateTime.now();
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(automaticallyImplyLeading:MediaQuery.orientationOf(context).index==0,
         actions: [
           BlocBuilder<RangkumanWeekCubit, RangkumanWeekState>(
             builder: (context, state) {
@@ -35,7 +36,7 @@ class RangkumanMingguan extends StatelessWidget {
                       context: context,
                       builder: (context) => PrintMingguan(
                         perDay: state.daily,
-                        startDate: state.tanggalStart,
+                        startDate: state.filter.start,
                       ),
                     );
                   },
@@ -105,14 +106,12 @@ class RangkumanMingguan extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () {
-                        BlocProvider.of<RangkumanWeekCubit>(context).loadData({
-                          'tanggalStart': state.tanggalStart.subtract(
+                        BlocProvider.of<RangkumanWeekCubit>(context).loadData(Datafilter(start: state.filter.start.subtract(
                             const Duration(days: 7),
-                          ),
-                          'tanggalEnd': state.tanggalEnd.subtract(
+                          ), end: state.filter.end.subtract(
                             const Duration(days: 7),
-                          ),
-                        });
+                          ), sortfield: '', sortType: .none)
+                          );
                       },
                       icon: const Icon(Icons.chevron_left),
                     ),
@@ -124,6 +123,7 @@ class RangkumanMingguan extends StatelessWidget {
                             context: context,
                             firstDate: DateTime(now.year - 5),
                             lastDate: now.add(const Duration(days: 7)),
+                            
                           ).then((value) {
                             if (value != null) {
                               var ts = DateTime(
@@ -134,28 +134,25 @@ class RangkumanMingguan extends StatelessWidget {
                               var te = ts.add(const Duration(days: 7));
                               BlocProvider.of<RangkumanWeekCubit>(
                                 context,
-                              ).loadData({
-                                'tanggalStart': ts,
-                                'tanggalEnd': te,
-                              });
+                              ).loadData(
+                                Datafilter(start: ts, end: te , sortfield: '', sortType: .none));
                             }
                           });
                         },
                         child: Text(
-                          '${DateFormat.yMEd('id_ID').format(state.tanggalStart)} - ${DateFormat.yMEd('id_ID').format(state.tanggalEnd.subtract(Durations.extralong1))}',
+                          '${DateFormat.yMEd('id_ID').format(state.filter.start)} - ${DateFormat.yMEd('id_ID').format(state.filter.end.subtract(Durations.extralong1))}',
                         ),
                       ),
                     ),
                     IconButton(
                       onPressed: () {
-                        BlocProvider.of<RangkumanWeekCubit>(context).loadData({
-                          'tanggalStart': state.tanggalStart.add(
+                        BlocProvider.of<RangkumanWeekCubit>(context).loadData(
+                          Datafilter(start: state.filter.start.add(
                             const Duration(days: 7),
-                          ),
-                          'tanggalEnd': state.tanggalEnd.add(
+                          ), end: state.filter.end.add(
                             const Duration(days: 7),
-                          ),
-                        });
+                          ), sortfield: '', sortType: SortType.none)
+                          );
                       },
                       icon: const Icon(Icons.chevron_right),
                     ),
@@ -352,19 +349,8 @@ class TileMingguan extends StatelessWidget {
         context,
       ).getBonFiltered(fc.Filter('namaSubjek', isEqualTo: data.namaKaryawan)),
       builder: (context, snapshot) {
-        double totcut = 0.0;
-        for (var ewe in dataState.dailycut) {
-          totcut += ewe
-              .where((e) => data.namaKaryawan == e.namaKaryawan)
-              .fold(
-                0,
-                (previousValue, element) =>
-                    previousValue + element.totalPendapatan,
-              );
-        }
-        // for (var awo in data.itemCards) {
-        //   tot += awo.price .cutPercentage(awo.type);
-        // }
+        double totcut = data.itemCards.fold(0.0, (previousValue, element) => previousValue+(element.employeeCut*element.pcs),);
+   
         num hutang = 0;
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           for (var e in snapshot.data!) {
@@ -375,7 +361,7 @@ class TileMingguan extends StatelessWidget {
           title: Text(data.namaKaryawan),
           subtitle: Row(
             children: [
-              Text(total.toString()),
+              Text(total.numberFormat()),
               const Expanded(child: SizedBox()),
               const Text('Expected payment: '),
               Text(
@@ -432,7 +418,7 @@ class TileMingguan extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () async {
-                                var te = dataState.tanggalEnd;
+                                var te = dataState.filter.end;
                                 var checkdata =
                                     await RepositoryProvider.of<
                                           PengeluaranRepository
@@ -562,33 +548,28 @@ class TileMingguan extends StatelessWidget {
                             children: [
                               Table(
                                 border: TableBorder.all(),
+
+columnWidths: {1:FixedColumnWidth(12)},
                                 children: [
                                   for (var awo in data.itemCards)
                                     TableRow(
+                                      decoration: BoxDecoration(),
                                       children: [
-                                        // Padding(
-                                        //   padding: const EdgeInsets.all(1.0),
-                                        //   child: Text(cardType[awo.id]),
-                                        // ),
-                                        Text(
-                                          awo.price.toString(),
-                                          textAlign: TextAlign.end,
+                                        TableCell(
+                                          // padding: const EdgeInsets.all(2.0),
+                                          child: Text( awo.title),
                                         ),
-                                        // Text(
-                                        //   ' ${cutPercentage(awo.id)}${awo.id == 0 ? '-0.5' : ''}',
-                                        // ),
                                         Text(
-                                          dataState.dataPerPersoncut
-                                              .firstWhere(
-                                                (e) =>
-                                                    e.namaKaryawan ==
-                                                    data.namaKaryawan,
-                                              )
-                                              .itemCards
-                                              .firstWhere(
-                                                (e2) => e2.id == awo.id,
-                                              )
-                                              .price
+                                          awo.pcs.numberFormat(),
+                                          textAlign: TextAlign.end,
+                                        ), 
+                                        Text(
+                                          awo.price.numberFormat(),
+                                          textAlign: TextAlign.end,
+                                        ), 
+                                        Text(
+                                          (awo
+                                              .employeeCut*awo.pcs)
                                               .numberFormat(),
                                           textAlign: TextAlign.end,
                                         ),
@@ -702,8 +683,8 @@ class _SlipGajiState extends State<SlipGaji> {
     var aWeek = await RepositoryProvider.of<BonRepository>(context)
         .getByNama(
           nama: widget.nama,
-          tgl: DateUtils.dateOnly(widget.dataState.tanggalStart),
-          tglEnd: DateUtils.dateOnly(widget.dataState.tanggalEnd),
+          tgl: DateUtils.dateOnly(widget.dataState.filter.start),
+          tglEnd: DateUtils.dateOnly(widget.dataState.filter.end),
         )
         .then(
           (value) => value
@@ -773,28 +754,28 @@ class _SlipGajiState extends State<SlipGaji> {
 
   @override
   Widget build(BuildContext context) {
-    List<PerPerson> waw = List.generate(
-      7,
-      (index) => PerPerson(
-        namaKaryawan: widget.nama,
-        perCategory: const [],
-        totalPendapatan: 0,
-      ),
-    );
+    // List<PerPerson> waw = List.generate(
+    //   7,
+    //   (index) => PerPerson(
+    //     namaKaryawan: widget.nama,
+    //     perCategory: const [],
+    //     totalPendapatan: 0,
+    //   ),
+    // );
     // List<ItemCardMdl> groundItemCards = List.generate(
     //   cardType.length,
     //   (i) => ItemCardMdl(index: 0, price: 0, id: i),
     // );
     num totHC = 0, totSHV = 0, totCLR = 0, totBRG = 0, totLain = 0;
 
-    var singleKaryawan = widget.dataState.dailycut
-        .map(
-          (e) => e
-              .map((e2) => e2.namaKaryawan == widget.nama ? e2 : null)
-              .nonNulls
-              .toList(),
-        )
-        .toList();
+    // var singleKaryawan = widget.dataState.dailycut
+    //     .map(
+    //       (e) => e
+    //           .map((e2) => e2.namaKaryawan == widget.nama ? e2 : null)
+    //           .nonNulls
+    //           .toList(),
+    //     )
+    //     .toList();
     // for (var i = 0; i < 7; i++) {
     //   waw[i] = widget.dataState.daily[i].firstWhere(
     //     (element) => element.namaKaryawan == widget.nama,
@@ -883,88 +864,88 @@ class _SlipGajiState extends State<SlipGaji> {
                 ),
               ],
             ),
-            Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: [
-                const TableRow(
-                  children: [
-                    Text('Tgl'),
-                    Text('HC'),
-                    Text('SHV'),
-                    Text('SMR'),
-                    Text('BRG'),
-                    Text('ETC'),
-                  ],
-                ),
-                for (var i = 0; i < 7; i++)
-                  TableRow(
-                    decoration: const BoxDecoration(),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => BlocProvider.value(
-                                  value:
-                                      BlocProvider.of<RangkumanDayCubit>(
-                                        context,
-                                      )..loadData({
-                                        'tanggalStart': widget
-                                            .dataState
-                                            .tanggalStart
-                                            .addDays(i),
-                                        'tanggalEnd': widget
-                                            .dataState
-                                            .tanggalStart
-                                            .addDays(i)
-                                            .addDays(1),
-                                      }),
-                                  child: const RangkumanHarian(),
-                                ),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            widget.dataState.tanggalStart
-                                .addDays(i)
-                                .formatDayMonth(),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        singleKaryawan
-                                .elementAtOrNull(i)
-                                ?.singleOrNull
-                                ?.perCategory[0]
-                                .price
-                                .numberFormat() ??
-                            '0',
-                      ),
-                      // Text((waw[i].perCategory[1].price.cutPercentage(1))
-                      //     .numberFormat()),
-                      // Text((waw[i].perCategory[2].price.cutPercentage(2))
-                      //     .numberFormat()),
-                      // Text((waw[i].perCategory[3].price.cutPercentage(3))
-                      //     .numberFormat()),
-                      // Text((waw[i].perCategory[4].price.cutPercentage(4))
-                      //     .numberFormat()),
-                    ],
-                  ),
-                TableRow(
-                  children: [
-                    const Text('Total : '),
-                    Text((totHC).numberFormat()),
-                    Text((totSHV).numberFormat()),
-                    Text((totCLR).numberFormat()),
-                    Text((totBRG).numberFormat()),
-                    Text((totLain).numberFormat()),
-                  ],
-                ),
-              ],
-            ),
+            // Table(
+            //   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            //   children: [
+            //     const TableRow(
+            //       children: [
+            //         Text('Tgl'),
+            //         Text('HC'),
+            //         Text('SHV'),
+            //         Text('SMR'),
+            //         Text('BRG'),
+            //         Text('ETC'),
+            //       ],
+            //     ),
+            //     for (var i = 0; i < 7; i++)
+            //       TableRow(
+            //         decoration: const BoxDecoration(),
+            //         children: [
+            //           Padding(
+            //             padding: const EdgeInsets.all(2.0),
+            //             child: InkWell(
+            //               onTap: () {
+            //                 Navigator.push(
+            //                   context,
+            //                   CupertinoPageRoute(
+            //                     builder: (context) => BlocProvider.value(
+            //                       value:
+            //                           BlocProvider.of<RangkumanDayCubit>(
+            //                             context,
+            //                           )..loadData({
+            //                             'tanggalStart': widget
+            //                                 .dataState
+            //                                 .tanggalStart
+            //                                 .addDays(i),
+            //                             'tanggalEnd': widget
+            //                                 .dataState
+            //                                 .tanggalStart
+            //                                 .addDays(i)
+            //                                 .addDays(1),
+            //                           }),
+            //                       child: const RangkumanHarian(),
+            //                     ),
+            //                   ),
+            //                 );
+            //               },
+            //               child: Text(
+            //                 widget.dataState.tanggalStart
+            //                     .addDays(i)
+            //                     .formatDayMonth(),
+            //               ),
+            //             ),
+            //           ),
+            //           Text(
+            //             singleKaryawan
+            //                     .elementAtOrNull(i)
+            //                     ?.singleOrNull
+            //                     ?.perCategory[0]
+            //                     .price
+            //                     .numberFormat() ??
+            //                 '0',
+            //           ),
+            //           // Text((waw[i].perCategory[1].price.cutPercentage(1))
+            //           //     .numberFormat()),
+            //           // Text((waw[i].perCategory[2].price.cutPercentage(2))
+            //           //     .numberFormat()),
+            //           // Text((waw[i].perCategory[3].price.cutPercentage(3))
+            //           //     .numberFormat()),
+            //           // Text((waw[i].perCategory[4].price.cutPercentage(4))
+            //           //     .numberFormat()),
+            //         ],
+            //       ),
+            //     TableRow(
+            //       children: [
+            //         const Text('Total : '),
+            //         Text((totHC).numberFormat()),
+            //         Text((totSHV).numberFormat()),
+            //         Text((totCLR).numberFormat()),
+            //         Text((totBRG).numberFormat()),
+            //         Text((totLain).numberFormat()),
+            //       ],
+            //     ),
+            //   ],
+            // ),
             Row(
               children: [
                 const Text('Total : '),

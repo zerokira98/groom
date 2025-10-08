@@ -22,6 +22,7 @@ class _RangkumMonthState extends State<RangkumMonth> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rangkuman Bulanan'),
+        automaticallyImplyLeading: MediaQuery.orientationOf(context).index == 0,
       ),
       body: Column(
         children: [
@@ -52,8 +53,9 @@ class _RangkumMonthState extends State<RangkumMonth> {
                           initialDate: thedate,
                         ).then((value) {
                           if (value != null) {
-                            BlocProvider.of<BulananCubit>(context)
-                                .loadData(value);
+                            BlocProvider.of<BulananCubit>(
+                              context,
+                            ).loadData(value);
                           }
                         });
                       },
@@ -73,18 +75,21 @@ class _RangkumMonthState extends State<RangkumMonth> {
               }
               if (state.incomePerHari.isEmpty) {
                 return const Material(
-                    child: Center(
-                  child: Text('Empty: no data'),
-                ));
+                  child: Center(child: Text('Empty: no data')),
+                );
               } else if (state.incomePerHari.isNotEmpty) {
                 var thedate = state.bulan;
                 monthC.text = '${thedate.monthName} ${thedate.year}';
-                var dateHighestIncome = DateTime(thedate.year, thedate.month,
-                    state.pendapatanTertinggi['day']!.toInt());
+                var dateHighestIncome = DateTime(
+                  thedate.year,
+                  thedate.month,
+                  state.pendapatanTertinggi['day']!.toInt(),
+                );
                 var dateTotalCustomerperDay = DateTime(
-                    thedate.year,
-                    thedate.month,
-                    state.jumlahCustomerTertinggi['day']!.toInt());
+                  thedate.year,
+                  thedate.month,
+                  state.jumlahCustomerTertinggi['day']!.toInt(),
+                );
                 // var pr = state.groupAndSumPengeluaran;
                 // print(pr);
                 return Expanded(
@@ -92,9 +97,11 @@ class _RangkumMonthState extends State<RangkumMonth> {
                     child: Column(
                       children: [
                         Text(
-                            'Income : ${state.totalPemasukan.numberFormat(currency: true)}'),
+                          'Income : ${state.totalPemasukan.numberFormat(currency: true)}',
+                        ),
                         Text(
-                            'Pengeluaran : ${state.totalPengeluaran.numberFormat(currency: true)}'),
+                          'Pengeluaran : ${state.totalPengeluaran.numberFormat(currency: true)}',
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -112,9 +119,12 @@ class _RangkumMonthState extends State<RangkumMonth> {
                                     Text(dateHighestIncome.formatLengkap()),
                                     const Expanded(child: SizedBox()),
                                     Text(
-                                        '${state.pendapatanTertinggi['count']!.numberFormat(currency: false)}struk'),
-                                    Text(state.pendapatanTertinggi['sum']!
-                                        .numberFormat(currency: true))
+                                      '${state.pendapatanTertinggi['count']!.numberFormat(currency: false)}struk',
+                                    ),
+                                    Text(
+                                      state.pendapatanTertinggi['sum']!
+                                          .numberFormat(currency: true),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -131,17 +141,22 @@ class _RangkumMonthState extends State<RangkumMonth> {
                                       textScaler: TextScaler.linear(1.2),
                                     ),
                                     Text(
-                                        'Avg per open:${state.jumlahCustomerTertinggi['avg']!.numberFormat()}struk'),
+                                      'Avg per open:${state.jumlahCustomerTertinggi['avg']!.numberFormat()}struk',
+                                    ),
                                     const Expanded(child: SizedBox()),
                                     Text(
-                                        'peak:${dateTotalCustomerperDay.weekdayName}, ${dateTotalCustomerperDay.formatDayMonth()}'),
+                                      'peak:${dateTotalCustomerperDay.weekdayName}, ${dateTotalCustomerperDay.formatDayMonth()}',
+                                    ),
                                     // Text('No cust day:' +
                                     //     state.jumlahCustomerTertinggi['emptyDays']!
                                     //         .numberFormat()),
                                     Text(
-                                        '${state.jumlahCustomerTertinggi['count']!.numberFormat()}struk'),
-                                    Text(state.jumlahCustomerTertinggi['sum']!
-                                        .numberFormat(currency: true))
+                                      '${state.jumlahCustomerTertinggi['count']!.numberFormat()}struk',
+                                    ),
+                                    Text(
+                                      state.jumlahCustomerTertinggi['sum']!
+                                          .numberFormat(currency: true),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -152,10 +167,11 @@ class _RangkumMonthState extends State<RangkumMonth> {
                         SfCartesianChart(
                           tooltipBehavior: TooltipBehavior(enable: true),
                           zoomPanBehavior: ZoomPanBehavior(
-                              zoomMode: ZoomMode.x,
-                              enableDoubleTapZooming: true,
-                              enablePinching: true,
-                              enablePanning: true),
+                            zoomMode: ZoomMode.x,
+                            enableDoubleTapZooming: true,
+                            enablePinching: true,
+                            enablePanning: true,
+                          ),
                           title: const ChartTitle(text: 'Grafik Income Harian'),
                           series: [
                             if (showincome && state.incomePerHari.isNotEmpty)
@@ -181,7 +197,7 @@ class _RangkumMonthState extends State<RangkumMonth> {
                                 },
                                 dataSource: state.groupAndSumPengeluaran.entries
                                     .toList(),
-                              )
+                              ),
                           ],
                         ),
                         Row(
@@ -203,7 +219,7 @@ class _RangkumMonthState extends State<RangkumMonth> {
                                         onChanged: (value) => setState(() {
                                           showincome = value ?? false;
                                         }),
-                                      )
+                                      ),
                                     ],
                                   ),
                                   Row(
@@ -218,14 +234,14 @@ class _RangkumMonthState extends State<RangkumMonth> {
                                         onChanged: (value) => setState(() {
                                           showexpense = value ?? false;
                                         }),
-                                      )
+                                      ),
                                     ],
                                   ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),

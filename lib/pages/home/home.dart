@@ -6,8 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import 'package:groom/blocs/cubit/serviceitems_cubit.dart';
 import 'package:groom/blocs/inputservicebloc/inputservice_bloc.dart';
-import 'package:groom/db/db.dart';
+// import 'package:groom/db/db.dart';
 import 'package:groom/pages/adminapp/servicemenu/servicemenuedit.dart';
 import 'package:groom/pages/home/widgets/bottombar.dart';
 import 'package:groom/pages/home/widgets/drawer.dart';
@@ -200,55 +201,49 @@ class _HomeState extends State<Home> {
                                   ),
                             ),
                             const BottombarHome(),
-                            FutureBuilder(
-                              future:
-                                  RepositoryProvider.of<ServiceItemsRepository>(
-                                    context,
-                                  ).getItems(),
-                              builder: (context, snapshot) {
-                                switch (snapshot.connectionState) {
-                                  case ConnectionState.done:
-                                    print(snapshot.data);
-                                    if (snapshot.hasData &&
-                                        (snapshot.data as List).isNotEmpty) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 16.0,
-                                        ),
-                                        child: Wrap(
-                                          alignment: WrapAlignment.start,
-                                          spacing: 4,
-                                          runSpacing: 4,
-                                          children: [
-                                            for (
-                                              var a = 0;
-                                              a < snapshot.data!.length;
-                                              a++
-                                            )
-                                              ItemCardBox(snapshot.data![a]),
-                                          ],
-                                        ),
-                                      );
-                                    } else {
-                                      return ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ServicemenueditPage(),
-                                            ),
-                                          );
-                                        },
-                                        child: const Text(
-                                          'Empty menu items, click here to add',
+                            BlocBuilder<ServiceitemsCubit, ServiceitemsState>(
+                              // future:
+                              //     RepositoryProvider.of<ServiceItemsRepository>(
+                              //       context,
+                              //     ).getItems(),
+                              builder: (context, state) {
+                                if ((state).datas.isNotEmpty) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0,
+                                    ),
+                                    child: Wrap(
+                                      alignment: WrapAlignment.start,
+                                      spacing: 4,
+                                      runSpacing: 4,
+                                      children: [
+                                        for (
+                                          var a = 0;
+                                          a < state.datas.length;
+                                          a++
+                                        )
+                                          ItemCardBox(state.datas[a]),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  if (state.status == Status.loading) {
+                                    CircularProgressIndicator();
+                                  }
+                                  return ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ServicemenueditPage(),
                                         ),
                                       );
-                                    }
-                                  case ConnectionState.waiting:
-                                    return const CircularProgressIndicator();
-                                  default:
-                                    return Container();
+                                    },
+                                    child: const Text(
+                                      'Empty menu items, click here to add',
+                                    ),
+                                  );
                                 }
                               },
                             ),

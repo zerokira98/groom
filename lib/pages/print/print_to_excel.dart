@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:groom/blocs/cubit/serviceitems_cubit.dart';
 import 'package:universal_html/html.dart' as html;
 // import 'package:excel/excel.dart';
 
@@ -29,25 +31,20 @@ class PrintMingguan extends StatelessWidget {
         .nonNulls
         .toList();
     var karyawanList = karyawanListfr.map((e) => e.namaKaryawan).toList();
-    // debugPrint(karyawanList);
-    // var karyawanList = ['Rudy', 'Alfin', 'Febri', 'Indra', 'Yudha'];
-    var karyawanColorList = [
-      'DDEBF7',
-      'FCE4D6',
-      'E2EFDA',
-      'FFF2CC',
-      'EDEDED',
-      'ACB9CA',
-    ];
-    var karyawanColorList2 = [
-      '9BC2E6',
-      'F4B084',
-      'A9D08E',
-      'FFD966',
-      'D0CECE',
-      'D6DCE4',
-    ];
-    var colperPerson = ['HC', 'S/H', 'CLR', 'GOODS'];
+    var karyawanColorList = karyawanListfr
+        .map(
+          (e) => Color(
+            int.tryParse(e.warnahex ?? '', radix: 16) ?? Colors.red.toARGB32(),
+          ),
+        )
+        .toList();
+    var karyawanColorList2 = karyawanColorList
+        .map((e) => e.lighten(30))
+        .toList();
+
+    var colperPerson = RepositoryProvider.of<ServiceitemsCubit>(
+      context,
+    ).state.categories.map((e) => e.data()['title']).toList();
     // var excel = Excel.createExcel();
     final Workbook workbook = Workbook();
 
@@ -58,53 +55,54 @@ class PrintMingguan extends StatelessWidget {
       ..cellStyle.vAlign = VAlignType.center
       ..value = 'Date';
 
+    ///Create Header
     for (var i = 0; i < karyawanList.length; i++) {
-      sheet.getRangeByIndex(1, (i + 2) + (i * 3), 1, (i + 5) + (i * 3))
+      sheet.getRangeByIndex(1, 2 + (i * 4), 1, 5 + (i * 4))
         ..merge()
         ..cellStyle.bold = true
-        ..cellStyle.backColorRgb = Color(
-          int.parse("FF${karyawanColorList2[i]}", radix: 16),
-        )
+        ..cellStyle.backColorRgb = karyawanColorList2[i]
         ..value = karyawanList[i];
       for (var j = 0; j < colperPerson.length; j++) {
-        sheet.getRangeByIndex(2, i + 2 + (i * 3) + j)
+        sheet.getRangeByIndex(2, 2 + (i * 4) + j)
           ..value = colperPerson[j]
-          ..cellStyle.backColorRgb = Color(
-            int.parse("FF${karyawanColorList2[i]}", radix: 16),
-          );
+          ..cellStyle.backColorRgb = karyawanColorList2[i];
       }
       sheet
-          .getRangeByIndex(3, (i + 2) + (i * 3), 8, (i + 5) + (i * 3))
-          .cellStyle
-          .backColorRgb = Color(
-        int.parse("FF${karyawanColorList[i]}", radix: 16),
-      );
+              .getRangeByIndex(3, 2 + (i * 4), 9, 5 + (i * 4))
+              .cellStyle
+              .backColorRgb =
+          karyawanColorList[i];
     } //end loop
     //data inserts
-    for (var idx = 0; idx < perDay.length; idx++) {
-      var element = perDay[idx];
+    for (var idx = 0; idx < 7; idx++) {
+      // var element = perDay[idx];
       List<Object> insertRow = List.filled(
         (karyawanList.length * colperPerson.length) + 1,
-        '',
+        '0',
       );
       insertRow[0] = startDate.addDays(idx);
 
-      for (var e in element) {
-        var index = karyawanList.indexWhere((e1) => e1 == e.namaKaryawan);
-        var startIndex = 1 + (index * 4);
-        for (var i = 0; i < colperPerson.length; i++) {
-          var getprice =
-              e.perCategory.firstWhere((wew) => wew.id == i).price / 1000;
-          insertRow[startIndex + i] = getprice == 0 ? '' : getprice.toInt();
-        }
-      }
+      // for (var e in element) {
+      //   var index = karyawanList.indexWhere((e1) => e1 == e.namaKaryawan);
+      //   var startIndex = 1 + (index * 4);
+      //   for (var i = 0; i < colperPerson.length; i++) {
+      //     var getprice =
+      //         e.perCategory.firstWhere((wew) => wew.id == i).price / 1000;
+      //     insertRow[startIndex + i] = getprice == 0 ? '' : getprice.toInt();
+      //   }
+      // }
 
       sheet.importList(insertRow, 3 + idx, 1, false);
     }
     sheet.getRangeByName('A1:U2').cellStyle.hAlign = HAlignType.center;
     sheet.getRangeByName('B3:U9').cellStyle.hAlign = HAlignType.right;
-    sheet.getRangeByName('A1:U9').cellStyle.borders.all.lineStyle =
-        LineStyle.thin;
+    sheet
+        .getRangeByIndex(1, 1, 9, karyawanList.length * colperPerson.length + 1)
+        .cellStyle
+        .borders
+        .all
+        .lineStyle = LineStyle
+        .thin;
 
     sheet.autoFitColumn(1);
 

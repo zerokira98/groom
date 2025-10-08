@@ -11,19 +11,18 @@ class RangkumMingguanButton extends StatelessWidget {
           () {
             var valueWidget = BlocProvider.value(
               value: BlocProvider.of<RangkumanWeekCubit>(context)
-                ..loadData({
-                  'tanggalStart': DateTime(DateTime.now().year,
+                ..loadData(
+                  Datafilter(start: DateTime(DateTime.now().year,
                           DateTime.now().month, DateTime.now().day)
                       .subtract(Duration(
                     days: DateTime.now().weekday,
-                  )),
-                  'tanggalEnd': DateTime(DateTime.now().year,
+                  )), end: DateTime(DateTime.now().year,
                           DateTime.now().month, DateTime.now().day)
                       .subtract(Duration(
                         days: DateTime.now().weekday,
                       ))
-                      .add(const Duration(days: 7)),
-                }),
+                      .add(const Duration(days: 7)), sortfield: '', sortType:.none)
+              ),
               child: const RangkumanMingguan(),
               // ),
             );

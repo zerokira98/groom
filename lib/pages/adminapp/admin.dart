@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:groom/model/datafilter.dart';
 import 'package:groom/pages/adminapp/equity/uangkeluar.dart';
 import 'package:groom/pages/adminapp/karyawan.dart';
 import 'package:groom/pages/adminapp/rangkuman/rangkuman.dart';
@@ -60,17 +61,14 @@ class _AdminPageState extends State<AdminPage> {
       const BarangPage(), //7
       BlocProvider.value(
         value: BlocProvider.of<RangkumanWeekCubit>(context)
-          ..loadData({
-            'tanggalStart': DateTime(curdate.year, curdate.month, curdate.day)
+          ..loadData(Datafilter(start: DateTime(curdate.year, curdate.month, curdate.day)
                 .subtract(Duration(
               days: curdate.weekday,
-            )),
-            'tanggalEnd': DateTime(curdate.year, curdate.month, curdate.day)
+            )), end: DateTime(curdate.year, curdate.month, curdate.day)
                 .subtract(Duration(
                   days: curdate.weekday,
                 ))
-                .add(const Duration(days: 7)),
-          }),
+                .add(const Duration(days: 7)), sortfield: '', sortType: .none) ),
         child: const RangkumanMingguan(),
       ),
       BlocProvider.value(
@@ -234,7 +232,7 @@ class _AdminPageState extends State<AdminPage> {
                               }
                             : null),
                   ),
-                  const Padding(
+                    Padding(
                     padding: EdgeInsets.only(bottom: 4.0),
                     child: GantiPassAdmin(),
                   ),

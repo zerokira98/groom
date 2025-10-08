@@ -29,11 +29,18 @@ extension Uppercasing on String {
     }
     // return this.
   }
+
   // ···
 }
 
 extension TanggalFormat on DateTime {
   t.Timestamp get timestampFire => t.Timestamp.fromDate(this);
+
+  ///without second-nanosecond. DateTime(year,month,day)
+  DateTime dmyDate() {
+    return DateTime(year, month, day);
+  }
+
   String formatLengkap() {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat('EEEE, d MMMM yyyy ', 'ID_id');
@@ -95,7 +102,7 @@ enum Size {
   bold, //only bold text
   boldMedium, //bold with medium
   boldLarge, //bold with large
-  extraLarge //extra large
+  extraLarge, //extra large
 }
 
 enum Align {

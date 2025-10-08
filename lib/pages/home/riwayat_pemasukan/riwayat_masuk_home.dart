@@ -46,14 +46,9 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   var theData = snapshot.data![index];
-                  int total = 0;
                   StringBuffer servicelist = StringBuffer(
                     '${theData.namaKaryawan} : ',
                   );
-                  for (var e in theData.itemCards) {
-                    // servicelist.write('${cardType[e.id]}, ');
-                    total += e.price * (e.pcs);
-                  }
                   return Column(
                     children: [
                       if (index >= 1 &&
@@ -92,7 +87,6 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
                       TileStruk(
                         theData,
                         servicelist,
-                        total: total,
                         deletefun: () async {
                           var dia = await showDialog(
                             context: context,

@@ -34,14 +34,11 @@ class _SideDrawerState extends State<SideDrawer> {
   double _opacity = 0.0;
   @override
   void initState() {
-    Future.delayed(
-      Durations.short4,
-      () {
-        setState(() {
-          _opacity = 1.0;
-        });
-      },
-    );
+    Future.delayed(Durations.short4, () {
+      setState(() {
+        _opacity = 1.0;
+      });
+    });
     super.initState();
   }
 
@@ -59,15 +56,16 @@ class _SideDrawerState extends State<SideDrawer> {
                 padding: const EdgeInsets.only(top: 24, bottom: 18),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withValues(alpha: 0.01),
-                        Colors.white,
-                        Colors.white,
-                        Colors.white.withValues(alpha: 0.01),
-                      ],
-                      begin: const Alignment(0, -1),
-                      end: const Alignment(0, 1),
-                      stops: const [0.0, 0.05, 0.95, 1]),
+                    colors: [
+                      Colors.white.withValues(alpha: 0.01),
+                      Colors.white,
+                      Colors.white,
+                      Colors.white.withValues(alpha: 0.01),
+                    ],
+                    begin: const Alignment(0, -1),
+                    end: const Alignment(0, 1),
+                    stops: const [0.0, 0.05, 0.95, 1],
+                  ),
                 ),
                 // color: Colors.white,
                 // transformAlignment: Alignment.center,
@@ -91,7 +89,7 @@ class _SideDrawerState extends State<SideDrawer> {
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
         Padding(
@@ -104,40 +102,48 @@ class _SideDrawerState extends State<SideDrawer> {
                   if (state is InputserviceLoaded) {
                     dropdownC.text = state.karyawanName;
                     return FutureBuilder(
-                        future:
-                            RepositoryProvider.of<KaryawanRepository>(context)
-                                .getAllKaryawan(kIsWeb ? true : false),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                            List<DropdownMenuEntry<String?>> a = snapshot.data!
-                                .map((e) => e.aktif
+                      future: RepositoryProvider.of<KaryawanRepository>(
+                        context,
+                      ).getAllKaryawan(kIsWeb ? true : false),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                          List<DropdownMenuEntry<String?>> a = snapshot.data!
+                              .map(
+                                (e) => e.aktif
                                     ? DropdownMenuEntry(
-                                        value: e.id, label: e.namaKaryawan)
-                                    : null)
-                                .nonNulls
-                                .toList();
-                            return DropdownMenu<String?>(
-                              dropdownMenuEntries: a,
-                              controller: dropdownC,
-                              initialSelection: a
-                                  .firstWhere(
-                                    (element) =>
-                                        element.label == state.karyawanName,
-                                    orElse: () => const DropdownMenuEntry(
-                                        value: '-1', label: 'error'),
-                                  )
-                                  .value,
-                              onSelected: (value) {
-                                BlocProvider.of<InputserviceBloc>(context).add(
-                                    ChangeKaryawan(a
-                                        .firstWhere((e) => e.value == value!)
-                                        .label));
-                              },
-                            );
-                          } else {
-                            return const Text('error snapshot');
-                          }
-                        });
+                                        value: e.id,
+                                        label: e.namaKaryawan,
+                                      )
+                                    : null,
+                              )
+                              .nonNulls
+                              .toList();
+                          return DropdownMenu<String?>(
+                            dropdownMenuEntries: a,
+                            controller: dropdownC,
+                            initialSelection: a
+                                .firstWhere(
+                                  (element) =>
+                                      element.label == state.karyawanName,
+                                  orElse: () => const DropdownMenuEntry(
+                                    value: '-1',
+                                    label: 'error',
+                                  ),
+                                )
+                                .value,
+                            onSelected: (value) {
+                              BlocProvider.of<InputserviceBloc>(context).add(
+                                ChangeKaryawan(
+                                  a.firstWhere((e) => e.value == value!).label,
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          return const Text('error snapshot');
+                        }
+                      },
+                    );
                   } else if (state is InputserviceInitial) {
                     return const CircularProgressIndicator();
                   } else {
@@ -181,44 +187,84 @@ class _SideDrawerState extends State<SideDrawer> {
           title: const Text('Riwayat Pemasukan'),
           onTap: () {
             Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => const RiwayatPemasukan(),
-                ));
+              context,
+              CupertinoPageRoute(
+                builder: (context) => const RiwayatPemasukan(),
+              ),
+            );
           },
         ),
         ListTile(
           leading: const Icon(Icons.note_alt),
           title: const Text('Catat Pengeluaran Toko'),
           onTap: () {
-            var name = (BlocProvider.of<InputserviceBloc>(context).state
-                    as InputserviceLoaded)
-                .karyawanName;
-            RepositoryProvider.of<KaryawanRepository>(context)
-                .getAllKaryawan()
-                .then((listallkaryawan) {
-              var pass = listallkaryawan
-                  .firstWhere(
-                    (element) => element.namaKaryawan == name,
-                  )
-                  .password;
-              if (pass != null) {
-                showDialog<bool?>(
-                  context: context,
-                  builder: (context) => KeyLock(
-                    tendigits: pass,
-                    title: 'Karyawan: $name',
-                  ),
-                ).then((value) {
-                  if (value != null && value) {
-                    Navigator.push(
+            var currentstate = BlocProvider.of<InputserviceBloc>(context).state;
+            if (currentstate is InputserviceLoaded) {
+              var name = currentstate.karyawanName;
+              RepositoryProvider.of<KaryawanRepository>(
+                context,
+              ).getAllKaryawan().then((listallkaryawan) {
+                var pass = listallkaryawan
+                    .firstWhere((element) => element.namaKaryawan == name)
+                    .password;
+                if (pass != null) {
+                  showDialog<bool?>(
+                    context: context,
+                    builder: (context) =>
+                        KeyLock(tendigits: pass, title: 'Karyawan: $name'),
+                  ).then((value) {
+                    if (value != null && value) {
+                      Navigator.push(
                         context,
                         CupertinoPageRoute(
                           builder: (c) => BlocProvider.value(
                             value: BlocProvider.of<InputserviceBloc>(context),
                             child: const PengeluaranHome(),
                           ),
-                        ));
+                        ),
+                      );
+                    } else {
+                      // Navigator.pop(context);
+                    }
+                  });
+                } else {
+                  Flushbar(
+                    message: 'no password is set',
+                    duration: const Duration(seconds: 3),
+                    animationDuration: Durations.long1,
+                  ).show(context);
+                }
+              });
+            }
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.dangerous),
+          title: const Text('Tombol Berbahaya'),
+          onTap: () async {
+            var curstate = BlocProvider.of<InputserviceBloc>(context).state;
+            if (curstate is InputserviceLoaded) {
+              var name = curstate.karyawanName;
+              var listallkaryawan =
+                  await RepositoryProvider.of<KaryawanRepository>(
+                    context,
+                  ).getAllKaryawan();
+              var pass = listallkaryawan
+                  .firstWhere((element) => element.namaKaryawan == name)
+                  .password;
+              if (pass != null) {
+                showDialog<bool?>(
+                  context: context,
+                  builder: (context) =>
+                      KeyLock(tendigits: pass, title: 'Karyawan: $name'),
+                ).then((value) {
+                  if (value != null && value) {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => HutangHome(namaKaryawan: name),
+                      ),
+                    );
                   } else {
                     // Navigator.pop(context);
                   }
@@ -230,48 +276,6 @@ class _SideDrawerState extends State<SideDrawer> {
                   animationDuration: Durations.long1,
                 ).show(context);
               }
-            });
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.dangerous),
-          title: const Text('Tombol Berbahaya'),
-          onTap: () async {
-            var name = (BlocProvider.of<InputserviceBloc>(context).state
-                    as InputserviceLoaded)
-                .karyawanName;
-            var listallkaryawan =
-                await RepositoryProvider.of<KaryawanRepository>(context)
-                    .getAllKaryawan();
-            var pass = listallkaryawan
-                .firstWhere(
-                  (element) => element.namaKaryawan == name,
-                )
-                .password;
-            if (pass != null) {
-              showDialog<bool?>(
-                context: context,
-                builder: (context) => KeyLock(
-                  tendigits: pass,
-                  title: 'Karyawan: $name',
-                ),
-              ).then((value) {
-                if (value != null && value) {
-                  Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => HutangHome(namaKaryawan: name),
-                      ));
-                } else {
-                  // Navigator.pop(context);
-                }
-              });
-            } else {
-              Flushbar(
-                message: 'no password is set',
-                duration: const Duration(seconds: 3),
-                animationDuration: Durations.long1,
-              ).show(context);
             }
           },
         ),
@@ -283,27 +287,27 @@ class _SideDrawerState extends State<SideDrawer> {
               // InputController ic = InputController();
               final FocusNode focusNode = FocusNode();
               focusNode.requestFocus();
-              SharedPreferences.getInstance().then(
-                (spref) {
-                  showDialog<bool>(
-                    context: context,
-                    builder: (context) {
-                      return KeyLock(
-                          tendigits: spref.getString('adminpass') ?? adminpass,
-                          title: 'Admin');
-                    },
-                  ).then((dia) {
-                    if (dia == null) return;
-                    if (dia) {
-                      Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => const AdminPage(),
-                          ));
-                    }
-                  });
-                },
-              );
+              SharedPreferences.getInstance().then((spref) {
+                showDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return KeyLock(
+                      tendigits: spref.getString('adminpass') ?? adminpass,
+                      title: 'Admin',
+                    );
+                  },
+                ).then((dia) {
+                  if (dia == null) return;
+                  if (dia) {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => const AdminPage(),
+                      ),
+                    );
+                  }
+                });
+              });
             },
           ),
 
@@ -321,35 +325,44 @@ class _SideDrawerState extends State<SideDrawer> {
             children: [
               const Text('Color : '),
               Expanded(
-                  child: BlocBuilder<ThemeCubit, ThemeState>(
-                buildWhen: (previous, current) =>
-                    previous.currentScheme != current.currentScheme,
-                builder: (context, state) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: DropdownButton<FlexScheme>(
-                      isExpanded: true,
-                      items: [
-                        for (FlexScheme a in FlexScheme.values)
-                          DropdownMenuItem(
-                            value: a,
-                            child: Text(a.name.firstUpcase()),
-                          ),
-                      ],
-                      value: state.currentScheme,
-                      onChanged: (value) {
-                        if (value != null) {
-                          BlocProvider.of<ThemeCubit>(context)
-                              .changeColorScheme(value);
-                        }
-                      },
-                    ),
-                  );
-                },
-              )),
+                child: BlocBuilder<ThemeCubit, ThemeState>(
+                  buildWhen: (previous, current) =>
+                      previous.currentScheme != current.currentScheme,
+                  builder: (context, state) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: DropdownButton<FlexScheme>(
+                        isExpanded: true,
+                        items: [
+                          for (FlexScheme a in FlexScheme.values)
+                            DropdownMenuItem(
+                              value: a,
+                              child: Text(a.name.firstUpcase()),
+                            ),
+                        ],
+                        value: state.currentScheme,
+                        onChanged: (value) {
+                          if (value != null) {
+                            BlocProvider.of<ThemeCubit>(
+                              context,
+                            ).changeColorScheme(value);
+                          }
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
-        )
+        ),
+
+        IconButton(
+          onPressed: () {
+            BlocProvider.of<InputserviceBloc>(context).add(Initiate());
+          },
+          icon: Icon(Icons.refresh),
+        ),
       ],
     );
   }

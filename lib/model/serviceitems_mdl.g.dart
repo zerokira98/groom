@@ -14,14 +14,14 @@ ServiceitemsMdl _$ServiceitemsMdlFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String?,
       price: (json['price'] as num).toInt(),
       img: json['img'] as String?,
-      cutPercentage: (json['cutPercentage'] as num).toDouble(),
+      employeeCut: (json['employeeCut'] as num).toInt(),
     );
 
 Map<String, dynamic> _$ServiceitemsMdlToJson(ServiceitemsMdl instance) =>
     <String, dynamic>{
       'index': instance.index,
       'title': instance.title,
-      'cutPercentage': instance.cutPercentage,
+      'employeeCut': instance.employeeCut,
       'id': instance.id,
       'price': instance.price,
       'pcs': instance.pcs,
