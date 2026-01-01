@@ -7,9 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/cust_repo.dart';
 import 'package:groom/etc/extension.dart' as x;
 import 'package:groom/model/model.dart';
-import 'package:groom/pages/home/widgets/blue_print.dart';
+// import 'package:groom/pages/home/widgets/blue_print.dart';
 import 'package:intl/intl.dart';
-import 'package:open_filex/open_filex.dart';
+// import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -135,9 +135,9 @@ class _TileStrukState extends State<TileStruk> {
                           ],
                         ),
                       ),
-                      PrintWidget(
-                        theData: widget.theData,
-                      ),
+                      // PrintWidget(
+                      //   theData: widget.theData,
+                      // ),
                       const Padding(
                         padding: EdgeInsets.only(top: 8.0, bottom: 4),
                         child: Row(
@@ -160,7 +160,8 @@ class _TileStrukState extends State<TileStruk> {
                                 hintText: 'No. WA',
                                 border: UnderlineInputBorder(
                                     borderRadius: BorderRadius.circular(2),
-                                    borderSide: const BorderSide(color: Colors.red))),
+                                    borderSide:
+                                        const BorderSide(color: Colors.red))),
                             controller: nomorhp,
                             keyboardType: TextInputType.phone,
                             autovalidateMode:
@@ -255,6 +256,9 @@ class _TileStrukState extends State<TileStruk> {
                                 child: const Text('Share PDF')),
                             ElevatedButton(
                                 onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('content')));
+                                  return;
                                   generatePDF(false, widget.theData);
                                 },
                                 child: const Text('Open PDF')),
@@ -313,7 +317,8 @@ class _TileStrukState extends State<TileStruk> {
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
 
       telo.cells[0]
-        ..value = "${cardType[theData.itemCards[i].type]} :  ${theData.itemCards[i].namaBarang}"
+        ..value =
+            "${cardType[theData.itemCards[i].type]} :  ${theData.itemCards[i].namaBarang}"
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
     }
     var lastrow = grid.rows.add();
@@ -416,10 +421,11 @@ class _TileStrukState extends State<TileStruk> {
         if (share) {
           Share.shareXFiles([XFile(thefile.path)]);
         } else {
-          await OpenFilex.open(thefile.path).then((value) {
-            debugPrint(value.message);
-            return null;
-          });
+          // await OpenFilex.open(thefile.path).then((value) {
+          //   debugPrint(value.message);
+          //   return null;
+          // });
+          throw Exception('openfilex deleted from pub');
         }
       } catch (e) {
         debugPrint(e.toString());

@@ -197,10 +197,10 @@ class _HomeState extends State<Home> {
                                             spacing: 4,
                                             runSpacing: 4,
                                             children: [
-                                              for (var a = 0;
-                                                  a < cardType.length;
-                                                  a++)
-                                                ItemCardBox(cardType[a]),
+                                              // for (var a = 0;
+                                              //     a < cardType.length;
+                                              //     a++)
+                                              //   ItemCardBox(cardType[a]),
                                             ],
                                           ),
                                         );

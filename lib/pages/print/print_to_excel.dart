@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:groom/db/karyawan_repo.dart';
 import 'package:groom/model/model.dart';
-import 'package:open_filex/open_filex.dart';
+// import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 import 'package:weekly_date_picker/datetime_apis.dart';
@@ -116,16 +116,17 @@ class PrintMingguan extends StatelessWidget {
         ..setAttribute("download", "data.xlsx")
         ..click();
     } else if (Platform.isAndroid) {
-      Directory docDir = await getApplicationDocumentsDirectory();
-      File theFile = File('${docDir.path}/Backup_${DateTime.now().day}.xlsx');
-      theFile.createSync(recursive: true);
-      theFile.writeAsBytesSync(bytes, mode: FileMode.write);
-      // final params = SaveFileDialogParams(sourceFilePath: theFile.path);
-      // final filePath = await FlutterFileDialog.saveFile(params: params);
-      // if (filePath != null) {
-      var x = await OpenFilex.open(theFile.path);
-      debugPrint(x.message);
-      // }
+      throw Exception('openfilex removed from pub');
+      // Directory docDir = await getApplicationDocumentsDirectory();
+      // File theFile = File('${docDir.path}/Backup_${DateTime.now().day}.xlsx');
+      // theFile.createSync(recursive: true);
+      // theFile.writeAsBytesSync(bytes, mode: FileMode.write);
+      // // final params = SaveFileDialogParams(sourceFilePath: theFile.path);
+      // // final filePath = await FlutterFileDialog.saveFile(params: params);
+      // // if (filePath != null) {
+      // var x = await OpenFilex.open(theFile.path);
+      // debugPrint(x.message);
+      // // }
     }
 
     workbook.dispose();

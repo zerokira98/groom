@@ -37,7 +37,7 @@ class MyListTile extends StatelessWidget {
               icon: const Icon(Icons.arrow_right)),
         ],
       ),
-      title: Text(cardType[data.type]),
+      title: Text(cardType[data.type] + ' (Rp.${data.price.toString()})'),
       subtitle: Text(data.namaBarang),
     );
   }

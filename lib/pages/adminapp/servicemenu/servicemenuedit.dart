@@ -55,7 +55,7 @@ class _ServicemenueditPageState extends State<ServicemenueditPage> {
                                   selected == e
                                       ? BlendMode.color
                                       : BlendMode.dstOver),
-                              child: AbsorbPointer(child: ItemCardBox(e))));
+                              child: AbsorbPointer(child: ItemCardBox(val))));
                     },
                   ).toList())
                     ..add(InkWell(
@@ -191,8 +191,8 @@ class _MenueditDialogState extends State<MenueditDialog> {
               print(valid);
               if (valid) {
                 if (selectedimg != null) {
-                  var filepath =
-                      await FileRepo().uploadFile(selectedimg, namaMenu.text);
+                  // var filepath =
+                  //     await FileRepo().uploadFile(selectedimg, namaMenu.text);
                   var test =
                       await RepositoryProvider.of<ServiceItemsRepository>(
                               context)
@@ -206,11 +206,11 @@ class _MenueditDialogState extends State<MenueditDialog> {
                   //   (a, b) => a.type.compareTo(b.type),
                   // );
                   print(test);
-                  // RepositoryProvider.of<ServiceItemsRepository>(context)
-                  //     .addItem(ServiceitemsMdl(
-                  //         title: namaMenu.text,
-                  //         type: type,
-                  //         price: int.parse(harga.text)));
+                  RepositoryProvider.of<ServiceItemsRepository>(context)
+                      .addItem(ServiceitemsMdl(
+                          title: namaMenu.text,
+                          type: test.last.type + 1,
+                          price: int.parse(harga.text)));
                 }
               }
             },

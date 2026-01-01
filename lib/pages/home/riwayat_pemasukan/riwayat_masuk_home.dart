@@ -9,7 +9,7 @@ import 'package:groom/db/pemasukan_repo.dart';
 import 'package:groom/etc/extension.dart' as x;
 import 'package:groom/etc/lockscreen_keylock.dart';
 import 'package:groom/model/model.dart';
-import 'package:open_filex/open_filex.dart';
+// import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -221,7 +221,8 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
 
       telo.cells[0]
-        ..value = "${cardType[theData.itemCards[i].type]} :  ${theData.itemCards[i].namaBarang}"
+        ..value =
+            "${cardType[theData.itemCards[i].type]} :  ${theData.itemCards[i].namaBarang}"
         ..style.cellPadding = PdfPaddings(left: 2, right: 2, top: 2, bottom: 0);
     }
     grid.rows.add().cells[3]
@@ -309,10 +310,11 @@ class _RiwayatPemasukanState extends State<RiwayatPemasukan> {
         if (share) {
           Share.shareXFiles([XFile(thefile.path)]);
         } else {
-          await OpenFilex.open(thefile.path).then((value) {
-            debugPrint(value.message);
-            return null;
-          });
+          // await OpenFilex.open(thefile.path).then((value) {
+          //   debugPrint(value.message);
+          //   return null;
+          // });
+          throw Exception('openfilex deleted from pub');
         }
         // debugPrint(thefile.absolute);
         // await OpenAppFile.open(thefile.path);
